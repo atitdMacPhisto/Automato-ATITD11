@@ -30,7 +30,7 @@ maxUtilityWindowBorderColorRange = 0xA02829;
 -- The colors that srStripRegion/Screen() looks for to decide it should invert (and
 -- treat as background when stripping)
 minSetWindowInvertColorRange = 0x1E2E31;
-maxSetWindowInvertColorRange = 0x929DA0;
+maxSetWindowInvertColorRange = 0x929D8D;
 srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
 -- The color range that is treated as window background and stripped in srStripRegion()
