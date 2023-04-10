@@ -21,12 +21,17 @@ function findCoords()
     end
   end
 
-  local start, stop = string.find(str, "%-?[0-9]+, ?%-?[0-9]+");
+  local start, stop = string.find(str, "%-?[0-9]+. ?%-?[0-9]+");
   if start ~= nil then
     -- Strip everything except the coords
     str = string.sub(str, start, stop);
 
-    local coords = explode(",", str);
+    --[[
+      Updated to explode on full stop, rather than a comma, due to new HD textures on the clockloc
+      which require much more accurate stripping, so the ability to train all characters individually
+      is no longer possible without stripping away part of the comma. - T11
+    --]]
+    local coords = explode(".", str);
 
     for i=1,#coords do
       x = tonumber(coords[1])
@@ -134,10 +139,16 @@ function getTime(fmt)
   if #t == 0 then
     return nil;
   end
+
   -- Strip spaces - Fixes issue where one's (1) will show as a space before and after it. ie 11 shows as 1 1
   str = string.gsub(t[1][2], " ?1 ?","1");
 
-  local year, season, month, day, hour, minute, ampm = string.match(str, "Year ?(%d+), (%a+) (%a+)-(%d+), ?(%d+):(%d+)(%a+)");
+  --[[
+    Updated regex pattern to use full stop, rather than a comma, due to new HD textures on the clockloc
+    which require much more accurate stripping, so the ability to train all characters individually
+    is no longer possible without stripping away part of the comma. - T11
+  --]]
+  local year, season, month, day, hour, minute, ampm = string.match(str, "Year ?(%d+). (%a+) (%a+)-(%d+). ?(%d+):(%d+)(%a+)");
   if year and season and month and day and hour and minute then
     datetime = "Year " .. year .. ", " .. season .. " " .. month .. "-" .. day .. ", " .. hour .. ":" .. minute .. ampm
     date = season .. " " .. month .. "-" .. day
