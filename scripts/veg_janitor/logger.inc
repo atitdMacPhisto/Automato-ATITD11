@@ -1,5 +1,5 @@
 dofile("veg_janitor/io.inc")
-VEG_JANITOR_LOG_FILE_NAME = 'v2_2_veg_janitor_debug_log.txt'
+VEG_JANITOR_LOG_FILE_NAME = 'T11_veg_janitor_debug_log.txt'
 
 LOG_LEVEL_TO_NAME = {
   [1] = 'NONE',
