@@ -226,12 +226,15 @@ function PlantController:grow_plant()
 end
 
 function clickPlantButton(seed_name)
+  -- Wait for no build image to exist to avoid "Already Building" popup
+  waitForNoImage("veg_janitor/build_button.png")
+
   local build_menu_opened = false
   while not build_menu_opened do
     local plantPos = findImage("plant.png", nil, 7000)
     if plantPos then
       safeClick(plantPos[0], plantPos[1])
-      build_menu_opened = waitForImage("veg_janitor/build_button.png", 1000, "Waiting for build button to appear")
+      build_menu_opened = waitForImage("veg_janitor/build_button.png", 1350, "Waiting for build button to appear")
     else
       playErrorSoundAndExit("Plant button not found")
     end
@@ -329,6 +332,10 @@ function PlantController:openBedWindow()
       lsSleep(100)
       self.dragged_at = lsGetTimer()
       self.window_open = findImageInWindowVec("this_is", self.window_pos)
+
+      -- Make sure we are not already building before trying again
+      waitForNoImage("veg_janitor/build_button.png")
+
       return self.window_open
     else
       self.window_open = findImageInWindowVec("this_is", self.window_pos)

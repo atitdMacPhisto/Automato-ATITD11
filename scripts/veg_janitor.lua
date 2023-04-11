@@ -301,6 +301,9 @@ function debugSearchBoxes(config, plants)
     plants[i].location:move()
     plants[i].location:show('Showing the search box for plant ' .. i)
     safeClick(buildButton[0] + 70, buildButton[1])
+
+    -- Wait for no build image to exist to avoid "Already Building" popup
+    waitForNoImage("veg_janitor/build_button.png")
   end
 end
 
@@ -342,6 +345,10 @@ function preLocatePlants(config, plants, seedScreenSearcher, dead_player_box)
     plants[i]:set_search_box(search_box)
 
     safeClick(buildButton[0] + 70, buildButton[1])
+
+    -- Wait for no build image to exist to avoid "Already Building" popup
+    waitForNoImage("veg_janitor/build_button.png")
+
     veg_log(DEBUG, config.debug_log_level, 'preLocatePlants', 'Done pre-locating plant ' .. i)
   end
 
@@ -359,9 +366,13 @@ function preLocatePlants(config, plants, seedScreenSearcher, dead_player_box)
         srReadScreen()
         local buildButton = clickPlantButton(config.seed_name)
         srReadScreen()
+        lsSleep(200)
         plants[i].location:move()
         lsSleep(200)
         safeClick(buildButton[0], buildButton[1])
+
+        -- Wait for no build image to exist to avoid "Already Building" popup
+        waitForNoImage("veg_janitor/build_button.png")
       end
       veg_log(DEBUG, config.debug_log_level, 'preLocatePlants', 'Snapshotting now that all plants are on the screen so we only detect moving plant pixels.')
       plantSearcher:snapshotScreen('before')
@@ -736,6 +747,10 @@ function gatherVeggies(config)
       pause_after_this_run = false
     else
       sleepWithStatus(config.end_of_run_wait, "Running at " .. total .. " veg per hour. ")
+      
+      -- Make sure "Harvesting" popup is gone before we restart
+      closePopUp()
+      waitForNoImage("OK.png")
     end
     srReadScreen()
     local not_suitables = findAllImages('veg_janitor/not_suitable.png')

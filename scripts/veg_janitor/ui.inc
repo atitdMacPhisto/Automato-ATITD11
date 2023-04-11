@@ -5,7 +5,7 @@ dofile("screen_reader_common.inc")
 current_y = 0
 -- How far off the left hand side to place gui elements.
 X_PADDING = 5
-CONFIG_FILE_VERSION = "v2_2_"
+CONFIG_FILE_VERSION = "T11_"
 DEFAULT_CONFIG_FILENAME_VEG = CONFIG_FILE_VERSION .. "default_veg_janitor_config.txt"
 TYPES = {
   "Cabbages",
@@ -600,7 +600,7 @@ end
 
 dropdown_index = 1
 starting_plant_type = 'Onions'
-starting_seed_name = 'Tears of Sinai'
+starting_seed_name = 'Tears of Axum'
 function plant_creator(config)
   local existing_plant_types = { "Create New" }
   config.plants = config.plants or {}
@@ -997,6 +997,17 @@ function default_deep_config()
             [3] = 15000,
           }
         },
+        ["Prid of Memphis"] = {
+          ["type"] = "Cabbages",
+          ["waters"] = 3,
+          ["stages"] = 4,
+          ["yield"] = 4,
+          ["stage_advance_timings"] = {
+            [1] = 16000,
+            [2] = 15000,
+            [3] = 15000,
+          }
+        },
       },
       ["Carrots"] = {
         ["Green Leaf"] = {
@@ -1046,6 +1057,18 @@ function default_deep_config()
           }
         },
         ["Isis' Bounty"] = {
+          ["type"] = "Cucumbers",
+          ["waters"] = 3,
+          ["stages"] = 4,
+          ["yield"] = 4,
+          ["stage_advance_timings"] = {
+            [1] = 16000,
+            [2] = 13000,
+            [3] = 13000,
+            [4] = 13000,
+          }
+        },
+        ["Prid of Memphis"] = {
           ["type"] = "Cucumbers",
           ["waters"] = 3,
           ["stages"] = 4,
@@ -1107,7 +1130,7 @@ function default_deep_config()
         },
       },
       ['Onions'] = {
-        ["Tears of Sinai"] = {
+        ["Tears of Axum"] = {
           ["type"] = "Onions",
           ["waters"] = 2,
           ["stages"] = 3,
