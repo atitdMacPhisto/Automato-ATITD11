@@ -997,17 +997,6 @@ function default_deep_config()
             [3] = 15000,
           }
         },
-        ["Prid of Memphis"] = {
-          ["type"] = "Cabbages",
-          ["waters"] = 3,
-          ["stages"] = 4,
-          ["yield"] = 4,
-          ["stage_advance_timings"] = {
-            [1] = 16000,
-            [2] = 15000,
-            [3] = 15000,
-          }
-        },
       },
       ["Carrots"] = {
         ["Green Leaf"] = {
@@ -1057,18 +1046,6 @@ function default_deep_config()
           }
         },
         ["Isis' Bounty"] = {
-          ["type"] = "Cucumbers",
-          ["waters"] = 3,
-          ["stages"] = 4,
-          ["yield"] = 4,
-          ["stage_advance_timings"] = {
-            [1] = 16000,
-            [2] = 13000,
-            [3] = 13000,
-            [4] = 13000,
-          }
-        },
-        ["Prid of Memphis"] = {
           ["type"] = "Cucumbers",
           ["waters"] = 3,
           ["stages"] = 4,
@@ -1130,7 +1107,7 @@ function default_deep_config()
         },
       },
       ['Onions'] = {
-        ["Tears of Axum"] = {
+        ["Tears of Sinai"] = {
           ["type"] = "Onions",
           ["waters"] = 2,
           ["stages"] = 3,
