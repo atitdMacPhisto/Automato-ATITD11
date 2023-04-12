@@ -19,7 +19,7 @@ dofile("veg_janitor/logger.inc")
 
 WARNING = [[
 1. In Options -> Interface Options
-    1. You Must SET: UI Size to %125
+    1. You Must SET: UI Size to Normal
     2. You Must ENABLE: "Use the chat area instead of popups for many messages"
     3. You Must ENABLE: "Position Menus to right of mouse"
     4. You Must ENABLE: "Right-Click Pins/Unpins a Menu"
@@ -301,9 +301,6 @@ function debugSearchBoxes(config, plants)
     plants[i].location:move()
     plants[i].location:show('Showing the search box for plant ' .. i)
     safeClick(buildButton[0] + 70, buildButton[1])
-
-    -- Wait for no build image to exist to avoid "Already Building" popup
-    waitForNoImage("veg_janitor/build_button.png")
   end
 end
 
@@ -345,10 +342,6 @@ function preLocatePlants(config, plants, seedScreenSearcher, dead_player_box)
     plants[i]:set_search_box(search_box)
 
     safeClick(buildButton[0] + 70, buildButton[1])
-
-    -- Wait for no build image to exist to avoid "Already Building" popup
-    waitForNoImage("veg_janitor/build_button.png")
-
     veg_log(DEBUG, config.debug_log_level, 'preLocatePlants', 'Done pre-locating plant ' .. i)
   end
 
@@ -366,13 +359,9 @@ function preLocatePlants(config, plants, seedScreenSearcher, dead_player_box)
         srReadScreen()
         local buildButton = clickPlantButton(config.seed_name)
         srReadScreen()
-        lsSleep(200)
         plants[i].location:move()
         lsSleep(200)
         safeClick(buildButton[0], buildButton[1])
-
-        -- Wait for no build image to exist to avoid "Already Building" popup
-        waitForNoImage("veg_janitor/build_button.png")
       end
       veg_log(DEBUG, config.debug_log_level, 'preLocatePlants', 'Snapshotting now that all plants are on the screen so we only detect moving plant pixels.')
       plantSearcher:snapshotScreen('before')
@@ -537,7 +526,7 @@ function findSeedAndPickupIfThere(searcher, num_dead, config)
         srClickMouse(clickLoc.x - 1, clickLoc.y - 1, 0)
         lsSleep(click_delay)
         srClickMouse(clickLoc.x - 1, clickLoc.y - 1, 0)
-        sleepWithStatus(3500, "Waiting for pickup animation...", nil, 0.7, "Please standby");
+        sleepWithStatus(3750, "Waiting for pickup animation...", nil, 0.7, "Please standby");
       else
         veg_log(DEBUG, config.debug_log_level, 'findSeedAndPickupIfThere', 'Failed to find seed closing window!')
         lsSleep(click_delay)
@@ -747,10 +736,6 @@ function gatherVeggies(config)
       pause_after_this_run = false
     else
       sleepWithStatus(config.end_of_run_wait, "Running at " .. total .. " veg per hour. ")
-      
-      -- Make sure "Harvesting" popup is gone before we restart
-      closePopUp()
-      waitForNoImage("OK.png")
     end
     srReadScreen()
     local not_suitables = findAllImages('veg_janitor/not_suitable.png')
