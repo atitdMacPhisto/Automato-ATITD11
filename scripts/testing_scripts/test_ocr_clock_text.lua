@@ -67,6 +67,7 @@ end
 function findStuff()
   local scale = 0.7;
   local y = 70;
+  local z = 0;
   local foo;
   local text = "";
   local result = "";
@@ -129,11 +130,11 @@ function findStuff()
   if findCount ~= 0 then
     lsPrint(10, lsScreenY - 30 - 18*2, 20, scale, scale, 0xFFFFFFff, "Click a string above to move mouse to that location.");
     lsPrint(10, lsScreenY - 30 - 18, 20, scale, scale, 0xFFFFFFff, "Click Point to move mouse to location(s).");
-    if lsButtonText(10, lsScreenY - 30, 20, 100, 0xFFFFFFff, "Point") then
+    if lsButtonText(10, lsScreenY - 30, 20, 100, 0x00ff00ff, "Point") then
       pointToLocation();
     end
   end
-  if lsButtonText(lsScreenX - 110, lsScreenY - 30, 1000, 100, 0xFFFFFFff, "End script") then
+  if lsButtonText(lsScreenX - 110, lsScreenY - 30, 1000, 100, 0xFF0000ff, "End script") then
     error "Clicked End Script button";
   end
 

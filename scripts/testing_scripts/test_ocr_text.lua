@@ -69,7 +69,6 @@ function findStuff()
   srReadScreen();
   local pos = getMousePos();
 
-
   lsPrint(5, y, z, scale, scale, 0xFFFFFFff, "Search Text (case sensitive):");
   y = y + 18;
   foo, text = lsEditBox("text", 10, y, z, 200, 25, scale, scale, 0x000000ff);
@@ -124,14 +123,14 @@ function findStuff()
   if findCount ~= 0 then
     lsPrint(10, lsScreenY - 30 - 18*2, 20, scale, scale, 0xFFFFFFff, "Click a string above to move mouse to that location.");
     lsPrint(10, lsScreenY - 30 - 18, 20, scale, scale, 0xFFFFFFff, "Click Point to move mouse to location(s).");
-    if lsButtonText(10, lsScreenY - 30, 20, 100, 0xFFFFFFff, "Point") then
+    if lsButtonText(10, lsScreenY - 30, 20, 100, 0x00ff00ff, "Point") then
       while lsMouseIsDown() do
         sleepWithStatus(16, "Release Mouse to continue ...", nil, 0.7, "Preparing to Click");
       end
       pointToLocation();
     end
   end
-  if lsButtonText(lsScreenX - 110, lsScreenY - 30, 1000, 100, 0xFFFFFFff, "End script") then
+  if lsButtonText(lsScreenX - 110, lsScreenY - 30, 1000, 100, 0xFF0000ff, "End script") then
     error "Clicked End Script button";
   end
 

@@ -22,17 +22,16 @@ function doit()
     srMakeImage("clock-region", clockRegion.x, clockRegion.y, clockRegion.width, clockRegion.height, true);
     srShowImageDebug("clock-region", 5, 150, 1, zoomLevel);
 
-    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff,
-                    "Exit") then
+    if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFF0000ff, "Exit") then
       error "Clicked End Script button";
     end
 
 
-    if ButtonText(60, lsScreenY - 30, 0, 20, 0xFFFFFFff, "-") then
+    if ButtonText(60, lsScreenY - 30, 0, 20, 0xFF0000ff, "-") then
       zoomLevel = zoomLevel - zoomeLevelStep;
     end
 
-    if ButtonText(84, lsScreenY - 30, 0, 20, 0xFFFFFFff, "+") then
+    if ButtonText(84, lsScreenY - 30, 0, 20, 0x00ff00ff, "+") then
       zoomLevel = zoomLevel + zoomeLevelStep;
     end
 
