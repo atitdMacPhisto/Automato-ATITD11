@@ -573,25 +573,25 @@ function findClockRegion()
 
   if neutral then
     faction = "Neutral";
-    srSetWindowInvertColorRange(0x533E1B, 0xd5b68b);
+    srSetWindowInvertColorRange(0x533E1B, 0xD6B98B);
     clockUpperLeftX = neutral[0];
     clockUpperLeftY = neutral[1];
 
   elseif hyksos then
     faction = "Hyksos";
-    srSetWindowInvertColorRange(0x5A5014, 0xD9CC79);
+    srSetWindowInvertColorRange(0x5A5014, 0xDACD81);
     clockUpperLeftX = hyksos[0];
     clockUpperLeftY = hyksos[1];
 
   elseif kush then
     faction = "Kush";
-    srSetWindowInvertColorRange(0x1A390F, 0x7EA271);
+    srSetWindowInvertColorRange(0x1A390F, 0x83A678);
     clockUpperLeftX = kush[0];
     clockUpperLeftY = kush[1];
 
   elseif meshwesh then
     faction = "Meshwesh";
-    srSetWindowInvertColorRange(0x002E2E, 0x59A1A2);
+    srSetWindowInvertColorRange(0x043B39, 0x7CB1B6);
     clockUpperLeftX = meshwesh[0];
     clockUpperLeftY = meshwesh[1];
 
