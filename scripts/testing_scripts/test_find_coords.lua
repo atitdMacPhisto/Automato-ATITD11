@@ -4,39 +4,41 @@
 dofile("common.inc");
 dofile("settings.inc");
 
+----------------------------------------
+--          Global Variables          --
+----------------------------------------
+askText = "Test OCR on ATITD Clock." ..
+"\n\nReturn Coordinates and Lookup Regions"
+
 walkX = 0;
 walkY = 0;
+globalWalking = nil;
 showTime = nil;
+----------------------------------------
 
 function doit()
 
-askForWindow("Test OCR on ATITD Clock.\n\nReturn Coordinates and Lookup Regions");
+askForWindow(askText);
 
   while 1 do
     checkBreak();
     srReadScreen();
     local startPos = findCoords();
     --faction is a global returned from findCoords() -- common_find.inc
-    local message = "Note: You can run around and see coordinates update ...\n\nFaction Region: " .. faction .. "\n";
+    local message = "Note: You can run around and see coordinates update";
     if startPos then
       local x = startPos[0];
       local y = startPos[1];
       coord2region(x,y);
-      message = message .. "Region: " .. regionName .. "\nCoordinates: " .. startPos[0] .. ", " .. startPos[1];
+      message = message .. "\n\nRegion: " .. regionName .. "\nFaction Region: " .. faction ..
+      "\nCoordinates: " .. startPos[0] .. ", " .. startPos[1];
     else
-      message = message .. "Coordinates NOT Found";
+      message = message .. "\n\nCoordinates NOT Found";
     end
 
-
     if showTime then
-      srReadScreen(); -- on purpose we have another srReadScreen(), after the one above; or else it'll error
-      local fetchTime = getTime(1);
-
-        if fetchTime then
-          message = message .. "\n\nTime: " .. getTime(1)
-        else
-          message = message .. "\n\nTime NOT Found";
-        end
+      findClockInfo();
+      message = message .. "\n\nYear " .. year .. ", " .. Date .. ", " .. Time
     end
 
     sleepWithStatus(250, message, nil, 0.7, "Reading ATITD Clock");
@@ -44,7 +46,20 @@ askForWindow("Test OCR on ATITD Clock.\n\nReturn Coordinates and Lookup Regions"
   end
 end
 
-
+function findClockInfo()
+  srReadScreen();
+  fetchTime = getTime(1);
+  if fetchTime ~= nil then
+    year = string.match(fetchTime, "Year (%d+)")
+    -- I know it's weird to have +0, but don't remove it or will error, shrug
+    theDateTime = string.sub(fetchTime,string.find(fetchTime,",") + 0);
+    stripYear = string.sub(theDateTime,string.find(theDateTime,",") + 2);
+    Time = string.sub(stripYear,string.find(stripYear,",") + 2);
+    stripYear = "," .. stripYear
+    Date = string.sub(stripYear,string.find(stripYear,",") + 1, string.len(stripYear) - string.len(Time) - 2);
+    stripYear = string.sub(theDateTime,string.find(theDateTime,",") + 2);
+  end
+end
 
 --Custom sleepWithStatus to add extra boxes, buttons, etc
 local waitChars = {"-", "\\", "|", "/"};
@@ -62,22 +77,13 @@ function sleepWithStatus(delay_time, message, color, scale, waitMessage)
   if not delay_time then
     error("Incorrect number of arguments for sleepWithStatus()");
   end
-  if not scale then
-    scale = 0.8;
-  end
   local start_time = lsGetTimer();
   while delay_time > (lsGetTimer() - start_time) do
     local frame = math.floor(waitFrame/5) % #waitChars + 1;
-    time_left = delay_time - (lsGetTimer() - start_time);
-    newWaitMessage = waitMessage;
-    if delay_time >= 1000 then
-      newWaitMessage = waitMessage .. time_left .. " ms ";
-    end
+    local y = 240;
+    local z = 0;
 
-  local y = 240;
-  local z = 0;
-  local scale = 0.7;
-  showTime = CheckBox(10, y-28, z, 0xFFFFFFff, " Show Clock Time", showTime, 0.65, 0.65);
+    showTime = CheckBox(10, y-28, z, 0xFFFFFFff, " Show Clock Time", showTime, 0.65, 0.65);
   lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Walk to Coordinates:");
   y = y + 25;
   lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "X:");
@@ -99,7 +105,7 @@ function sleepWithStatus(delay_time, message, color, scale, waitMessage)
   writeSetting("walkY",walkY);
     if not globalWalking then
 
-	  if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Walk") then
+	  if lsButtonText(10, lsScreenY - 30, z, 100, 0x00ff00ff, "Walk") then
 	        while lsMouseIsDown() do
 	          sleepWithStatus(16, "Release Mouse !", nil, 0.7, "Preparing to Walk");
 	        end
@@ -120,7 +126,7 @@ function sleepWithStatus(delay_time, message, color, scale, waitMessage)
     else
 
 	  if not globalWalkingStop then
-	    if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Stop") then
+	    if lsButtonText(10, lsScreenY - 30, z, 100, 0xFF0000ff, "Stop") then
 	      globalWalkingStop = 1;
 	        while lsMouseIsDown() do
 	          sleepWithStatus(16, "Release Mouse !", nil, 0.7, "Preparing Brakes");
