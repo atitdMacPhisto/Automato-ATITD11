@@ -230,7 +230,14 @@ function clickPlantButton(seed_name)
   local plantPos = findImage("plant.png", nil, 7000)
   if plantPos then
     safeClick(plantPos[0], plantPos[1])
-    build_menu_opened = waitForImage("veg_janitor/build_button.png", 1500, "Waiting for build button to appear")
+    while not findImage("veg_janitor/build_button.png") do
+      current_y = 10
+      srReadScreen()
+      checkBreak()
+      build_menu_opened = waitForImage("veg_janitor/build_button.png", 1000, "Waiting for build button to appear")
+      lsDoFrame()
+      lsSleep(tick_delay)
+    end
   else
     playErrorSoundAndExit("Plant button not found")
   end
