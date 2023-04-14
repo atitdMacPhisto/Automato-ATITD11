@@ -149,8 +149,8 @@ maxDanger = makePoint(219, 90); --88%
 uberDanger = makePoint(228, 90); --92%
 progressGreen = makePoint(62, 110); --25%
 
-greenColor = 0x01F901;
-barColor = 0x0101F9;
+greenColor = 0x00FF00;
+barColor = 0x0000FF;
 
 function processOven(oven, vent)
   local newVent = vent;
