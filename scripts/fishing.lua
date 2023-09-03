@@ -1,5 +1,5 @@
 dofile("common.inc");
-dofile("Fishing_Func.inc");
+dofile("fishing_func.inc");
 dofile("settings.inc");
 
 ----------------------------------------

@@ -1,4 +1,4 @@
-dofile("cc_Assist.lua");
+dofile("cc_assist.lua");
 
 askText = "Automatically runs many charcoal hearths or ovens simultaneously.\n\nMake sure this window is in the TOP-RIGHT corner of the screen.\n\nTap Shift (while hovering ATITD window) to continue.";
 
