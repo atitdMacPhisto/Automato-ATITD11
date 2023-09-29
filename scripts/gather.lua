@@ -1874,7 +1874,12 @@ function prepareForWalking()
     mid[0] = xyWindowSize[0] / 2;
     mid[1] = xyWindowSize[1] / 2;
     lsSleep(150);
-    setCameraView(CARTOGRAPHER2CAM);
+    
+    -- Set the camera back to "default", then set the CARTOGRAPHERCAM,
+    -- otherwise just pressing F8 ends up in the wrong view
+    setCameraView(BUILDERCAM)
+    lsSleep(300)
+    setCameraView(CARTOGRAPHERCAM)
 end
 
 function zoomIn()
