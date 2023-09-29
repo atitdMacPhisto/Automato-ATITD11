@@ -474,8 +474,12 @@ function doit()
     rot_flax = false;
     water_needed = false;
   end
+  -- Set the camera back to "default", then set the CARTOGRAPHERCAM,
+  -- otherwise just pressing F8 ends up in the wrong view
+  setCameraView(BUILDERCAM)
+  lsSleep(300)
+  setCameraView(CARTOGRAPHERCAM)
 
-  setCameraView(CARTOGRAPHER2CAM)
   drawWater()
   startTime = lsGetTimer()
 
