@@ -136,19 +136,19 @@ function planeBoards()
         boards = boards + 1;
         srReadScreen();
         else
-        p = srFindImageInRange("boards/upgrade.png", x, y, width, height, 5000);
+        p = srFindImageInRange("boards/installBlade.png", x, y, width, height, 5000);
           if(p) then
           safeClick(p[0]+15,p[1]+8);
           lsSleep(75);
           srReadScreen();
             if bladeName == "Slate Blade" then
-            p = srFindImage("boards/installASlateBlade.png", 5000);
+            p = srFindImage("boards/slateBlade.png", 5000);
             elseif bladeName == "Flint Blade" then
-            p = srFindImage("boards/installAFlintBlade.png", 5000);
+            p = srFindImage("boards/flintBlade.png", 5000);
             elseif bladeName == "Bone Blade" then
-            p = srFindImage("boards/installABoneBlade.png", 5000);
+            p = srFindImage("boards/boneBlade.png", 5000);
             elseif bladeName == "Carpentry Blade" then
-            p = srFindImage("boards/installACarpentryBlade.png", 5000);
+            p = srFindImage("boards/carpentryBlade.png", 5000);
             end
               if(p) then
               safeClick(p[0]+10,p[1]+10);
