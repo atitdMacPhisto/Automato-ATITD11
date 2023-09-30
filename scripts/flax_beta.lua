@@ -40,6 +40,7 @@ grid_deltas =
 };
 seeds_per_pass = 4;
 harvestLeft = 0
+harvestLeft = 0
 finish_up = 0;
 finish_up_message = "";
 
@@ -73,6 +74,9 @@ refresh_time = 75; -- Time to wait for windows to update
 
 max_width_offset = 350;
 numSeedsHarvested = 0;
+
+CLICK_MIN_WEED = 15 * 1000
+CLICK_MIN_SEED = 27 * 1000
 
 -------------------------------------------------------------------------------
 -- initGlobals()
@@ -681,6 +685,8 @@ end
 
 function harvestAll(loop_count)
   local did_harvest = false
+  local totalBeds = 0
+  local isHarvestTime = false
 
   while not did_harvest do
     lsSleep(10);
@@ -695,64 +701,74 @@ function harvestAll(loop_count)
 
     if is_plant then
       harvestLeft = #tops
+      if totalBeds == 0 and #tops > 1 then
+        totalBeds = #tops
+      end
     else
-      harvestLeft = (seeds_per_pass * #tops) - numSeedsHarvested
+      --harvestLeft = seeds_per_iter - numSeedsHarvested;
+      harvestLeft = (seeds_per_pass * #tops) - numSeedsHarvested -- New method in case one or more plants failed and we have less flax beds than expected
     end
 
     sleepWithStatusHarvest(200, "(" .. loop_count .. "/" .. num_loops ..
          ") Harvests Left: " .. harvestLeft .. "\n\nElapsed Time: " .. getElapsedTime(startTime) ..
-         finish_up_message, nil, 0.7, "Monitoring Windows", loop_count);
+         finish_up_message, nil, 0.7, "Monitoring Windows");
 
     if is_plant then
       lsPrintln("Checking Weeds")
       lsPrintln("numTops: " .. #tops)
 
-      local weeds = findAllImages("flax/weedThis.png")
-      for i=1,#weeds do
-        safeClick(weeds[i][0], weeds[i][1]);
-        lsSleep(400);
-        -- Re-click the flax window to make sure the water option is gone
-        safeClick(weeds[i][0], weeds[i][1] - 25);
-        lsSleep(150);
-      end
-
       local waters = findAllImages("flax/water.png")
-      for i=1,#waters do
-        safeClick(waters[i][0], waters[i][1]);
-        lsSleep(400);
-        -- Re-click the flax window to make sure the water option is gone
-        safeClick(waters[i][0], waters[i][1] - 25);
-        lsSleep(150);
+      for i = #waters, 1, -1 do
+        lastClick = lastClickTime(waters[i][0], waters[i][1])
+        if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
+          safeClick(waters[i][0], waters[i][1]);
+          trackClick(waters[i][0], waters[i][1])
+        end
       end
 
-      local harvests = findAllImages("flax/harvest.png");
-      for i=1,#harvests do
-        safeClick(harvests[i][0], harvests[i][1]);
-        lsSleep(refresh_time);
-        -- Right click the window to close it.
-        safeClick(harvests[i][0], harvests[i][1] - 15, 1);
-        lsSleep(150);
+      local weeds = findAllImages("flax/weedThis.png")
+      for i = #weeds, 1, -1 do
+        lastClick = lastClickTime(weeds[i][0], weeds[i][1])
+        if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
+          safeClick(weeds[i][0], weeds[i][1]);
+          trackClick(weeds[i][0], weeds[i][1])
+        end
       end
 
+      local harvests = findAllImages("flax/harvest.png")
+      if isHarvestTime == false and #harvests == totalBeds then
+        isHarvestTime = true
+      end
+      if isHarvestTime == true then
+        for i = #harvests, 1, -1 do
+          lastClick = lastClickTime(harvests[i][0], harvests[i][1])
+          if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
+            safeClick(harvests[i][0], harvests[i][1]);
+            trackClick(harvests[i][0], harvests[i][1])
+          end
+        end
+      end
     else -- if not is_plant
       seedsList = findAllImages("flax/harvest.png")
-      for i=1,#seedsList do
-        safeClick(seedsList[i][0], seedsList[i][1]);
-        lsSleep(350);
-        -- Right click the window to close it.
-        safeClick(seedsList[i][0], seedsList[i][1] - 25);
-        lsSleep(refresh_time);
-        numSeedsHarvested = numSeedsHarvested + 1
-      end
-    end -- if not is_plant
+        for i = #seedsList, 1, -1 do
+          lastClick = lastClickTime(seedsList[i][0], seedsList[i][1])
+          if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_SEED then
+            clickText(seedsList[i])
+            trackClick(seedsList[i][0], seedsList[i][1])
+            numSeedsHarvested = numSeedsHarvested + 1
+          end
+        end
+      end -- if not is_plant
 
-    if harvestLeft <= 0 and not is_plant then
+    --if numSeedsHarvested >= seeds_per_iter and not is_plant  then
+    if harvestLeft <= 0 and not is_plant then -- New method in case one or more plants failed and we have less flax beds than expected
       bedDisappeared = false
       did_harvest = true
       while did_harvest and not bedDisappeared do
         lsSleep(30);
         srReadScreen();
         -- Monitor for Weed This/etc
+        local tops = findAllImages("ThisIs.png")
         for i = 1, #tops do
           checkBreak()
           safeClick(tops[i][0], tops[i][1])
@@ -860,8 +876,29 @@ function checkForMenu()
 end
 
 -------------------------------------------------------------------------------
--- Harvest Status Update
+-- Click Tracking Functions
 -------------------------------------------------------------------------------
+
+clicks = {}
+function trackClick(x, y)
+  local curTime = lsGetTimer()
+  lsPrintln("Tracking click " .. x .. ", " .. y .. " at time " .. curTime)
+  if clicks[x] == nil then
+    clicks[x] = {}
+  end
+  clicks[x][y] = curTime
+end
+
+function lastClickTime(x, y)
+  if clicks[x] ~= nil then
+    if clicks[x][y] ~= nil then
+      lsPrintln("Click " .. x .. ", " .. y .. " found at time " .. clicks[x][y])
+    end
+    return clicks[x][y]
+  end
+  lsPrintln("Click " .. x .. ", " .. y .. " not found. ")
+  return nil
+end
 
 local waitChars = {"-", "\\", "|", "/"};
 local waitFrame = 1;
