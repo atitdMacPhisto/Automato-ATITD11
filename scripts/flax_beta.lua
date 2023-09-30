@@ -39,12 +39,9 @@ grid_deltas =
   { {-1, 0, 1, 0}, {0, 1, 0, -1} }
 };
 seeds_per_pass = 4;
-seeds_per_harvest = 1;
+harvestLeft = 0
 finish_up = 0;
 finish_up_message = "";
-
--- How many seeds are left
-seeds_in_pocket = 26;
 
 -- Don't touch. These are set according to Jimbly's black magic.
 walk_px_x = 355;
@@ -75,8 +72,6 @@ water_location[1] = 0;
 refresh_time = 75; -- Time to wait for windows to update
 
 max_width_offset = 350;
-CLICK_MIN_WEED = 15 * 1000;
-CLICK_MIN_SEED = 27 * 1000;
 numSeedsHarvested = 0;
 
 -------------------------------------------------------------------------------
@@ -126,7 +121,6 @@ local ending = false
 function checkForEnd()
   if ((lsAltHeld() and lsControlHeld()) and not ending) then
     ending = true
-    cleanup()
     error "broke out with Alt+Ctrl"
   end
   if (lsShiftHeld() and lsControlHeld()) then
@@ -236,13 +230,13 @@ function promptFlaxNumbers()
 
     lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Plant to the:");
     lsSetCamera(0,0,lsScreenX*1.4,lsScreenY*1.4);
-  	grid_direction = readSetting("grid_direction",grid_direction);
+    grid_direction = readSetting("grid_direction",grid_direction);
       if setWalkDelay then
-    	  grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
+        grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
       else
         grid_direction = lsDropdown("grid_direction", 145, y+26, 0, 145, grid_direction, grid_directions);
       end
-  	writeSetting("grid_direction",grid_direction);
+    writeSetting("grid_direction",grid_direction);
     lsSetCamera(0,0,lsScreenX,lsScreenY);
     y = y + 26
 
@@ -301,7 +295,8 @@ function promptFlaxNumbers()
         lsSetCamera(0,0,lsScreenX*1.2,lsScreenY*1.2);
         lsPrint(170, y+23, z, scale, scale, 0xFFFFFFff, "Coords:")
         water_location[0] = readSetting("water_locationX", water_location[0])
-        is_done, water_location[0] = lsEditBox("water_locationX", 230, y+23, z, 55, 0, scale, scale, 0x000000ff, water_location[0])
+        is_done, water_location[0] = lsEditBox("water_locationX", 230, y+23, z, 55, 0,
+                                            scale, scale, 0x000000ff, water_location[0])
         water_location[0] = tonumber(water_location[0])
           if not water_location[0] then
             is_done = nil
@@ -376,7 +371,7 @@ function promptFlaxNumbers()
       -- This window MUST be big enough otherwise rip out seeds will hang automato!
       -- As a result, we need to reduce space on the right to accomodate a 5x5 grid on widescreen monitors
       window_w = 370
-      space_to_leave = 50
+      space_to_leave = 150
 
       lsPrintWrapped(
         10,
@@ -433,24 +428,6 @@ function getPlantWindowPos()
   end
   lastPlantPos = plantPos
   return plantPos
-end
-
--------------------------------------------------------------------------------
--- getToggle()
---
--- Returns 0 or 2 alternately. Used to slightly shift position of windows
--- while collecting them.
--------------------------------------------------------------------------------
-
-toggleBit = 0
-
-function getToggle()
-  if toggleBit == 0 then
-    toggleBit = 2
-  else
-    toggleBit = 0
-  end
-  return toggleBit
 end
 
 -------------------------------------------------------------------------------
@@ -513,21 +490,6 @@ function doit()
 end
 
 -------------------------------------------------------------------------------
--- cleanup()
---
--- Tears out any remaining beds and unpins menus.
--------------------------------------------------------------------------------
-
-function cleanup()
-  local tops = findAllText(thisIs)
-  if #tops > 0 then
-    for i = 1, #tops do
-      ripOut(tops[i])
-    end
-  end
-end
-
--------------------------------------------------------------------------------
 -- rotFlax()
 --
 -- Rots flax in water.  Requires you to be standing near water already.
@@ -570,7 +532,6 @@ function plantAndPin(loop_count)
   local dxi = 1
   local dt_max = grid_w
   local dt = grid_w
-  local i;
   local dx = {};
   local dy = {};
     for i=1, 4 do
@@ -592,7 +553,7 @@ function plantAndPin(loop_count)
         nil,
         0.7
       )
-      success = plantHere(xyPlantFlax, y)
+      success = plantHere(xyPlantFlax)
       if not success then
         break
       end
@@ -603,7 +564,7 @@ function plantAndPin(loop_count)
         lsSleep(40)
         x_pos = x_pos + dx[dxi]
         y_pos = y_pos + dy[dxi]
-        local spot = getWaitSpot(xyFlaxMenu[0], xyFlaxMenu[1])
+        spot = getWaitSpot(xyFlaxMenu[0], xyFlaxMenu[1])
         safeClick(xyCenter[0] + walk_px_x * dx[dxi], xyCenter[1] + walk_px_y * dy[dxi], 0)
         spot = getWaitSpot(xyFlaxMenu[0], xyFlaxMenu[1])
         if not waitForChange(spot, 1500) then
@@ -652,7 +613,7 @@ end
 -- Plant a single flax bed, get the window, pin it, then stash it.
 -------------------------------------------------------------------------------
 
-function plantHere(xyPlantFlax, y_pos)
+function plantHere(xyPlantFlax)
   -- Plant
   lsPrintln("planting " .. xyPlantFlax[0] .. "," .. xyPlantFlax[1])
   local bed = clickPlant(xyPlantFlax)
@@ -720,17 +681,13 @@ end
 
 function harvestAll(loop_count)
   local did_harvest = false
-  local harvestLeft = 0
-  local seedIndex = 1
-  local seedWave = 1
-  local lastTops = {}
 
   while not did_harvest do
     lsSleep(10);
     srReadScreen()
 
     -- Monitor for Weed This/etc
-    local tops = findAllImages("ThisIs.png")
+    local tops = findAllImages("flax/flaxBed.png")
     for i = 1, #tops do
       checkBreak()
       safeClick(tops[i][0], tops[i][1])
@@ -739,67 +696,63 @@ function harvestAll(loop_count)
     if is_plant then
       harvestLeft = #tops
     else
-      --harvestLeft = seeds_per_iter - numSeedsHarvested;
-      harvestLeft = (seeds_per_pass * #tops) - numSeedsHarvested -- New method in case one or more plants failed and we have less flax beds than expected
+      harvestLeft = (seeds_per_pass * #tops) - numSeedsHarvested
     end
 
     sleepWithStatusHarvest(200, "(" .. loop_count .. "/" .. num_loops ..
          ") Harvests Left: " .. harvestLeft .. "\n\nElapsed Time: " .. getElapsedTime(startTime) ..
-         finish_up_message, nil, 0.7, "Monitoring Windows");
+         finish_up_message, nil, 0.7, "Monitoring Windows", loop_count);
 
     if is_plant then
       lsPrintln("Checking Weeds")
       lsPrintln("numTops: " .. #tops)
 
       local weeds = findAllImages("flax/weedThis.png")
-      for i = #weeds, 1, -1 do
-        lastClick = lastClickTime(weeds[i][0], weeds[i][1])
-        if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
-          clickText(weeds[i])
-          trackClick(weeds[i][0], weeds[i][1])
-        end
+      for i=1,#weeds do
+        safeClick(weeds[i][0], weeds[i][1]);
+        lsSleep(400);
+        -- Re-click the flax window to make sure the water option is gone
+        safeClick(weeds[i][0], weeds[i][1] - 25);
+        lsSleep(150);
       end
 
-     local waters = findAllImages("flax/water.png")
-      for i = #waters, 1, -1 do
-        lastClick = lastClickTime(waters[i][0], waters[i][1])
-        if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
-          clickText(waters[i])
-          trackClick(waters[i][0], waters[i][1])
-        end
+      local waters = findAllImages("flax/water.png")
+      for i=1,#waters do
+        safeClick(waters[i][0], waters[i][1]);
+        lsSleep(400);
+        -- Re-click the flax window to make sure the water option is gone
+        safeClick(waters[i][0], waters[i][1] - 25);
+        lsSleep(150);
       end
 
-      local harvests = findAllImages("flax/harvest.png")
-      for i = #harvests, 1, -1 do
-        lastClick = lastClickTime(harvests[i][0], harvests[i][1])
-        if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
-          clickText(harvests[i])
-          trackClick(harvests[i][0], harvests[i][1])
-        end
+      local harvests = findAllImages("flax/harvest.png");
+      for i=1,#harvests do
+        safeClick(harvests[i][0], harvests[i][1]);
+        lsSleep(refresh_time);
+        -- Right click the window to close it.
+        safeClick(harvests[i][0], harvests[i][1] - 15, 1);
+        lsSleep(150);
       end
 
     else -- if not is_plant
-        seedsList = findAllImages("flax/harvest.png")
-        for i = #seedsList, 1, -1 do
-          lastClick = lastClickTime(seedsList[i][0], seedsList[i][1])
-          if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_SEED then
-            clickText(seedsList[i])
-            trackClick(seedsList[i][0], seedsList[i][1])
-            numSeedsHarvested = numSeedsHarvested + 1
-          end
-          firstSeedHarvest = true
-        end
-      end -- if not is_plant
+      seedsList = findAllImages("flax/harvest.png")
+      for i=1,#seedsList do
+        safeClick(seedsList[i][0], seedsList[i][1]);
+        lsSleep(350);
+        -- Right click the window to close it.
+        safeClick(seedsList[i][0], seedsList[i][1] - 25);
+        lsSleep(refresh_time);
+        numSeedsHarvested = numSeedsHarvested + 1
+      end
+    end -- if not is_plant
 
-    --if numSeedsHarvested >= seeds_per_iter and not is_plant  then
-    if harvestLeft <= 0 and not is_plant then -- New method in case one or more plants failed and we have less flax beds than expected
+    if harvestLeft <= 0 and not is_plant then
       bedDisappeared = false
       did_harvest = true
       while did_harvest and not bedDisappeared do
         lsSleep(30);
         srReadScreen();
         -- Monitor for Weed This/etc
-        local tops = findAllImages("ThisIs.png")
         for i = 1, #tops do
           checkBreak()
           safeClick(tops[i][0], tops[i][1])
@@ -907,34 +860,13 @@ function checkForMenu()
 end
 
 -------------------------------------------------------------------------------
--- Click Tracking Functions
+-- Harvest Status Update
 -------------------------------------------------------------------------------
-
-clicks = {}
-function trackClick(x, y)
-  local curTime = lsGetTimer()
-  lsPrintln("Tracking click " .. x .. ", " .. y .. " at time " .. curTime)
-  if clicks[x] == nil then
-    clicks[x] = {}
-  end
-  clicks[x][y] = curTime
-end
-
-function lastClickTime(x, y)
-  if clicks[x] ~= nil then
-    if clicks[x][y] ~= nil then
-      lsPrintln("Click " .. x .. ", " .. y .. " found at time " .. clicks[x][y])
-    end
-    return clicks[x][y]
-  end
-  lsPrintln("Click " .. x .. ", " .. y .. " not found. ")
-  return nil
-end
 
 local waitChars = {"-", "\\", "|", "/"};
 local waitFrame = 1;
 
-function sleepWithStatusHarvest(delay_time, message, color, scale, waitMessage)
+function sleepWithStatusHarvest(delay_time, message, color, scale, waitMessage, loop_count)
   if not waitMessage then
     waitMessage = "Waiting ";
   else
@@ -962,13 +894,13 @@ function sleepWithStatusHarvest(delay_time, message, color, scale, waitMessage)
 
 	if finish_up == 0 and tonumber(loop_count) ~= tonumber(num_loops) then
 		if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xFFFFFFff, "Finish up") then
-	  	  finish_up = 1;
-	  	  finish_up_message = "\n\nFinishing up ..."
+      finish_up = 1;
+      finish_up_message = "\n\nFinishing up ..."
 		end
 	else
 		if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xff6251ff, "Cancel Finish Up") then
-	  	  finish_up = 0;
-	  	  finish_up_message = ""
+      finish_up = 0;
+      finish_up_message = ""
 		end
 	end
 
