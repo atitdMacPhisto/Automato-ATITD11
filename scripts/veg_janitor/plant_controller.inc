@@ -264,7 +264,6 @@ function PlantController:harvest()
     return false
   end
 
-  srReadScreen();
   local harvest_vec = findImageInWindowVec("harvest", self.window_pos)
   if not harvest_vec then
     return false
@@ -272,6 +271,7 @@ function PlantController:harvest()
   if harvest_vec then
     click(harvest_vec)
     lsSleep(click_delay / 2)
+    srReadScreen();
     self.harvested = true
     self.bad_calibration = false
     self.harvest_time = lsGetTimer()

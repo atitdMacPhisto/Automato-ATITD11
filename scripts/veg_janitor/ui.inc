@@ -1083,22 +1083,22 @@ function default_deep_config()
         },
       },
       ['Leeks'] = {
-        ["Hapi's Harvest"] = {
+        ["Hapi's Grain"] = {
           ["type"] = "Leeks",
           ["waters"] = 1,
           ["stages"] = 3,
-          ["yield"] = 1,
+          ["yield"] = 4,
           ["stage_advance_timings"] = {
             [1] = 15000,
             [2] = 13500,
             [3] = 13500,
           }
         },
-        ["Horus' Grain"] = {
+        ["Horus' Harvest"] = {
           ["type"] = "Leeks",
           ["waters"] = 3,
           ["stages"] = 3,
-          ["yield"] = 2,
+          ["yield"] = 6,
           ["stage_advance_timings"] = {
             [1] = 15000,
             [2] = 13500,
@@ -1107,22 +1107,22 @@ function default_deep_config()
         },
       },
       ['Onions'] = {
-        ["Tears of Sinai"] = {
+        ["Tears of Axum"] = {
           ["type"] = "Onions",
           ["waters"] = 2,
           ["stages"] = 3,
-          ["yield"] = 2,
+          ["yield"] = 6,
           ["stage_advance_timings"] = {
             [1] = 15768.55,
             [2] = 15065.37,
             [3] = 15749.1,
           }
         },
-        ["Amun's Bounty"] = {
+        ["Bastet's Bounty"] = {
           ["type"] = "Onions",
           ["waters"] = 1,
           ["stages"] = 3,
-          ["yield"] = 1,
+          ["yield"] = 4,
           ["stage_advance_timings"] = {
             [1] = 11872.1,
             [2] = 11372.2,
