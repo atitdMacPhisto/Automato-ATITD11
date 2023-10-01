@@ -22,13 +22,13 @@ function doit()
 	askForWindow(askText);
 	promptParameters();
 	if pinnedMode then
-		windowManager("Pottery Wheel Setup", wmText, false, true, window_w, window_h, nil, 20, 25);
+		windowManager("Pottery Wheel Setup", wmText, false, true, window_w, window_h, nil, 20, 55);
 		sleepWithStatus(500, "Starting... Don\'t move mouse!");
 		unpinOnExit(start);
 	elseif hotkeyMode then
-    getPoints();
+		getPoints();
 		clickSequence();
-  end
+	end
 end
 
 function start()
@@ -36,13 +36,13 @@ function start()
 		-- refresh windows
 		refreshWindows();
 		lsSleep(500);
-			if jug then
-				clickAllText("Jug");
-			elseif mortar then
-				clickAllText("Mortar");
-			elseif cookpot then
-				clickAllText("Cookpot");
-			end
+		if jug then
+			clickAllText("Jug");
+		elseif mortar then
+			clickAllText("Mortar");
+		elseif cookpot then
+			clickAllText("Cookpot");
+		end
 		lsSleep(500);
 		closePopUp();  --If you don't have enough clay in your inventory, then a popup will occur.
 		checkMaking();
@@ -259,21 +259,21 @@ function checkMaking()
 		refreshWindows();
 		srReadScreen();
 		wheel = findAllText("Wheel");
-		making = findAllText("Mould a " .. product);
-			if #making == #wheel then
-				break; --We break this while statement because Making is not detect, hence we're done with this round
-			end
-		sleepWithStatus(999, "Waiting for " .. product .. "s to finish", nil, 0.7, "Monitoring Pinned Window(s)");
+		making = findAllText(product);
+		if #making == #wheel then
+			break; --We break this while statement because Making is not detect, hence we're done with this round
+		end
+		sleepWithStatus(999, "Waiting for " .. product .. "s to finish\n\n" .. #making .. " " .. #wheel, nil, 0.7, "Monitoring Pinned Window(s)");
 	end
 end
 
 function refreshWindows()
-  srReadScreen();
-  this = findAllText("This");
-	  for i = 1, #this do
-	    clickText(this[i]);
-	  end
-  lsSleep(100);
+	srReadScreen();
+	this = findAllText("This");
+	for i = 1, #this do
+		clickText(this[i]);
+	end
+	lsSleep(100);
 end
 
 function getPoints()
