@@ -38,7 +38,7 @@ grid_deltas =
   { {1, 0, -1, 0}, {0, 1, 0, -1} },
   { {-1, 0, 1, 0}, {0, 1, 0, -1} }
 };
-seeds_per_pass = 4;
+seeds_per_pass = 5;
 harvestLeft = 0
 harvestLeft = 0
 finish_up = 0;
@@ -203,17 +203,35 @@ function promptFlaxNumbers()
     y = y + 26
 
     grid_w = readSetting("grid_w", grid_w)
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid size:")
-    is_done, grid_w = lsEditBox("grid", 105, y, z, 45, 0, scale, scale, 0x000000ff, grid_w)
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid width:")
+    is_done, grid_w = lsEditBox("grid_w", 105, y, z, 45, 0, scale, scale, 0x000000ff, grid_w)
     if not tonumber(grid_w) then
       is_done = nil
       lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER")
-      grid_w = 1
-      grid_h = 1
+      grid_w = 2
     end
     grid_w = tonumber(grid_w)
-    grid_h = grid_w
+    if grid_w < 2 then
+      is_done = nil
+      lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE > 1")
+    end
     writeSetting("grid_w", grid_w)
+    y = y + 26
+
+    grid_h = readSetting("grid_h", grid_h)
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid height:")
+    is_done, grid_h = lsEditBox("grid_h", 105, y, z, 45, 0, scale, scale, 0x000000ff, grid_h)
+    if not tonumber(grid_h) then
+      is_done = nil
+      lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER")
+      grid_h = 2
+    end
+    grid_h = tonumber(grid_h)
+    if grid_h < 2 then
+      is_done = nil
+      lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE > 1")
+    end
+    writeSetting("grid_h", grid_h)
     y = y + 26
 
     if setWalkDelay then
@@ -236,9 +254,9 @@ function promptFlaxNumbers()
     lsSetCamera(0,0,lsScreenX*1.4,lsScreenY*1.4);
     grid_direction = readSetting("grid_direction",grid_direction);
       if setWalkDelay then
-        grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
+        grid_direction = lsDropdown("grid_direction", 145, y+46, 0, 145, grid_direction, grid_directions);
       else
-        grid_direction = lsDropdown("grid_direction", 145, y+26, 0, 145, grid_direction, grid_directions);
+        grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
       end
     writeSetting("grid_direction",grid_direction);
     lsSetCamera(0,0,lsScreenX,lsScreenY);
@@ -358,12 +376,12 @@ function promptFlaxNumbers()
         "This will plant and harvest a " ..
           grid_w ..
             "x" ..
-              grid_w ..
+              grid_h ..
                 " grid of flax beds " ..
                       num_loops ..
                         " times, requiring " ..
-                          math.floor(grid_w * grid_w * num_loops) ..
-                            " seeds, doing " .. math.floor(grid_w * grid_w * num_loops) .. " flax harvests."
+                          math.floor(grid_w * grid_h * num_loops) ..
+                            " seeds, doing " .. math.floor(grid_w * grid_h * num_loops) .. " flax harvests."
       )
     else
       lsPrintWrapped(10, y+10, z + 10, lsScreenX - 20, 0.7, 0.7, 0x00ff00ff, 'Check "Grow Flax" for FLAX!')
@@ -388,12 +406,12 @@ function promptFlaxNumbers()
         "This will plant a " ..
           grid_w ..
             "x" ..
-              grid_w ..
-                " grid of flex beds and harvest it " ..
+              grid_h ..
+                " grid of flax beds and harvest it " ..
                       seeds_per_pass ..
                         " times, requiring " ..
-                          (grid_w * grid_w) .. " seeds, and repeat this " .. num_loops .. " times, yielding " ..
-                          (grid_w * grid_w * seeds_per_pass * num_loops) .. " seeds."
+                          (grid_w * grid_h * num_loops) .. " seeds, and repeat this " .. num_loops .. " times, yielding " ..
+                          (grid_w * grid_h * seeds_per_pass * num_loops) .. " seed harvests."
       )
     end
 
@@ -533,16 +551,18 @@ function plantAndPin(loop_count)
   local xyPlantFlax = getPlantWindowPos()
 
   -- for spiral
-  local dxi = 1
-  local dt_max = grid_w
-  local dt = grid_w
+  local dxi = 1                      -- direction: 1=right, 2=down, 3=left, 4=up
+  local dt_max_w = grid_w            -- total horizontal distance to be traveled on this stretch of remaining spiral
+  local dt_max_h = grid_h            -- total vertical distance to be traveled on this stretch of remaiing spiral
+  local dt = grid_w - 1              -- distance remaining to be traveled after first planting in current direction, we start to the right so we take grid_w as base
+  local i;
   local dx = {};
   local dy = {};
     for i=1, 4 do
       dx[i] = grid_deltas[grid_direction][1][i];
       dy[i] = grid_deltas[grid_direction][2][i];
     end
-  local num_at_this_length = 3
+  -- local num_at_this_length = 3   -- old var
   local x_pos = 0
   local y_pos = 0
   local success = true
@@ -557,7 +577,7 @@ function plantAndPin(loop_count)
         nil,
         0.7
       )
-      success = plantHere(xyPlantFlax)
+      success = plantHere(xyPlantFlax, y)
       if not success then
         break
       end
@@ -568,7 +588,6 @@ function plantAndPin(loop_count)
         lsSleep(40)
         x_pos = x_pos + dx[dxi]
         y_pos = y_pos + dy[dxi]
-        spot = getWaitSpot(xyFlaxMenu[0], xyFlaxMenu[1])
         safeClick(xyCenter[0] + walk_px_x * dx[dxi], xyCenter[1] + walk_px_y * dy[dxi], 0)
         spot = getWaitSpot(xyFlaxMenu[0], xyFlaxMenu[1])
         if not waitForChange(spot, 1500) then
@@ -576,20 +595,47 @@ function plantAndPin(loop_count)
           break
         end
         lsSleep(walkSpeed)
-        waitForStasis(spot, 1500)
+        waitForStasis(spot, 1000)
+        -- dt = dt - 1
+        -- if dt == 1 then
+        --  dxi = dxi + 1
+        --  num_at_this_length = num_at_this_length - 1
+        --  if num_at_this_length == 0 then
+        --     dt_max = dt_max - 1
+        --     num_at_this_length = 2
+        --   end
+        --   if dxi == 5 then
+        --     dxi = 1
+        --   end
+        --   dt = dt_max
+        -- end
+
         dt = dt - 1
-        if dt == 1 then
-          dxi = dxi + 1
-          num_at_this_length = num_at_this_length - 1
-          if num_at_this_length == 0 then
-            dt_max = dt_max - 1
-            num_at_this_length = 2
+        if dt == 0 then               -- end of stretch?
+          dxi = dxi + 1               -- change direction
+          -- going down?
+          if dxi == 2 then             -- down?
+            dt_max_h = dt_max_h - 1
+            dt = dt_max_h
           end
-          if dxi == 5 then
+          -- going left?
+          if dxi == 3 then             -- left?
+            dt_max_w = dt_max_w - 1
+            dt = dt_max_w
+          end
+          -- going up?
+          if dxi == 4 then             -- up?
+            dt_max_h = dt_max_h - 1
+            dt = dt_max_h
+          end
+         -- going right?
+          if dxi == 5 then             -- right?
             dxi = 1
+            dt_max_w = dt_max_w - 1
+            dt = dt_max_w
           end
-          dt = dt_max
         end
+
       else
         lsPrintln("skipping walking, on last leg")
       end
@@ -619,14 +665,14 @@ end
 
 function plantHere(xyPlantFlax)
   -- Plant
-  lsPrintln("planting " .. xyPlantFlax[0] .. "," .. xyPlantFlax[1])
+  -- lsPrintln("planting " .. xyPlantFlax[0] .. "," .. xyPlantFlax[1])
   local bed = clickPlant(xyPlantFlax)
   if not bed then
     return false
   end
 
   -- Bring up menu
-  lsPrintln("menu " .. bed[0] .. "," .. bed[1])
+  -- lsPrintln("menu " .. bed[0] .. "," .. bed[1])
   if not openAndPin(bed[0], bed[1], 3500) then
     error_status = "No window came up after planting."
     return false
@@ -741,11 +787,10 @@ function harvestAll(loop_count)
       end
       if isHarvestTime == true then
         for i = #harvests, 1, -1 do
-          lastClick = lastClickTime(harvests[i][0], harvests[i][1])
-          if lastClick == nil or lsGetTimer() - lastClick >= CLICK_MIN_WEED then
-            safeClick(harvests[i][0], harvests[i][1]);
-            trackClick(harvests[i][0], harvests[i][1])
-          end
+          safeClick(harvests[i][0], harvests[i][1]);
+          lsSleep(refresh_time);
+          safeClick(harvests[i][0], harvests[i][1] - 15, 1);
+          lsSleep(1500);
         end
       end
     else -- if not is_plant
@@ -882,7 +927,7 @@ end
 clicks = {}
 function trackClick(x, y)
   local curTime = lsGetTimer()
-  lsPrintln("Tracking click " .. x .. ", " .. y .. " at time " .. curTime)
+  -- lsPrintln("Tracking click " .. x .. ", " .. y .. " at time " .. curTime)
   if clicks[x] == nil then
     clicks[x] = {}
   end
