@@ -998,7 +998,7 @@ function followRoute(route)
         if (pos) then
             lastPos = pos;
         end
-        setStatus("Moving to " .. WaypointTypes[r[curr][3]] .. "\n(" .. r[curr][1] .. ", " .. r[curr][2] .. ")");
+        setStatus("Moving to " .. WaypointTypes[r[curr][3]] .. "\n(" .. r[curr][1] .. ". " .. r[curr][2] .. ")");
         if(not walkTo(r[curr][1],r[curr][2])) then
             return;
         end
@@ -1014,14 +1014,9 @@ function followRoute(route)
         elseif(r[curr][3] == Warehouse) then
             stashAll();
         elseif(plantPapy and r[curr][3] == Papyrus) then
-          plant();
+            plant();
         elseif(r[curr][3] == Water) then
-            while(not fillJugs()) do
-                walkTo(r[curr][1]+math.random(-1,1),r[curr][2]+math.random(-1,1),false,false);
-                if(not walkTo(r[curr][1],r[curr][2])) then
-                    return false;
-                end
-            end
+            fillJugs()
         elseif(wood and r[curr][3] ~= Waypoint) then
             if(ensureClickWaypoint(r,curr)) then
                 lsSleep(250);
@@ -1370,7 +1365,7 @@ function walkTo(x, y, showStatus, promptIfNotMoving)
                 lastPos = pos;
             end
             if(showStatus) then
-                setStatus("Moving from (" .. pos[0] .. ", " .. pos[1] .. ")\nTo (" .. xn .. ", " .. yn .. ")");
+                setStatus("Moving from (" .. pos[0] .. ". " .. pos[1] .. ")\nTo (" .. xn .. ". " .. yn .. ")");
             end
             errorCount = 0;
             if((pos[0] == xn) and (pos[1] == yn)) then
@@ -1880,23 +1875,6 @@ function prepareForWalking()
     setCameraView(BUILDERCAM)
     lsSleep(300)
     setCameraView(CARTOGRAPHERCAM)
-end
-
-function zoomIn()
-    srReadScreen();
-    local pos = findText("Year");
-    if(not pos) then
-        pos = findText("2, ");
-    end
-    if(not pos) then
-        pos = findText("3, ");
-    end
-    if(not pos) then
-        error("Unable to find the clock.");
-    end
-    srClickMouse(pos[0]+10, pos[1]+10);
-    srSetMousePos(100,-20);
-    sleepWithStatus(1000,"Zooming in");
 end
 
 local statusMessage = "";
