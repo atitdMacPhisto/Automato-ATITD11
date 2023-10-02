@@ -203,7 +203,7 @@ function promptFlaxNumbers()
     y = y + 26
 
     grid_w = readSetting("grid_w", grid_w)
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid width:")
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid size:")
     is_done, grid_w = lsEditBox("grid_w", 105, y, z, 45, 0, scale, scale, 0x000000ff, grid_w)
     if not tonumber(grid_w) then
       is_done = nil
@@ -216,11 +216,10 @@ function promptFlaxNumbers()
       lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE > 1")
     end
     writeSetting("grid_w", grid_w)
-    y = y + 26
 
     grid_h = readSetting("grid_h", grid_h)
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Grid height:")
-    is_done, grid_h = lsEditBox("grid_h", 105, y, z, 45, 0, scale, scale, 0x000000ff, grid_h)
+    lsPrint(153, y+3, z, scale, scale, 0xFFFFFFff, "x")
+    is_done, grid_h = lsEditBox("grid_h", 165, y, z, 45, 0, scale, scale, 0x000000ff, grid_h)
     if not tonumber(grid_h) then
       is_done = nil
       lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER")
@@ -233,6 +232,21 @@ function promptFlaxNumbers()
     end
     writeSetting("grid_h", grid_h)
     y = y + 26
+
+    if not is_plant then
+      lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Seeds per:")
+      seeds_per_pass = readSetting("seeds_per_pass", seeds_per_pass)
+      is_done, seeds_per_pass = lsEditBox("seedsper", 105, y, z, 45, 0, scale, scale, 0x000000ff, seeds_per_pass)
+      seeds_per_pass = tonumber(seeds_per_pass)
+      if not seeds_per_pass then
+        is_done = nil
+        lsPrint(10, y + 18, z + 10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER")
+        seeds_per_pass = 4
+      end
+      seeds_per_pass = tonumber(seeds_per_pass)
+      writeSetting("seeds_per_pass", seeds_per_pass)
+      y = y + 26
+    end
 
     if setWalkDelay then
       lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Walk delay:")
@@ -253,11 +267,17 @@ function promptFlaxNumbers()
     lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Plant to the:");
     lsSetCamera(0,0,lsScreenX*1.4,lsScreenY*1.4);
     grid_direction = readSetting("grid_direction",grid_direction);
-      if setWalkDelay then
-        grid_direction = lsDropdown("grid_direction", 145, y+46, 0, 145, grid_direction, grid_directions);
-      else
-        grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
-      end
+
+    if setWalkDelay and not is_plant then
+      grid_direction = lsDropdown("grid_direction", 145, y+46, 0, 145, grid_direction, grid_directions);
+    elseif setWalkDelay then
+      grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
+    elseif not is_plant then
+      grid_direction = lsDropdown("grid_direction", 145, y+36, 0, 145, grid_direction, grid_directions);
+    else
+      grid_direction = lsDropdown("grid_direction", 145, y+26, 0, 145, grid_direction, grid_directions);
+    end
+
     writeSetting("grid_direction",grid_direction);
     lsSetCamera(0,0,lsScreenX,lsScreenY);
     y = y + 26
@@ -315,10 +335,18 @@ function promptFlaxNumbers()
 
       if rot_flax or water_needed then
         lsSetCamera(0,0,lsScreenX*1.2,lsScreenY*1.2);
-        lsPrint(170, y+23, z, scale, scale, 0xFFFFFFff, "Coords:")
         water_location[0] = readSetting("water_locationX", water_location[0])
-        is_done, water_location[0] = lsEditBox("water_locationX", 230, y+23, z, 55, 0,
+
+        if setWalkDelay then
+          lsPrint(170, y+27, z, scale, scale, 0xFFFFFFff, "Coords:")
+          is_done, water_location[0] = lsEditBox("water_locationX", 230, y+27, z, 55, 0,
                                             scale, scale, 0x000000ff, water_location[0])
+        else
+          lsPrint(170, y+23, z, scale, scale, 0xFFFFFFff, "Coords:")
+          is_done, water_location[0] = lsEditBox("water_locationX", 230, y+23, z, 55, 0,
+                                            scale, scale, 0x000000ff, water_location[0])
+        end
+
         water_location[0] = tonumber(water_location[0])
           if not water_location[0] then
             is_done = nil
@@ -328,8 +356,16 @@ function promptFlaxNumbers()
         writeSetting("water_locationX", water_location[0])
 
         water_location[1] = readSetting("water_locationY", water_location[1])
-        is_done, water_location[1] =
+
+        if setWalkDelay then
+          lsPrint(170, y+27, z, scale, scale, 0xFFFFFFff, "Coords:")
+          is_done, water_location[1] =
+          lsEditBox("water_locationY", 290, y+27, z, 55, 0, scale, scale, 0x000000ff, water_location[1])
+        else
+          is_done, water_location[1] =
           lsEditBox("water_locationY", 290, y+23, z, 55, 0, scale, scale, 0x000000ff, water_location[1])
+        end
+
         water_location[1] = tonumber(water_location[1])
           if not water_location[1] then
             is_done = nil
