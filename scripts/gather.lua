@@ -1466,6 +1466,7 @@ function walkTo(x, y, showStatus, promptIfNotMoving)
         end
         pos = srFindImage("DoYouWantToDropSomething.png",5000);
         if(pos) then
+            srKeyUp(VK_ALL);
             fatalError("You are overloaded.");
         end
         pos = srFindImage("cancelThin.png",5000);
@@ -1869,7 +1870,7 @@ function prepareForWalking()
     mid[0] = xyWindowSize[0] / 2;
     mid[1] = xyWindowSize[1] / 2;
     lsSleep(150);
-    
+
     -- Set the camera back to "default", then set the CARTOGRAPHERCAM,
     -- otherwise just pressing F8 ends up in the wrong view
     setCameraView(BUILDERCAM)
