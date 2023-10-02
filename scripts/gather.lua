@@ -1545,10 +1545,10 @@ function checkSlate()
     if not slate then
         return false;
     end
-    local pos = srFindImage("slate.png", 7000);
+    local pos = srFindImage("slate.png",5000);
     if pos then
-        safeClick(pos[0] + 3, pos[1] + 3);
         stopMoving();
+        safeClick(pos[0] + 3, pos[1] + 3);
         sleepWithBreak(1500);
         return true;
     end
@@ -1559,7 +1559,7 @@ function checkGrass()
     if not grass then
         return false;
     end
-    local pos = srFindImage("grass.png",7000);
+    local pos = srFindImage("grass.png",5000);
     if(pos) then
         safeClick(pos[0] + 3, pos[1] + 3);
         sleepWithBreak(1250);
@@ -1572,7 +1572,7 @@ function checkClay()
     if not clay then
         return false;
     end
-    local pos = srFindImage("clay.png",7000);
+    local pos = srFindImage("clay.png",5000);
     if(pos) then
         safeClick(pos[0] + 3, pos[1] + 3);
         sleepWithBreak(1250);
