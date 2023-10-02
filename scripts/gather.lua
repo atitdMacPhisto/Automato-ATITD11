@@ -375,11 +375,13 @@ This macro will automatically configure ATITD Interface, Video, and One Click Op
 
 Hover ATITD window and press Shift to start.
   ]]);
-
+  
   math.randomseed(lsGetTimer());
   gather_randomNumber = math.random();
 
   loadRoutes();
+  setCleanupCallback(stopMoving);
+  setPauseCallback(stopMoving);
   queryRoute();
 end
 
@@ -1893,6 +1895,7 @@ function updateStatus()
     lsPrintWrapped(10, 80, 0, lsScreenX - 20, 0.8, 0.8, color, statusMessage);
     lsPrintWrapped(10, lsScreenY-100, 0, lsScreenX - 20, 0.8, 0.8, 0xffd0d0ff,error_status);
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100,0xFFFFFFff, "End script") then
+        stopMoving();        
         error(quit_message);
     end
 

@@ -22,6 +22,18 @@ function setCleanupCallback(callback)
 end
 
 
+pauseCallback = nil;
+
+-------------------------------------------------------------------------------
+-- setPauseCallback()
+--
+-- Specify the callback function to call when a macro pauses
+-------------------------------------------------------------------------------
+
+function setPauseCallback(callback)
+  pauseCallback = callback;
+end
+
 -------------------------------------------------------------------------------
 -- checkBreak()
 --
@@ -41,6 +53,13 @@ function checkBreak()
     error(quit_message);
   end
   if allow_pause and lsAltHeld() and lsShiftHeld() then
+    if(pauseCallback) then
+      lsPrintln("calling pause call back");
+      pcall(pauseCallback);
+      lsPrintln("pause call back returned");
+    else
+      lsPrintln("pauseCallback == " .. type(pauseCallback));
+    end    
     -- Pause
     while lsAltHeld() or lsShiftHeld() do
       statusScreen("Please release Alt+Shift", 0x808080ff, false);
