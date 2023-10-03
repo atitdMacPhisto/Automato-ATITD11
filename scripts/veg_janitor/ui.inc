@@ -1016,9 +1016,9 @@ function default_deep_config()
           ["stages"] = 3,
           ["yield"] = 1,
           ["stage_advance_timings"] = {
-            [1] = 16500,
-            [2] = 16000,
-            [3] = 16000,
+            [1] = 12000,
+            [2] = 12000,
+            [3] = 12000,
           }
         },
       },
@@ -1059,18 +1059,18 @@ function default_deep_config()
         },
       },
       ['Garlic'] = {
-        ["Apep's Crop"] = {
+        ["Apep's Reaping"] = {
           ["type"] = "Garlic",
           ["waters"] = 2,
           ["stages"] = 3,
           ["yield"] = 2,
           ["stage_advance_timings"] = {
-            [1] = 17000,
-            [2] = 16000,
-            [3] = 16000,
+            [1] = 11000,
+            [2] = 11000,
+            [3] = 11000,
           }
         },
-        ["Heket's Reaping"] = {
+        ["Heket's Crop"] = {
           ["type"] = "Garlic",
           ["waters"] = 1,
           ["stages"] = 3,
@@ -1094,15 +1094,15 @@ function default_deep_config()
             [3] = 13500,
           }
         },
-        ["Horus' Harvest"] = {
+        ["Horus's Harvest"] = {
           ["type"] = "Leeks",
-          ["waters"] = 3,
+          ["waters"] = 2,
           ["stages"] = 3,
           ["yield"] = 6,
           ["stage_advance_timings"] = {
-            [1] = 15000,
-            [2] = 13500,
-            [3] = 13500,
+            [1] = 12000,
+            [2] = 12000,
+            [3] = 12000,
           }
         },
       },
