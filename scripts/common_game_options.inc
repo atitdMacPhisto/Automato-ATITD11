@@ -243,7 +243,7 @@ function setOneClickOptions(options)
 
   local close = findImage("options/close.png", oneClickOptionsRange, 7000);
   if close then
-    safeClick(close[0], close[1]);
+    safeClick(close[0]+5, close[1]+5);
   end
 
   lsSleep(200);
@@ -270,7 +270,7 @@ function setVideoOptions(options)
 
   local close = findImage("options/close.png", videoOptionsRange, 7000);
   if close then
-    safeClick(close[0], close[1]);
+    safeClick(close[0]+5, close[1]+5);
   end
 
   if options[TERRAIN] and options[TERRAIN] ~= current[TERRAIN] then
@@ -336,7 +336,7 @@ function setInterfaceOptions(options)
 
   local close = findImage("options/close.png", interfaceOptionsRange, 7000);
   if close then
-    safeClick(close[0], close[1]);
+    safeClick(close[0]+5, close[1]+5);
   end
 
   lsSleep(200);
