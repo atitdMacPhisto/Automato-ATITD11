@@ -51,7 +51,9 @@ items = {
           "Bottle Stopper",
           "Clay Lamp",
           "Crudely Carved Handle",
+          "Flint Hatchet",
           "Flint Hammer",
+          "Flint Chisel",
           "Heavy Mallet",
           "Large Crude Handle",
           "Long Sharp Stick",
@@ -59,11 +61,13 @@ items = {
           "Rawhide Strips",
           "Search Rotten Wood",
           "Sharpened Stick",
+          "Slate Shovel",
           "Spore Paper",
           "Tackle Block",
           "Tap Rods",
           "Tinder",
           "Wooden Cog",
+          "Wooden Dowsing Rod",
           "Wooden Peg",
           "Wooden Pestle",
         },
@@ -92,83 +96,96 @@ askText = singleLine([[
 
 );
 function getClickActions()
-    local scale = 1.4;
-    local z = 0;
-    local done = false;
-    -- initializeTaskList
-    tasks = {};
-    for i = 1, 4 do
-        tasks[i] = 1;
+  local scale = 1.4;
+  local z = 0;
+  local done = false;
+  -- initializeTaskList
+  tasks = {};
+  for i = 1, 4 do
+      tasks[i] = 1;
+  end
+
+  while not done do
+    checkBreak();
+    y = 10;
+    lsSetCamera(0, 0, lsScreenX * 1.7, lsScreenY * 1.7);
+    lsPrint(5, y, z, 1.2, 1.2, 0xFFFFFFff, "Ensure that all menus are pinned!");
+    y = y + 50;
+    for i = 1, #statNames do
+      lsPrint(5, y, z, 1, 1, 0xFFFFFFff, statNames[i]:gsub("^%l", string.upper) .. ":");
+      y = y + 24;
+      tasks[i] = lsDropdown(statNames[i], 5, y, 0, 200, tasks[i], items[i]);
+      y = y + 32;
+
+      if items[i][tasks[i]] == "Stir Cement" then
+        y = y + 35;
+        stirMaster = readSetting("stirMaster",stirMaster);
+        stirMaster = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Clinker Vat", stirMaster);
+        writeSetting("stirMaster",stirMaster);
+          if stirMaster == true then
+            stirFuel = readSetting("stirFuel",stirFuel);
+            lsPrint(5, y, 0, 1, 1, 0xffffffff, "Fuel Type:");
+            stirFuel = lsDropdown("stirFuel", 105, y, 0, 150, stirFuel, fuelList);
+            writeSetting("stirFuel",stirFuel);
+            y = y + 35;
+          end
+      end
+
+      if items[i][tasks[i]] == "Weave Canvas" or items[i][tasks[i]] == "Weave Linen"
+        or items[i][tasks[i]] == "Weave Papy Basket" or items[i][tasks[i]] == "Weave Wool Cloth"
+        or items[i][tasks[i]] == "Weave Silk" then
+        y = y + 35;
+        reloadLoom = readSetting("reloadLoom",reloadLoom);
+        reloadLoom = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically reload Loom", reloadLoom);
+        writeSetting("reloadLoom",reloadLoom);
+      end
+
+      if items[i][tasks[i]] == "Tap Rods" then
+        y = y + 35;
+        retrieveRods = readSetting("retrieveRods",retrieveRods);
+        retrieveRods = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically retrieve rods", retrieveRods);
+        writeSetting("retrieveRods",retrieveRods);
+      end
+
+      if items[i][tasks[i]] == "Limestone" or items[i][tasks[i]] == "Dirt" then
+        y = y + 35;
+        stashRawMaterials = readSetting("stashRawMaterials",stashRawMaterials);
+        stashRawMaterials = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically stash while digging (Pin WH)", stashRawMaterials);
+        writeSetting("stashRawMaterials",stashRawMaterials);
+      end
+
+      if items[i][tasks[i]] == "Barrel Grinder" then
+        y = y + 35;
+        refilGrinder = readSetting("refilGrinder",refilGrinder);
+        refilGrinder = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Barrel Grinder", refilGrinder);
+        writeSetting("refilGrinder",refilGrinder);
+        if refilGrinder == true then
+          metalGrind = readSetting("metalGrind",metalGrind);
+          lsPrint(5, y, 0, 1, 1, 0xffffffff, "Metal Type:");
+          metalGrind = lsDropdown("metalGrind", 115, y, 0, 150, metalGrind, metalList);
+          lsPrint(5, y+32, 0, 1, 1, 0xffff40ff, "Pin the 'Take... > Metal... > All Metal' window");
+          writeSetting("metalGrind",metalGrind);
+          y = y + 65;
+        end
+      end
     end
 
-    while not done do
-        checkBreak();
-        y = 10;
-        lsSetCamera(0, 0, lsScreenX * 1.7, lsScreenY * 1.7);
-        lsPrint(5, y, z, 1.2, 1.2, 0xFFFFFFff, "Ensure that all menus are pinned!");
-        y = y + 50;
-        for i = 1, #statNames do
-            lsPrint(5, y, z, 1, 1, 0xFFFFFFff, statNames[i]:gsub("^%l", string.upper) .. ":");
-            y = y + 24;
-            tasks[i] = lsDropdown(statNames[i], 5, y, 0, 200, tasks[i], items[i]);
-            y = y + 32;
-            if items[i][tasks[i]] == "Stir Cement" then
-              y = y + 35;
-              stirMaster = readSetting("stirMaster",stirMaster);
-              stirMaster = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Clinker Vat", stirMaster);
-              writeSetting("stirMaster",stirMaster);
-                if stirMaster == true then
-                  stirFuel = readSetting("stirFuel",stirFuel);
-                  lsPrint(5, y, 0, 1, 1, 0xffffffff, "Fuel Type:");
-                  stirFuel = lsDropdown("stirFuel", 105, y, 0, 150, stirFuel, fuelList);
-                  writeSetting("stirFuel",stirFuel);
-                  y = y + 35;
-                end
-            end
+    y = y + 45;
+    autoOnion = readSetting("autoOnion",autoOnion);
+    autoOnion = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically eat onions", autoOnion);
+    writeSetting("autoOnion",autoOnion);
 
-            if items[i][tasks[i]] == "Weave Canvas" or items[i][tasks[i]] == "Weave Linen"
-              or items[i][tasks[i]] == "Weave Papy Basket" or items[i][tasks[i]] == "Weave Wool Cloth"
-              or items[i][tasks[i]] == "Weave Silk" then
-              y = y + 35;
-              reloadLoom = readSetting("reloadLoom",reloadLoom);
-              reloadLoom = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically reload Loom", reloadLoom);
-              writeSetting("reloadLoom",reloadLoom);
-            end
-
-            if items[i][tasks[i]] == "Tap Rods" then
-              y = y + 35;
-              retrieveRods = readSetting("retrieveRods",retrieveRods);
-              retrieveRods = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically retrieve rods", retrieveRods);
-              writeSetting("retrieveRods",retrieveRods);
-            end
-            if items[i][tasks[i]] == "Limestone" or items[i][tasks[i]] == "Dirt" then
-              y = y + 35;
-              stashRawMaterials = readSetting("stashRawMaterials",stashRawMaterials);
-              stashRawMaterials = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically stash while digging (Pin WH)", stashRawMaterials);
-              writeSetting("stashRawMaterials",stashRawMaterials);
-            end
-            if items[i][tasks[i]] == "Barrel Grinder" then
-              y = y + 35;
-              refilGrinder = readSetting("refilGrinder",refilGrinder);
-              refilGrinder = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Barrel Grinder", refilGrinder);
-              writeSetting("refilGrinder",refilGrinder);
-                if refilGrinder == true then
-                  metalGrind = readSetting("metalGrind",metalGrind);
-                  lsPrint(5, y, 0, 1, 1, 0xffffffff, "Metal Type:");
-                  metalGrind = lsDropdown("metalGrind", 115, y, 0, 150, metalGrind, metalList);
-                  lsPrint(5, y+32, 0, 1, 1, 0xffff40ff, "Pin the 'Take... > Metal... > All Metal' window");
-                  writeSetting("metalGrind",metalGrind);
-                  y = y + 65;
-                end
-            end
-        end
-
-        lsDoFrame();
-        lsSleep(tick_delay);
-        if lsButtonText(150, 58, z, 100, 0x00ff00ff, "OK") then
-          done = true;
-        end
+    if autoOnion then
+      y = y + 10
+      lsPrintWrapped(5, y, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
     end
+
+    lsDoFrame();
+    lsSleep(tick_delay);
+    if lsButtonText(150, 58, z, 100, 0x00ff00ff, "OK") then
+      done = true;
+    end
+  end
 end
 
 function weave(clothType)
@@ -220,11 +237,6 @@ function weave(clothType)
     end
 
     srReadScreen();
-    local consume = srFindImage("consume.png");
-      if consume then
-        eatOnion();
-      end
-
     if clothType == "Basket" then
       weaveImage = srFindImage("statclicks/weave_papyrus.png");
     elseif clothType == "TatteredSail" then
@@ -267,11 +279,7 @@ end
 function digHole()
   srReadScreen();
   local digdeeper = srFindImage("statclicks/dig_deeper.png");
-  local consume = srFindImage("consume.png");
     if digdeeper ~= nil then
-      if consume then
-        eatOnion();
-      end
       safeClick(digdeeper[0], digdeeper[1])
       lsSleep(per_tick);
     end
@@ -285,12 +293,8 @@ function gather(resource)
   end
 
   srReadScreen();
-  local consume = srFindImage("consume.png");
   local material = srFindImage(srcImg, 7000);
     if material ~= nil then
-      if consume then
-          eatOnion();
-      end
       safeClick(material[0], material[1]);
       lsSleep(100);
       gatherCounter = gatherCounter + 1
@@ -434,10 +438,7 @@ function combFlax()
         lsSleep(75);
       end
     srReadScreen();
-    local consume = srFindImage("consume.png");
-      if consume then
-        eatOnion();
-      end
+
     local s1 = srFindImage("rake/separate.png", 6000);
     local s23 = srFindImage("rake/process.png", 6000);
     local clean = srFindImage("rake/clean.png", 6000);
@@ -460,11 +461,8 @@ function eatOnion()
     if not buffed then
       srReadScreen();
       local consumeOnion = srFindImage("consume.png")
-      lsSleep(75);
       safeClick(consumeOnion[0],consumeOnion[1]);
-        if not buffed then
-          sleepWithStatus(1500,"Waiting for the green endurance icon to appear")
-        end
+      waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
     end
 end
 
@@ -487,10 +485,7 @@ function hacklingRake()
         lsSleep(75);
       end
     srReadScreen();
-    local consume = srFindImage("consume.png");
-      if consume then
-        eatOnion();
-      end
+
     s1 = findText("Separate Rotten", flaxReg);
     s23 = findText("Continue processing", flaxReg);
     clean = findText("Clean the", flaxReg);
@@ -701,21 +696,21 @@ function sporePaper()
 	rw.height = 240;
 	local parse = findAllText(nil, rw);
   local foundPaper = false
-  	for i = 1, #parse do
-  		parse[i][2] = stripCharacters(parse[i][2]);
-      if foundPaper == false then
-        if string.find(parse[i][2], "SpoePape") then
-          foundPaper = true;
-          clickText(parse[i]);
-        else
-          srReadScreen();
-          local cancel = srFindImage("cancel.png")
-            if cancel then
-              safeClick(cancel[0],cancel[1])
-            end
-        end
+  for i = 1, #parse do
+    parse[i][2] = stripCharacters(parse[i][2]);
+    if foundPaper == false then
+      if string.find(parse[i][2], "SpoePape") then
+        foundPaper = true;
+        clickText(parse[i]);
+      else
+        srReadScreen();
+        local cancel = srFindImage("cancel.png")
+          if cancel then
+            safeClick(cancel[0],cancel[1])
+          end
       end
-  	end
+    end
+  end
 end
 
 function doTasks()
@@ -738,12 +733,20 @@ function doTasks()
                 --check for special cases, like flax.
                 lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Working on " .. curTask);
                 lsDoFrame();
-                digHole();
-                if curtask == "Dig Hole" then
+
+                if autoOnion then
+                  eatOnion();
+                end
+
+                if curTask == "Dig Hole" then
                   digHole();
                 elseif curTask == "Tinder" then
                   carve(curTask);
                 elseif curTask == "Rawhide Strips" then
+                  carve(curTask);
+                elseif curTask == "Wooden Dowsing Rod" then
+                  carve(curTask);
+                elseif curTask == "Slate Shovel" then
                   carve(curTask);
                 elseif curTask == "Long Sharp Stick" then
                   carve(curTask);
@@ -760,6 +763,10 @@ function doTasks()
                 elseif curTask == "Personal Chit" then
                   carve(curTask);
                 elseif curTask == "Flint Hammer" then
+                  carve(curTask);
+                elseif curTask == "Flint Hatchet" then
+                  carve(curTask);
+                elseif curTask == "Flint Chisel" then
                   carve(curTask);
                 elseif curTask == "Heavy Mallet" then
                   carve(curTask);
