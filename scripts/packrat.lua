@@ -25,7 +25,7 @@ function findContainer()
     return;
   end
 
-  local containerText = parseText(containerRegion.x, containerRegion.y, containerRegion.width - 20, containerRegion.height);
+  local containerText = parseText(containerRegion.x, containerRegion.y, containerRegion.width - 25, containerRegion.height);
   local line3 = containerText[3][2];
   if string.sub(line3, 0, 6) == "Browse" then
     return;
@@ -58,9 +58,7 @@ function stashContainer()
   lsSleep(200);
 
   srReadScreen();
-  srSetMousePos(stash[0] + 21, stash[1] + 8);
   local stashWindow = getWindowBorders(stash[0] + 22, stash[1] + 9)
-  srSetMousePos(stashWindow.x, stashWindow.y);
   safeClick(stashWindow.x + 5, stashWindow.y + 5, 1);
 
   repeat
@@ -87,8 +85,12 @@ function stashContainer()
 
   lsSleep(50);
   srReadScreen();
-  safeClick(stashWindow.x + 5, stashWindow.y + 5, 1);
-  lsSleep(50)
+  stash = findText("Stash");
+  if stash then
+    safeClick(stash[0] + 5, stash[1] + 5, 1);
+    lsSleep(50)
+  end
+
   safeClick(containerRegion.x + 5, containerRegion.y + 5);
 end
 
@@ -246,7 +248,7 @@ function displayConfig()
 
   while true do
     local y = 5;
-    lsScrollAreaBegin("setting_mushrooms", 5, y, 0, 280, 280);
+    lsScrollAreaBegin("config_packrat", 5, y, 0, 280, 280);
 
     for _, item in pairs(sortConfig(newConfig)) do
       if lsButtonText(5, y, 1, 25, 0xFF0000ff, "-") then
@@ -284,8 +286,10 @@ function displayStatus()
   local message = "Open a storage container to configure it.\n Or tap ctrl over a container to auto stash.";
   if containerRegion ~= nil then
     if (containerName) then
-      message = "Found container: " .. containerName .. "\n" ..
-        round(containerCurrent / containerMax * 100) .. "% full (" .. containerCurrent .. " of " .. containerMax .. ")";
+      message = "Found container: " .. containerName .. "\n";
+      if containerCurrent ~= nil and containerMax ~= nil then
+        message = message .. round(containerCurrent / containerMax * 100) .. "% full (" .. containerCurrent .. " of " .. containerMax .. ")";
+      end
 
       if next(containerConfig) ~= nil then
         if lsButtonText(10, lsScreenY - 30, 0, 80, 0x00FF00ff, "Stash") then
