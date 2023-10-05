@@ -893,18 +893,12 @@ function getUserParams()
         local plant_is_calibrated = timings and timings.calibrated
         if not plant_is_calibrated then
           drawWrappedText("Please click calibrate first to " .. seed_type .. " to calculate stage water times automatically. If you instead want to use the timings manually set in your config just click start.", GREEN, X_PADDING, lsScreenY - 100)
-          calibration_mode = lsButtonText(0, lsScreenY - 30, z, 200, GREEN, "Calibrate " .. seed_name)
-          is_done = lsButtonText(210, lsScreenY - 30, z, 100, ORANGE, "Start")
-          if lsButtonText(320, lsScreenY - 30, z, 100, WHITE, "Back") then
-            got_user_params = false
-          end
+          calibration_mode = lsButtonText(0, lsScreenY - 30, z, 100, GREEN, "Calibrate")
+          is_done = lsButtonText(90, lsScreenY - 30, z, 100, ORANGE, "Start")
         else
           drawWrappedText("Please re-run the calibration often especially if the macro is miss-timing often and over or under watering.", GREEN, X_PADDING, lsScreenY - 100)
           is_done = lsButtonText(0, lsScreenY - 30, z, 100, GREEN, "Start")
           calibration_mode = lsButtonText(110, lsScreenY - 30, z, 200, YELLOW, "Calibrate More")
-          if lsButtonText(320, lsScreenY - 30, z, 100, WHITE, "Back") then
-            got_user_params = false
-          end
         end
       else
         drawWrappedText("Config value " .. invalid_key .. " is invalid, please edit config and fix it.", RED, X_PADDING, lsScreenY - 60)

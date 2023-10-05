@@ -29,22 +29,20 @@ WARNING = [[
 3. In Options -> Video
     1. You must set: "Tufts of Grass", "Shadow Quality", and "Time-of-Day Lighting" to the lowest possible settings
     2. Ideally run Veg Janitor in windowed mode with the window resized to be about 1280x1000 in size.
-4. Press F8 F8 F8 to set the camera in top down mode
+4. Press F8 F8 to set the camera in top down mode
 5. Press ALT-L to lock the camera so it doesn't move accidentally
 6. Do not move once the macro is running and you must be standing on a tile with water available to refill
-7. Do not stand directly on or nearby animated water as this can break the plant detection
+7. DO NOT STAND NEAR WATER OR ANY OTHER ANIMATED OBJECTS. IF WATER IS WITHIN HALF A SCREEN SIZE DISTANCE FROM YOUR
+CHARACTER BAD THINGS WILL HAPPEN.
 8. Click the seed you wish to plant and ensure the seed window with the "Plant" button is pinned and visible
 9. Make sure on the previous screen you have selected the same seed name as the open seed window.
 10. Open the Main chat tab to automatically stop the macro when the ground is not suitable.
 11. Do not use the mouse whilst the macro is running.
-12. DO NOT STAND NEAR WATER OR ANY OTHER ANIMATED OBJECTS. IF WATER IS WITHIN HALF A SCREEN SIZE DISTANCE FROM YOUR
-    CHARACTER BAD THINGS WILL HAPPEN.
 ]]
 
 RED = 0xFF2020ff
 BLACK = 0x000000ff
 WHITE = 0xFFFFFFff
-
 
 -- Used to control the plant window placement and tiling.
 WINDOW_HEIGHT = 120 -- Was 80

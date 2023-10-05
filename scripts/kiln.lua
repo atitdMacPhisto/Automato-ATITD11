@@ -199,6 +199,10 @@ function start()
     srReadScreen();
     clickAllText("with Wood");
     sleepWithStatus(1000,"Adding " .. productNames[typeOfProduct] .. " to the kiln");
+    if productNames[typeOfProduct] == "Wet Jugs" then
+      srReadScreen();
+      clickAllImages("kiln/wetJugs.png");
+    end
     clickAllText(productNames[typeOfProduct]);
     sleepWithStatus(1000,"Firing all kilns");
     clickAllText("Fire the Kiln");
