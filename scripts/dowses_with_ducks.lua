@@ -32,24 +32,19 @@ local autorun = 0;
 local autodowse = 0;
 local spacing = 0;
 local nearby = false;
-local multipleRods = false;
 local file = "dowsing.txt"
 local currentRod = "";
 
 function getFileName()
-  if not multipleRods then
-    return file;
-  end
-
   local name, extension = string.match(file, "(.+)%.(.+)$");
   return name .. "_" .. currentRod .. "." .. extension;
 end
 
 function writeDowseLog(x, y, region, name, exact)
   if exact then
-    status = name .. " at " .. x .. ", " .. y;
+    status = name .. " at " .. x .. ". " .. y;
   else
-    status = name .. " near " .. x .. ", " .. y;
+    status = name .. " near " .. x .. ". " .. y;
     if not nearby then
       return;
     end
@@ -67,16 +62,16 @@ function writeDowseLog(x, y, region, name, exact)
   local text;
   if format == 1 then
     text = "(" .. color .. ") " ..
-      string.gsub(x, "%.[0-9]+", "") .. "," ..
+      string.gsub(x, "%.[0-9]+", "") .. "." ..
       string.gsub(y, "%.[0-9]+", "") .. "," ..
-      name .. " @ (" .. x .. ", " .. y .. ") " .. region;
+      name .. " @ (" .. x .. ". " .. y .. ") " .. region;
   elseif format == 2 then
-    text = string.gsub(x, "%.[0-9]+", "") .. "," ..
+    text = string.gsub(x, "%.[0-9]+", "") .. "." ..
       string.gsub(y, "%.[0-9]+", "") .. "," ..
       region .. "," ..
       name;
   else
-    text = x .. "," ..
+    text = x .. "." ..
       y .. "," ..
       region .. "," ..
       name;
@@ -123,7 +118,7 @@ function getRegionFromLine(line)
 end
 
 function getCoordsFromLine(line)
-  local x, y = string.match(line, "([-0-9]+%.[0-9]+) ([-0-9]+%.[0-9]+)");
+  local x, y = string.match(line, "([-0-9]+) ([-0-9]+)");
   if not x then
     return "", "";
   end
@@ -158,7 +153,6 @@ function getDowseResult(wait, init)
       chatText = getChatText();
     end
 
-    local secondToLastLine = chatText[#chatText - 1][2];
     local lastLine         = chatText[#chatText][2];
 
     local x, y = getCoordsFromLine(lastLine);
@@ -169,9 +163,7 @@ function getDowseResult(wait, init)
 
       local x2 = "";
       local y2 = "";
-      if multipleRods then
-        x2, y2    = getCoordsFromLine(secondToLastLine);
-      end
+
       local resultKey = table.concat({x,y,x2,y2}, ",");
       if init then
         lastResult = resultKey;
@@ -181,7 +173,6 @@ function getDowseResult(wait, init)
       if lastResult ~= resultKey then
         lastResult = resultKey;
         writeDowseLog(x , y, region, foundOre, exact);
-        switchRods();
 
         if foundOre ~= "Sand" and (exact or nearby) then
           lsPlaySound("cymbals.wav");
@@ -192,7 +183,7 @@ function getDowseResult(wait, init)
 
     if wait then
       local seconds = math.floor(10.5 - (lsGetTimer() - startTimer) / 1000);
-      lsPrintWrapped(10, 10, 0, lsScreenX - 20, 0.7, 0.7, 0xFFFFFFff, "Waiting " .. seconds .. "s for new dowsing line in chat.\n\nIf there are 2 (3 with multiple rods enabled) identical dowsing lines (from dowsing in the exact same spot) the macro won't detect them.\n\nJust move to the next spot and wait out the timer.");
+      lsPrintWrapped(10, 10, 0, lsScreenX - 20, 0.7, 0.7, 0xFFFFFFff, "Waiting " .. seconds .. "s for new dowsing line in chat.\n\nIf there are 2 identical dowsing lines (from dowsing in the exact same spot) the macro won't detect them.\n\nJust move to the next spot and wait out the timer.");
       if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "Cancel") then
         return;
       end
@@ -227,12 +218,6 @@ function displayConfig()
     lsPrint(10, y, 0, 1, 1, 0xFFFFFFff, "Log Nearby:");
     nearby = CheckBox(130, y, 0, 0xFFFFFFff, "", nearby, 1, 1);
     writeSetting("nearby", nearby)
-    y = y + 35;
-
-    multipleRods = readSetting("multipleRods", multipleRods);
-    lsPrint(10, y, 0, 1, 1, 0xFFFFFFff, "Multi Rods:");
-    multipleRods = CheckBox(130, y, 0, 0xFFFFFFff, "", multipleRods, 1, 1);
-    writeSetting("multipleRods", multipleRods)
     y = y + 35;
 
     lsPrint(10, y, 0, 1, 1, 0xFFFFFFff, "Auto Run:");
@@ -298,9 +283,6 @@ end
 
 function dowse()
   local count = 1;
-  if multipleRods then
-    count = 2;
-  end
 
   for i = 1, count do
     srReadScreen();
@@ -343,34 +325,6 @@ function getRodType()
   return string.lower(string.gsub(type, "[%(%)]", ""));
 end
 
-function switchRods()
-  if multipleRods then
-    local rods = findAllText("Dowsing Rod (");
-    while not rods or #rods ~= 2 do
-      promptOkay("Please pin both of your dowsing rods", nil, nil, nil, true);
-      srReadScreen();
-      rods = findAllText("Dowsing Rod (");
-    end
-    clickAllText("Dowsing Rod (");
-    lsSleep(100);
-
-    srReadScreen();
-    local select = findText("Select as preferred Dowsing");
-    if not select then
-      error("Unable to select dowsing rod");
-    end
-    safeClick(select[0], select[1]);
-    lsSleep(100);
-
-    srReadScreen();
-    clickAllText("Dowsing Rod (");
-    currentRod = getRodType();
-    if not currentRod then
-      error("Couldn't read current rod");
-    end
-  end
-end
-
 function doit()
   askForWindow([[
 Dowses With Ducks
@@ -390,11 +344,10 @@ Hover over the ATITD window and press shift.
 
   displayConfig();
   getDowseResult(false, true);
-  switchRods();
   lsDoFrame();
 
   if autorun > 1 then
-    setCameraView(CARTOGRAPHER2CAM);
+    setCameraView(CARTOGRAPHERCAM);
   end
 
   if spacing > 0 then
