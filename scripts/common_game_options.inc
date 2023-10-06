@@ -94,7 +94,7 @@ local movements = {
 }
 
 function setGameOptions(oneClickOptions, videoOptions, interfaceOptions)
-  if not promptOkay("This macro needs to specific ATITD Options.\n\nWould you like to set them automatically?", 0xFFFFCCff, nil, true) then
+  if (promptOkay("This macro needs specific ATITD Options.\n\nWould you like to set them automatically?", 0xFFFFCCff, nil, true)) then
     if next(oneClickOptions) ~= nil then
       setOptionsError(oneClickOptionKeys, oneClickOptions, "One Click");
     end
@@ -105,6 +105,8 @@ function setGameOptions(oneClickOptions, videoOptions, interfaceOptions)
       setOptionsError(interfaceOptionKeys, interfaceOptions, "Interface");
     end
     return;
+  else
+    return {};
   end
 
   if next(oneClickOptions) ~= nil then
@@ -281,7 +283,7 @@ function setVideoOptions(options)
   end
 
   if options[LIGHT_INTENSITY] and options[LIGHT_INTENSITY] ~= current[LIGHT_INTENSITY] then
-    promptOkay("You must restart ATITD for the Light Intensity setting to take effect", 0xFF0000ff, nil, nil, false);
+    promptOkay("You must either restart your ATITD client or press Scroll Lock to force the game to reload for the Light Intensity setting to take effect correctly", 0xFF0000ff, nil, nil, false);
     error("Restart ATITD");
   end
 
@@ -361,7 +363,7 @@ function setOptionsError(keys, options, title)
   promptOkay(msg, nil, nil, nil, true);
 
   if options[LIGHT_INTENSITY] and keys[LIGHT_INTENSITY] == videoOptionKeys[LIGHT_INTENSITY] then
-    promptOkay("You must restart ATITD for the Light Intensity setting to take effect", 0xFF0000ff, nil, nil, true);
+    promptOkay("You must either restart your ATITD client or press Scroll Lock to force the game to reload for the Light Intensity setting to take effect correctly", 0xFF0000ff, nil, nil, true);
   end
 end
 
