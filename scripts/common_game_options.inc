@@ -94,29 +94,18 @@ local movements = {
 }
 
 function setGameOptions(oneClickOptions, videoOptions, interfaceOptions)
-  if (promptOkay("This macro needs specific ATITD Options.\n\nWould you like to set them automatically?", 0xFFFFCCff, nil, true)) then
+  if promptOkay("This macro needs to specific ATITD Options.\n\nWould you like to set them automatically?", 0xFFFFCCff, nil, true) then
     if next(oneClickOptions) ~= nil then
-      setOptionsError(oneClickOptionKeys, oneClickOptions, "One Click");
+      setOneClickOptions(oneClickOptions);
     end
     if next(videoOptions) ~= nil then
-      setOptionsError(videoOptionKeys, videoOptions, "Video");
+      setVideoOptions(videoOptions);
     end
     if next(interfaceOptions) ~= nil then
-      setOptionsError(interfaceOptionKeys, interfaceOptions, "Interface");
+      setInterfaceOptions(interfaceOptions);
     end
-    return;
   else
     return {};
-  end
-
-  if next(oneClickOptions) ~= nil then
-    setOneClickOptions(oneClickOptions);
-  end
-  if next(videoOptions) ~= nil then
-    setVideoOptions(videoOptions);
-  end
-  if next(interfaceOptions) ~= nil then
-    setInterfaceOptions(interfaceOptions);
   end
 end
 
