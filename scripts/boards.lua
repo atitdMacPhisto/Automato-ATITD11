@@ -54,25 +54,32 @@ function promptParameters()
     lsPrintWrapped(10, 60, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
       "Will use Carpentry Shops instead of Wood Planes to plane boards.");
 
-    arrangeWindows = readSetting("arrangeWindows",arrangeWindows);
-    arrangeWindows = lsCheckBox(10, 100, z, 0xFFFFFFff, "Arrange windows", arrangeWindows);
-    writeSetting("arrangeWindows",arrangeWindows);
+    autoOnion = readSetting("autoOnion",autoOnion);
+    autoOnion = lsCheckBox(10, 100, z, 0xFFFFFFff, "Automatically eat onions", autoOnion);
+    writeSetting("autoOnion",autoOnion);
 
     lsPrintWrapped(10, 120, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "(Pin the 'Grilled Onion' window)\nWill automatically eat an onion, everytime the endurance buff is not visible.");
+
+    arrangeWindows = readSetting("arrangeWindows",arrangeWindows);
+    arrangeWindows = lsCheckBox(10, 180, z, 0xFFFFFFff, "Arrange windows", arrangeWindows);
+    writeSetting("arrangeWindows",arrangeWindows);
+
+    lsPrintWrapped(10, 200, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
       "Will sort your pinned Wood Planes or Carpentry Shops into a grid on your screen.");
 
     unpinWindows = readSetting("unpinWindows",unpinWindows);
-    unpinWindows = lsCheckBox(10, 160, z, 0xFFFFFFff, "Unpin windows on exit", unpinWindows);
+    unpinWindows = lsCheckBox(10, 240, z, 0xFFFFFFff, "Unpin windows on exit", unpinWindows);
     writeSetting("unpinWindows",unpinWindows);
 
-    lsPrintWrapped(10, 180, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
-      "On exit will close all windows when you close this macro.\n\nPress OK to continue.");
+    lsPrintWrapped(10, 260, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "On exit will close all windows when you close this macro.");
 
-    if lsButtonText(10, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff, "OK") then
+    if lsButtonText(10, (lsScreenY - 30) * scale, z, 100, 0x00ff00ff, "OK") then
       is_done = 1;
     end
 
-    if lsButtonText((lsScreenX - 100) * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
+    if lsButtonText((lsScreenX - 100) * scale, (lsScreenY - 30) * scale, z, 100, 0xFF0000ff,
       "End script") then
       error "Clicked End Script button";
     end
@@ -85,30 +92,25 @@ function promptParameters()
     end
 end
 
-function refreshWindows()
-  srReadScreen();
-  this = findAllImages("ThisIs.png");
-    for i=1,#this do
-      clickText(this[i]);
-    end
-  lsSleep(100);
-end
-
 function repairBoards()
   srReadScreen();
-    if not carpShop then
-  	clickrepair = findAllImages("boards/RepairWoodPlane.png");
-      for i=1,#clickrepair do
-        clickText(clickrepair[i]);
-        lsSleep(100);
-      end
+  if not carpShop then
+    clickrepair = findAllImages("boards/RepairWoodPlane.png");
+    for i=1,#clickrepair do
+      clickText(clickrepair[i]);
+      lsSleep(100);
     end
+  end
 end
 
 function planeBoards()
   srReadScreen();
 
   while 1 do
+  -- eat an onion
+  if autoOnion then
+    eatOnion()
+  end
   -- Click pin ups to refresh the window
   clickAllImages("ThisIs.png");
   sleepWithStatus(500, "Refreshing\nBoards Planed: " .. boards);
@@ -186,6 +188,17 @@ function cleanup()
   if(unpinWindows) then
     closeAllWindows();
   end
+end
+
+function eatOnion()
+  srReadScreen();
+  buffed = srFindImage("stats/enduranceBuff.png")
+    if not buffed then
+      srReadScreen();
+      local consumeOnion = srFindImage("consume.png")
+      safeClick(consumeOnion[0],consumeOnion[1]);
+      waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+    end
 end
 
 function closePopUp()
