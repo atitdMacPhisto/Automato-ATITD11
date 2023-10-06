@@ -33,11 +33,10 @@ local autodowse = 0;
 local spacing = 0;
 local nearby = false;
 local file = "dowsing.txt"
-local currentRod = "";
 
 function getFileName()
   local name, extension = string.match(file, "(.+)%.(.+)$");
-  return name .. "_" .. currentRod .. "." .. extension;
+  return name .. "." .. extension;
 end
 
 function writeDowseLog(x, y, region, name, exact)
