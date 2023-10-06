@@ -54,6 +54,7 @@ stds.common = {
     "deserialize",
     "drag",
     "drawWater",
+    "drawWrappedText",
     "EXACT",
     "explode",
     "fastFindCoords",
