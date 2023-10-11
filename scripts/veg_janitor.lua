@@ -17,29 +17,6 @@ dofile("veg_janitor/screen.inc")
 dofile("veg_janitor/calibration.inc")
 dofile("veg_janitor/logger.inc")
 
-WARNING = [[
-1. In Options -> Interface Options
-    1. You Must SET: UI Size to Normal
-    2. You Must ENABLE: "Use the chat area instead of popups for many messages"
-    3. You Must ENABLE: "Position Menus to right of mouse"
-    4. You Must ENABLE: "Right-Click Pins/Unpins a Menu"
-2. In Options -> One-Click and Related
-    1. You must DISABLE: "Plant all crops where you stand"
-    2. You must ENABLE: "Auto take piles of upto 50 portable items"
-3. In Options -> Video
-    1. You must set: "Tufts of Grass", "Shadow Quality", and "Time-of-Day Lighting" to the lowest possible settings
-    2. Ideally run Veg Janitor in windowed mode with the window resized to be about 1280x1000 in size.
-4. Press F8 F8 to set the camera in top down mode
-5. Press ALT-L to lock the camera so it doesn't move accidentally
-6. Do not move once the macro is running and you must be standing on a tile with water available to refill
-7. DO NOT STAND NEAR WATER OR ANY OTHER ANIMATED OBJECTS. IF WATER IS WITHIN HALF A SCREEN SIZE DISTANCE FROM YOUR
-CHARACTER BAD THINGS WILL HAPPEN.
-8. Click the seed you wish to plant and ensure the seed window with the "Plant" button is pinned and visible
-9. Make sure on the previous screen you have selected the same seed name as the open seed window.
-10. Open the Main chat tab to automatically stop the macro when the ground is not suitable.
-11. Do not use the mouse whilst the macro is running.
-]]
-
 RED = 0xFF2020ff
 BLACK = 0x000000ff
 WHITE = 0xFFFFFFff
@@ -454,7 +431,7 @@ function recordPlantMovement(plantSearcher, watchTime, config)
     elapsedTime = lsGetTimer() - start
     current_y = current_y + lsPrintWrapped(10, current_y, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
       [[Recording the plants movement to reduce click errors, please do not interfere the macro wants this first set of plants to die and will pickup itself...]]);
-    lsPrintWrapped(10, current_y, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
+    lsPrintWrapped(10, current_y+20, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
       (watchTime - elapsedTime) .. ' ms left, ' .. numSnaps .. ' snapshots taken... ');
     lsDoFrame()
     checkBreak(true)
@@ -469,9 +446,9 @@ function recordMovement(searcher, config)
   for i = 1, num_snaps do
     searcher:markChangesAsDeadZone('beforeSeeds')
     checkBreak()
-    lsPrintWrapped(10, 50, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
+    lsPrintWrapped(10, 10, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
       [[Recording your characters movement to reduce click errors...]]);
-    lsPrintWrapped(10, 100, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
+    lsPrintWrapped(10, 90, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff,
       (num_snaps - i) .. ' snapshots left');
     lsDoFrame()
   end
@@ -482,7 +459,7 @@ function recordMovement(searcher, config)
 end
 
 function findSeedAndPickupIfThere(searcher, num_dead, config)
-  lsPrintWrapped(10, 100, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff, 'Searching for ' .. num_dead .. ' seed bags left over on the floor from failed plants.');
+  lsPrintWrapped(10, 10, 0, lsScreenX - 20, 1, 1, 0xd0d0d0ff, 'Searching for ' .. num_dead .. ' seed bags left over on the floor from failed plants.');
   lsDoFrame()
   srReadScreen()
   local start_seed_box_found = srFindImage("veg_janitor/seeds.png",
