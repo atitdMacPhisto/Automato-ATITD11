@@ -40,7 +40,6 @@ function getFileName()
 end
 
 function writeDowseLog(x, y, region, name, exact)
-  sleepWithStatus(4000,name)
   if exact then
     status = name .. " at " .. x .. ". " .. y;
   else
