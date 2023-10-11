@@ -913,9 +913,9 @@ function getUserParams()
           last_flash = lsGetTimer()
         end
 
-        lsScrollAreaBegin("warningScroll", 10, current_y+15, z, windowRight-10, windowBottom-160);
+        lsScrollAreaBegin("warningScroll", 5, current_y+15, z, windowRight-10, windowBottom-160);
           for i=1, #WARNING do
-            current_y = current_y + lsPrintWrapped(X_PADDING, current_y-40, 10, windowRight-25, 0.6, 0.6, WHITE, WARNING[i])
+            current_y = current_y + lsPrintWrapped(X_PADDING, current_y-40, 10, windowRight-35, 0.6, 0.6, WHITE, WARNING[i])
           end
         lsScrollAreaEnd(current_y);
     
