@@ -40,6 +40,7 @@ function getFileName()
 end
 
 function writeDowseLog(x, y, region, name, exact)
+  sleepWithStatus(4000,name)
   if exact then
     status = name .. " at " .. x .. ". " .. y;
   else
@@ -97,14 +98,14 @@ function getOreFromLine(line)
 
   local ore = string.match(line, " vein of (%D+) at");
   if not ore then
-    ore = string.match(line, " vein of (%D+), somewhere");
+    ore = string.match(line, " vein of (%D+) somewhere");
   end
 
   return ore;
 end
 
 function getExactFromLine(line)
-  return string.match(line, " at ");
+  return string.match(line, " underground vein ");
 end
 
 function getRegionFromLine(line)
@@ -219,6 +220,12 @@ function displayConfig()
     writeSetting("nearby", nearby)
     y = y + 35;
 
+    carrot = readSetting("carrot", carrot);
+    lsPrint(10, y, 0, 1, 1, 0xFFFFFFff, "Eat Carrots:");
+    carrot = CheckBox(130, y, 0, 0xFFFFFFff, "", carrot, 1, 1);
+    writeSetting("carrot", carrot)
+    y = y + 35;
+
     lsPrint(10, y, 0, 1, 1, 0xFFFFFFff, "Auto Run:");
     autorun = lsDropdown("autorun", 130, y, 0, 150, autorun, directions);
     y = y + 35;
@@ -285,6 +292,11 @@ function dowse()
 
   for i = 1, count do
     srReadScreen();
+
+    if carrot then
+      eatCarrot();
+    end
+
     local button = waitForImage("dowsing.png", 72000, "Waiting to dowse, stay put.", nil, 6000);
     if not button then
       fatalError("Unable to find dowsing button");
@@ -371,4 +383,15 @@ Hover over the ATITD window and press shift.
     checkBreak();
     lsSleep(50);
   end
+end
+
+function eatCarrot()
+  srReadScreen();
+  buffed = srFindImage("stats/perceptionBuff.png")
+    if not buffed then
+      srReadScreen();
+      local consumeCarrot = srFindImage("consume.png")
+      safeClick(consumeCarrot[0],consumeCarrot[1]);
+      waitForImage("stats/perceptionBuff.png", 5000, "Waiting for Endurance Buff icon")
+    end
 end
