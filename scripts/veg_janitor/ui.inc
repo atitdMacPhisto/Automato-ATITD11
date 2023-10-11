@@ -1,6 +1,36 @@
 dofile("veg_janitor/io.inc")
 dofile("veg_janitor/logger.inc")
 dofile("screen_reader_common.inc")
+
+windowRight = lsGetWindowSize()[0];
+windowBottom = lsGetWindowSize()[1];
+
+flashIdx = 0;
+flashColors = {RED, WHITE, GREEN};
+
+WARNING = {
+  [[ 1. In Options -> Interface Options]],
+  [[    1. You Must SET: UI Size to Normal]],
+  [[    2. You Must ENABLE: "Use the chat area instead of popups for many messages"]],
+  [[    3. You Must ENABLE: "Position Menus to right of mouse"]],
+  [[    4. You Must ENABLE: "Right-Click Pins/Unpins a Menu"]],
+  [[ 2. In Options -> One-Click and Related]],
+  [[    1. You must DISABLE: "Plant all crops where you stand"]],
+  [[    2. You must ENABLE: "Auto take piles of upto 50 portable items"]],
+  [[ 3. In Options -> Video]],
+  [[    1. You must set: "Tufts of Grass", "Shadow Quality", and "Time-of-Day Lighting" to the lowest possible settings]],
+  [[    2. Ideally run Veg Janitor in windowed mode with the window resized to be about 1280x1000 in size.]],
+  [[ 4. Press F8 F8 to set the camera in top down mode]],
+  [[ 5. Press ALT-L to lock the camera so it doesn't move accidentally]],
+  [[ 6. Do not move once the macro is running and you must be standing on a tile with water available to refill]],
+  [[ 7. DO NOT STAND NEAR WATER OR ANY OTHER ANIMATED OBJECTS. IF WATER IS WITHIN HALF A SCREEN SIZE DISTANCE FROM YOUR
+CHARACTER BAD THINGS WILL HAPPEN.]],
+  [[ 8. Click the seed you wish to plant and ensure the seed window with the "Plant" button is pinned and visible]],
+  [[ 9. Make sure on the previous screen you have selected the same seed name as the open seed window.]],
+  [[10. Open the Main chat tab to automatically stop the macro when the ground is not suitable.]],
+  [[11. Do not use the mouse whilst the macro is running.]]
+};
+
 -- Used to place gui elements sucessively.
 current_y = 0
 -- How far off the left hand side to place gui elements.
@@ -280,13 +310,13 @@ function edit_config_screen(config)
       sub_screen {
         config = config,
         done_button_text = "Back",
-        open_button = "Edit Calibration Mode Settings",
+        open_button = "Edit Calibration Settings",
         draw_screen = drawCalibrationModeSettingsScreen
       }
       sub_screen {
         config = config,
         done_button_text = "Back",
-        open_button = "Edit Plant Order and Locations",
+        open_button = "Edit Plant Build Order",
         draw_screen = function()
           drawTextUsingCurrent("PLANT ORDER AND LOCATION CONFIG:", GREEN)
           drawWrappedTextUsingCurrent("This menu lets you change where veg janitor puts each plant using the build menu.", WHITE)
@@ -447,7 +477,7 @@ function edit_config_screen(config)
       config.show_debug_images = CheckBox(X_PADDING, current_y, 10, WHITE, " Show Debug Images?", config.show_debug_images)
       current_y = current_y + 100
       config.debug_log_level = dropdown("debug_log_level", config.debug_log_level or INFO, LOG_LEVEL_TO_NAME, "Debug Log Level:", LOG_LEVEL_TO_LEVEL)
-      local copy_log_to_clipboard = button("Copy last runs debug log to clipboard", YELLOW)
+      local copy_log_to_clipboard = button("Copy last debug log to clipboard", YELLOW)
       if copy_log_to_clipboard then
         lsClipboardSet(get_veg_log())
       end
@@ -501,7 +531,7 @@ function button(text, colour, right_align)
   if right_align then
     current_y = current_y - 30
   end
-  local x = right_align and (lsScreenX - (button_widths[text] + 10)) or 5
+  local x = right_align and (lsScreenX - (button_widths[text] - 50)) or 5
   local result = lsButtonText(x, current_y, 1, button_widths[text], colour or WHITE, text)
   current_y = current_y + 30
   return result
@@ -528,7 +558,7 @@ function config_selector(starting_config)
       error("Failed to open config file " .. current_config)
     end
   end
-  local add = button("Create New Config", YELLOW)
+  local add = button("New Config", YELLOW)
   if add then
     sub_screen {
       config = starting_config,
@@ -755,7 +785,7 @@ function dropdown(key, starting_index, values, text, return_values)
     end
   end
   local before = dropdown_indexs[key]
-  dropdown_indexs[key] = lsDropdown(key, X_PADDING, current_y, 10, lsScreenX - 10, dropdown_indexs[key] or starting_index, values)
+  dropdown_indexs[key] = lsDropdown(key, X_PADDING, current_y, 10, lsScreenX + 45, dropdown_indexs[key] or starting_index, values)
   current_y = current_y + 30
   return_values = return_values or values
   return return_values[dropdown_indexs[key]], before ~= dropdown_indexs[key]
@@ -870,34 +900,36 @@ function getUserParams()
       local invalid_key = config_is_invalid(config)
 
       if not invalid_key then
-        drawWrappedText("IN-GAME SETUP INSTRUCTIONS:", RED, X_PADDING, current_y)
+
+        lsPrintWrapped(5, current_y, 10, lsGetWindowSize()[0]-5, 0.7, 0.7, GREEN, "IN-GAME SETUP INSTRUCTIONS:");
         if not flashing_colour then
-          flashing_colour = RED
+          flashing_colour = flashColors[flashIdx+1];
           last_flash = lsGetTimer()
         end
-        drawWrappedText("Please re-read these instructions, they have changed as of 21/06/2021", flashing_colour, X_PADDING, current_y)
+        current_y = current_y + 10 + lsPrintWrapped(5, current_y+20, 10, lsGetWindowSize()[0]-5, 0.7, 0.7, flashing_colour, "Please read AND re-read these instructions,\nTHEY ARE VERY VERY VERY IMPORTANT!!");
         if lsGetTimer() - last_flash > 500 then
-          if flashing_colour == RED then
-            flashing_colour = WHITE
-          elseif flashing_colour == WHITE then
-            flashing_colour = GREEN
-          else
-            flashing_colour = RED
-          end
+          flashIdx = (flashIdx+1)%3;
+          flashing_colour = flashColors[flashIdx+1];
           last_flash = lsGetTimer()
         end
-        drawWrappedText(WARNING, WHITE, X_PADDING, current_y)
+
+        lsScrollAreaBegin("warningScroll", 10, current_y+15, z, windowRight-10, windowBottom-160);
+          for i=1, #WARNING do
+            current_y = current_y + lsPrintWrapped(X_PADDING, current_y-40, 10, windowRight-25, 0.6, 0.6, WHITE, WARNING[i])
+          end
+        lsScrollAreaEnd(current_y);
+    
         local seed_type = config.selected_seed_type
         local seed_name = config.seed_name
         local timings = config.plants[seed_type][seed_name].stage_advance_timings
         local plant_is_calibrated = timings and timings.calibrated
         if not plant_is_calibrated then
-          drawWrappedText("Please click calibrate first to " .. seed_type .. " to calculate stage water times automatically. If you instead want to use the timings manually set in your config just click start.", GREEN, X_PADDING, lsScreenY - 100)
-          calibration_mode = lsButtonText(0, lsScreenY - 30, z, 100, GREEN, "Calibrate")
-          is_done = lsButtonText(90, lsScreenY - 30, z, 100, ORANGE, "Start")
+          drawWrappedText("Please click calibrate to automatically calculate stage watering times for " .. seed_type .. ". If you instead want to use the timings manually set in your config just click start.", GREEN, X_PADDING, lsScreenY - 87)
+          calibration_mode = lsButtonText(5, lsScreenY - 30, z, 100, GREEN, "Calibrate")
+          is_done = lsButtonText(110, lsScreenY - 30, z, 80, ORANGE, "Start")
         else
           drawWrappedText("Please re-run the calibration often especially if the macro is miss-timing often and over or under watering.", GREEN, X_PADDING, lsScreenY - 100)
-          is_done = lsButtonText(0, lsScreenY - 30, z, 100, GREEN, "Start")
+          is_done = lsButtonText(10, lsScreenY - 30, z, 80, GREEN, "Start")
           calibration_mode = lsButtonText(110, lsScreenY - 30, z, 200, YELLOW, "Calibrate More")
         end
       else
@@ -907,7 +939,7 @@ function getUserParams()
         end
       end
     end
-    if drawBottomButton(110, "Exit Script", RED) then
+    if drawBottomButton(105, "Exit Script", RED) then
       error "Script exited by user"
     end
 
