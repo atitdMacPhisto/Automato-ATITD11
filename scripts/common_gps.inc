@@ -112,6 +112,28 @@ local gpsInit = false;
 local gpsCenter;
 local gpsStep;
 
+-----------------------------------------------------------
+-- getRegion()
+----------------------------------------------------------
+function getRegion()
+  srReadScreen();
+
+  local result = nil;
+  local str = "";
+  local clockRegion = findClockRegion();
+  local lines = findAllText(nil, clockRegion);
+  srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
+
+  for i=1,#lines do
+    if i == 2 then
+      str = lines[i][2];
+    end
+  end
+
+  currentRegion = string.match(str, "(%D+):")
+  return currentRegion;
+end
+
 --------------------------------------------------------------
 -- getTime(fmt)
 --
