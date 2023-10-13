@@ -14,7 +14,7 @@ function doit()
 			if dest then
 			  chariot = string.match(dest[2], "Travel to (%a+)");
 			end
-			travelFree = findText("Travel now for free");
+			travelFree = findText("Travel now");
 
 			if window then
 			  message = "Waiting for travel to be free ...";
