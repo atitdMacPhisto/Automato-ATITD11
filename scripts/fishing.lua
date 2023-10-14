@@ -13,6 +13,9 @@ CurrentLureIndex = 1; -- 1 = First Lure Player Owns in alphabetical order
 QCurrentLureIndex = 1;
 PlayersLures = {}; -- Don't Edit, Holds Current Player Lures
 
+windowRight = lsGetWindowSize()[0];
+windowBottom = lsGetWindowSize()[1];
+
 castcount = 0;
 GrandTotalCaught = 0;
 GrandTotalCasts = 0;
@@ -38,22 +41,22 @@ TotalCasts = 5;
 SkipCommon = false; -- Skips to next lure if fish caught is a common (Choose True or False).
 displayCommon = false; -- Does not display common fish in the last 10 caught list
 LogFails = false; -- Do you want to add Failed Catches to log file? 'Failed to catch anything' or 'No fish bit'.
-LogStrangeUnusual = false; -- Do you want to add Strange and Unusual fish to the log file?
-LogOdd = false; -- Do you want to add Odd fish to the log file? Note the log will still add an entry if you lost lure.
 AutoFillet = true; -- Do you want to auto-fillet fish if menu is pinned?
 ----------------------------------------
 
 function setOptions()
     local is_done = false;
     local count = 1;
+    local z = 0;
+
     while not is_done do
         lsDoFrame();
         checkBreak();
         local y = 10;
 
-        lsPrint(5, y, 0, 0.7, 0.7, 0xffffffff, "# Casts until lure switches");
+        lsPrint(10, y, 0, 0.7, 0.7, 0xffffffff, "# Casts until lure switches:");
         TotalCasts = readSetting("TotalCasts", TotalCasts);
-        is_done, TotalCasts = lsEditBox("totalcasts", 180, y, 0, 40, 0, 0.8, 0.8, 0x000000ff, TotalCasts);
+        is_done, TotalCasts = lsEditBox("totalcasts", 185, y, 0, 40, 0, 0.8, 0.8, 0x000000ff, TotalCasts);
         TotalCasts = tonumber(TotalCasts);
         if not TotalCasts then
             is_done = false;
@@ -69,51 +72,48 @@ function setOptions()
         lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.7, 0.7, 0xffff40ff,
             "---------------------------------------------------------------");
         y = y + 20;
+
+        lsSetCamera(0,0,lsScreenX*1.4,lsScreenY*1.4);
+        lsScrollAreaBegin("optionsScroll", 10, y+30, 5, (windowRight*1.4)-20, (windowBottom*1.4)-315);
+
         muteSoundEffects = readSetting("muteSoundEffects", muteSoundEffects);
-        muteSoundEffects = CheckBox(10, y, 10, 0xFFFFFFff, " Mute Sound Effects", muteSoundEffects, 0.7, 0.7);
+        muteSoundEffects = lsCheckBox(15, y-70, 10, 0xffffffff, " Mute Sound Effects", muteSoundEffects);
         writeSetting("muteSoundEffects", muteSoundEffects);
         y = y + 20;
+
         SkipCommon = readSetting("SkipCommon", SkipCommon);
-        SkipCommon = CheckBox(10, y, 10, 0xFFFFFFff, " Skip Common Fish", SkipCommon, 0.7, 0.7);
+        SkipCommon = lsCheckBox(15, y-65, 10, 0xFFFFFFff, " Skip Common Fish", SkipCommon);
         writeSetting("SkipCommon", SkipCommon);
         y = y + 20;
-        if SkipCommon then
-            lsPrintWrapped(10, y, 0, lsScreenX, 0.6, 0.6, 0xffff80ff,
-                "If a Common Fish is caught, then switch to next lure.\n" ..
-                    "(Abdju, Chromis, Catfish, Carp, Oxyrynchus, Perch, Phagrus, Tilapia)");
-            y = y + 44
-            lsPrintWrapped(10, y, 0, lsScreenX, 0.6, 0.6, 0x80ff80ff,
-                "Log entries are recorded to FishLog.txt in Automato/games/ATITD folder.");
-            y = y + 35;
-        end
-        displayCommon = readSetting("displayCommon", displayCommon);
-        displayCommon = CheckBox(10, y, 10, 0xFFFFFFff, " Display Common Fish Caught", displayCommon, 0.7, 0.7);
-        writeSetting("displayCommon", displayCommon);
-        y = y + 20;
+
         AutoFillet = readSetting("AutoFillet", AutoFillet);
-        AutoFillet = CheckBox(10, y, 10, 0xFFFFFFff, " Automatically Fillet Fish", AutoFillet, 0.7, 0.7);
+        AutoFillet = lsCheckBox(15, y-60, 10, 0xFFFFFFff, " Automatically Fillet Fish", AutoFillet);
         writeSetting("AutoFillet", AutoFillet);
         y = y + 20;
-        lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.7, 0.7, 0xffff40ff,
-            "---------------------------------------------------------------");
+
+        if not SkipCommon then
+            displayCommon = readSetting("displayCommon", displayCommon);
+            displayCommon = lsCheckBox(15, y-35, 10, 0xFFFFFFff, " Display Common Fish Caught", displayCommon);
+            writeSetting("displayCommon", displayCommon);
+            y = y + 20;
+        end
+
+        writeStats = readSetting("writeStats", writeStats);
+        writeStats = lsCheckBox(15, y-30, 10, 0xFFFFFFff, " Write Fishing Statistics", writeStats);
+        writeSetting("writeStats", writeStats);
         y = y + 20;
+
         LogFails = readSetting("LogFails", LogFails);
-        LogFails = CheckBox(10, y, 10, 0xFFFFFFff, " Log Failed Catches (Log Everything)", LogFails, 0.7, 0.7);
+        LogFails = lsCheckBox(15, y-25, 10, 0xFFFFFFff, " Log Failed Catches (Log Everything)", LogFails);
         writeSetting("LogFails", LogFails);
 
-        if LogFails then
-            LogStrangeUnusual = false;
-            LogOdd = false;
-        else
-            y = y + 20;
-            LogStrangeUnusual = readSetting("LogStrangeUnusual", LogStrangeUnusual);
-            LogStrangeUnusual = CheckBox(10, y, 10, 0xFFFFFFff, " Log Strange & Unusual Fish Seen ...",
-                LogStrangeUnusual, 0.7, 0.7);
-            writeSetting("LogStrangeUnusual", LogStrangeUnusual);
-            y = y + 20;
-            LogOdd = readSetting("LogOdd", LogOdd);
-            LogOdd = CheckBox(10, y, 10, 0xFFFFFFff, " Log Odd Fish Seen ...", LogOdd, 0.7, 0.7);
-            writeSetting("LogOdd", LogOdd);
+        lsScrollAreaEnd(y);
+        lsSetCamera(0,0,lsScreenX*1.0,lsScreenY*1.0);
+
+        if SkipCommon then
+            lsPrintWrapped(15, y+70, z, lsScreenX, 0.6, 0.6, 0xffff80ff,
+                "If a Common Fish is caught, then switch to next lure.\n" ..
+                    "(Abdju, Chromis, Catfish, Carp, Oxyrynchus, Perch, Phagrus, Tilapia)");
         end
 
         if setResume then
@@ -233,6 +233,19 @@ function UseLure()
     LostLure = 0;
 
     if lure then
+        for i = 1, #Lure_Types, 1 do
+            test = findText(Lure_Types[i]);
+            if test then
+                LureType = Lure_Types[i];
+                if not muteSoundEffects then
+                    lsPlaySound("high_rise.wav");
+                end
+                --Click it!
+                srClickMouseNoMove(test[0]+12,test[1]+5);
+                break;
+            end
+        end
+
         srClickMouseNoMove(lure[0] + 12, lure[1] + 5);
         lsSleep(200);
         srReadScreen();
@@ -335,26 +348,24 @@ end
 function findClockInfo()
     srReadScreen();
     coordinates = findCoords()
-    if coordinates then
+    if not coordinates then
+        error("ATITD clock not found. Please post a screenshot in discord");
+    else
         coordX = coordinates[0];
         coordY = coordinates[1];
         coordinates = coordX .. ", " .. coordY
     end
+
     fetchTime = getTime(1);
-    theDateTime = string.sub(fetchTime, string.find(fetchTime, ",") + 0); -- I know it's weird to have +0, but don't remove it or will error, shrug
-    stripYear = string.sub(theDateTime, string.find(theDateTime, ",") + 2);
-    Time = string.sub(stripYear, string.find(stripYear, ",") + 2);
-    stripYear = "," .. stripYear
-    Date = string.sub(stripYear, string.find(stripYear, ",") + 1, string.len(stripYear) - string.len(Time) - 2);
-    stripYear = string.sub(theDateTime, string.find(theDateTime, ",") + 2);
+    year, date, time = fetchTime:match('(.*), (.*), (.*)')
 end
 
 function gui_refresh()
     checkBreak();
 
     if GrandTotalCasts == 0 or GrandTotalCasts == 1 then
-        DateBegin = Date;
-        TimeBegin = Time;
+        dateBegin = date;
+        timeBegin = time;
     end
 
     if GrandTotalCaught < 10 then
@@ -386,7 +397,7 @@ function gui_refresh()
     local y = 2;
     CurrentLure = PlayersLures[CurrentLureIndex];
     QCurrentLure = PlayersLures[QCurrentLureIndex];
-    lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, Date .. " | " .. Time .. " | " .. coordinates);
+    lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, date .. " | " .. time .. " | " .. coordinates);
     nextLureChange = TotalCasts + 1 - castcount
     nextLureChangeMessageColor = 0xc0ffffff;
 
@@ -555,9 +566,11 @@ function gui_refresh()
         allcaught = "*** No fish caught! ***";
     end
 
-    WriteFishStats(
-        "Note this report is overwritten every time the macro runs. The stats are for last fishing session only!\nYou can safely delete this file, but it will be created the next time macro runs!\n\n\nStart Time: " ..
-            DateBegin .. " @ " .. TimeBegin .. "\nEnd Time: " .. Date .. " @ " .. Time .. "\nLast coordinates: " ..
+    if writeStats then
+        WriteFishStats(
+            "Note this report is overwritten every time the macro runs. The stats are for last fishing session only!\n"
+            .. "You can safely delete this file, but it will be created the next time macro runs!\n\n\nStart Time: " ..
+            dateBegin .. " @ " .. timeBegin .. "\nEnd Time: " .. date .. " @ " .. time .. "\nLast coordinates: " ..
             coordinates .. "\n----------------------------------\nOdd Fish Seen: " .. GrandTotalOdd ..
             "\nUnusual Fish Seen: " .. GrandTotalUnusual .. "\nStrange Fish Seen: " .. GrandTotalStrange ..
             "\n----------------------------------\nLures Clicked: " .. GrandTotalLuresUsed .. "\nLures Lost: " ..
@@ -565,6 +578,8 @@ function gui_refresh()
             "\nFailed Catches: " .. GrandTotalFailed .. "\nFish Caught: " .. GrandTotalCaught .. " (" ..
             math.floor(GrandTotaldb) .. "db)\n----------------------------------\n\nAll lures lost this Session:\n\n" ..
             lostlures .. "\n\n\nAll fish caught this Session:\n\n" .. allcaught);
+    end
+
     lsDoFrame();
     lsSleep(10);
 end
@@ -732,8 +747,6 @@ function doit()
             -- Parse Chat
             CurrentLure = PlayersLures[CurrentLureIndex];
             caughtFish = false;
-            oddFound = false;
-            strangeUnusualFound = false;
 
             for k, v in pairs(Chat_Types) do
                 if string.find(lastLine, k, 0, true) then
@@ -769,23 +782,14 @@ function doit()
 
                     if v == "odd" then
                         GrandTotalOdd = GrandTotalOdd + 1;
-                        if LogOdd then
-                            oddFound = true;
-                        end
                     end
 
                     if v == "strange" then
                         GrandTotalStrange = GrandTotalStrange + 1;
-                        if LogStrangeUnusual then
-                            strangeUnusualFound = true;
-                        end
                     end
 
                     if v == "unusual" then
                         GrandTotalUnusual = GrandTotalUnusual + 1;
-                        if LogStrangeUnusual then
-                            strangeUnusualFound = true;
-                        end
                     end
 
                     if v == "caught" or caughtFish then
@@ -838,15 +842,19 @@ function doit()
             if v == "lure" or v == "alreadyfishing" or noWriteLog or not string.find(lastLine, "^%*%*", 0) then
                 -- Do nothing
             elseif overweight then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
-                                 LureType .. ")] " .. lastLineParse2 .. "\n");
+                if LogFails then
+                    WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
+                                    LureType .. ")] " .. lastLineParse2 .. "\n");
+                end
             elseif writeLastTwoLines then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
-                                 LureType .. ")] " .. lastLineParse2 .. "\n");
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
-                                 LureType .. ")] " .. lastLineParse .. "\n");
-            elseif LogFails or caughtFish or oddFound or strangeUnusualFound then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
+                if LogFails then
+                    WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
+                                    LureType .. ")] " .. lastLineParse2 .. "\n");
+                    WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
+                                    LureType .. ")] " .. lastLineParse .. "\n");
+                end
+            elseif LogFails then
+                WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse .. "\n");
             end
 
