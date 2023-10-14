@@ -11,3 +11,5 @@ data/version.txt
 Thumbs.db
 config_thistle_local.txt
 Settings*.txt
+
+.vscode/
