@@ -177,6 +177,8 @@ stds.common = {
     "wasStashed",
     "windowManager",
     "writeSetting",
+    "WriteFishLog",
+    "WriteFishStats",
   }
 }
 stds.automato = {
