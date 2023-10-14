@@ -12,7 +12,7 @@ miningTime = 0;
 timesworked = 0;
 miningTimeTotal = 0;
 dropdown_key_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
-dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
+dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Coal (10)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
 cancelButton = 0;
 lastLineFound = "";
 lastLineFound2 = "";
@@ -214,36 +214,39 @@ function getPoints()
         ore = "Antimony";
         stonecount = 14;
     elseif (dropdown_ore_cur_value == 3) then
-        ore = "Cobalt";
+        ore = "Coal";
         stonecount = 10;
     elseif (dropdown_ore_cur_value == 4) then
+        ore = "Cobalt";
+        stonecount = 10;
+    elseif (dropdown_ore_cur_value == 5) then
         ore = "Copper";
         stonecount = 8;
-    elseif (dropdown_ore_cur_value == 5) then
+    elseif (dropdown_ore_cur_value == 6) then
         ore = "Gold";
         stonecount = 12;
-    elseif (dropdown_ore_cur_value == 6) then
+    elseif (dropdown_ore_cur_value == 7) then
         ore = "Iron";
         stonecount = 7;
-    elseif (dropdown_ore_cur_value == 7) then
+    elseif (dropdown_ore_cur_value == 8) then
         ore = "Lead";
         stonecount = 9;
-    elseif (dropdown_ore_cur_value == 8) then
+    elseif (dropdown_ore_cur_value == 9) then
         ore = "Magnesium";
         stonecount = 9;
-    elseif (dropdown_ore_cur_value == 9) then
+    elseif (dropdown_ore_cur_value == 10) then
         ore = "Nickel";
         stonecount = 13;
-    elseif (dropdown_ore_cur_value == 10) then
+    elseif (dropdown_ore_cur_value == 11) then
         ore = "Platinum";
         stonecount = 12;
-    elseif (dropdown_ore_cur_value == 11) then
+    elseif (dropdown_ore_cur_value == 12) then
         ore = "Silver";
         stonecount = 10;
-    elseif (dropdown_ore_cur_value == 12) then
+    elseif (dropdown_ore_cur_value == 13) then
         ore = "Tin";
         stonecount = 9;
-    elseif (dropdown_ore_cur_value == 13) then
+    elseif (dropdown_ore_cur_value == 14) then
         ore = "Zinc";
         stonecount = 10;
     end
