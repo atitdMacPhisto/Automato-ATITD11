@@ -338,7 +338,7 @@ function findClockInfo()
     if coordinates then
         coordX = coordinates[0];
         coordY = coordinates[1];
-        Coordinates = coordX .. ", " .. coordY
+        coordinates = coordX .. ", " .. coordY
     end
     fetchTime = getTime(1);
     theDateTime = string.sub(fetchTime, string.find(fetchTime, ",") + 0); -- I know it's weird to have +0, but don't remove it or will error, shrug
@@ -386,7 +386,7 @@ function gui_refresh()
     local y = 2;
     CurrentLure = PlayersLures[CurrentLureIndex];
     QCurrentLure = PlayersLures[QCurrentLureIndex];
-    lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, Date .. " | " .. Time .. " | " .. Coordinates);
+    lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, Date .. " | " .. Time .. " | " .. coordinates);
     nextLureChange = TotalCasts + 1 - castcount
     nextLureChangeMessageColor = 0xc0ffffff;
 
@@ -557,8 +557,8 @@ function gui_refresh()
 
     WriteFishStats(
         "Note this report is overwritten every time the macro runs. The stats are for last fishing session only!\nYou can safely delete this file, but it will be created the next time macro runs!\n\n\nStart Time: " ..
-            DateBegin .. " @ " .. TimeBegin .. "\nEnd Time: " .. Date .. " @ " .. Time .. "\nLast Coordinates: " ..
-            Coordinates .. "\n----------------------------------\nOdd Fish Seen: " .. GrandTotalOdd ..
+            DateBegin .. " @ " .. TimeBegin .. "\nEnd Time: " .. Date .. " @ " .. Time .. "\nLast coordinates: " ..
+            coordinates .. "\n----------------------------------\nOdd Fish Seen: " .. GrandTotalOdd ..
             "\nUnusual Fish Seen: " .. GrandTotalUnusual .. "\nStrange Fish Seen: " .. GrandTotalStrange ..
             "\n----------------------------------\nLures Clicked: " .. GrandTotalLuresUsed .. "\nLures Lost: " ..
             GrandTotalLostLures .. " \n----------------------------------\nCasts: " .. GrandTotalCasts ..
@@ -838,15 +838,15 @@ function doit()
             if v == "lure" or v == "alreadyfishing" or noWriteLog or not string.find(lastLine, "^%*%*", 0) then
                 -- Do nothing
             elseif overweight then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. Coordinates .. "] [" .. CurrentLure .. " (" ..
+                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse2 .. "\n");
             elseif writeLastTwoLines then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. Coordinates .. "] [" .. CurrentLure .. " (" ..
+                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse2 .. "\n");
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. Coordinates .. "] [" .. CurrentLure .. " (" ..
+                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse .. "\n");
             elseif LogFails or caughtFish or oddFound or strangeUnusualFound then
-                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. Coordinates .. "] [" .. CurrentLure .. " (" ..
+                WriteFishLog("[" .. Date .. ", " .. Time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse .. "\n");
             end
 
