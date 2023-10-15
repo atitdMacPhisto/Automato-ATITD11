@@ -104,66 +104,58 @@ function repairBoards()
 end
 
 function planeBoards()
-  srReadScreen();
+srReadScreen();
 
   while 1 do
-  -- eat an onion
-  if autoOnion then
-    eatOnion()
-  end
-  -- Click pin ups to refresh the window
-  clickAllImages("ThisIs.png");
-  sleepWithStatus(500, "Refreshing\nBoards Planed: " .. boards);
+    -- eat an onion
+    if autoOnion then
+      eatOnion()
+    end
 
-  srReadScreen();
-  local clickCount = 0;
-  local ThisIsList = findAllImages("ThisIs.png");
+    clickAllImages("ThisIs.png");
+    sleepWithStatus(500, "Refreshing\nBoards Planed: " .. boards);
+
+    srReadScreen();
+    local clickCount = 0;
+    local ThisIsList = findAllImages("ThisIs.png");
     for i=1,#ThisIsList do
-    local x = ThisIsList[i][0]-75;
-    local y = ThisIsList[i][1];
-    local width = 285;
-    local height = 250;
+      local x = ThisIsList[i][0]-75;
+      local y = ThisIsList[i][1];
+      local width = 285;
+      local height = 250;
       if not carpShop then
-      srReadScreen();
-      p = srFindImageInRange("boards/planeWood.png", x, y, width, height, 5000);
-      repairBoards();
+        srReadScreen();
+        p = srFindImageInRange("boards/planeWood.png", x, y, width, height, 5000);
+        repairBoards();
       else
-      p = srFindImageInRange("boards/carpWood.png", x, y, width, height, 5000);
+        p = srFindImageInRange("boards/carpWood.png", x, y, width, height, 5000);
       end
-        if(p) then
+
+      if(p) then
         closePopUp();
         waitForStats();
-        safeClick(p[0]+10,p[1]+2);
+        safeClick(p[0]+10,p[1]+5);
         clickCount = clickCount + 1;
         boards = boards + 1;
         srReadScreen();
-        else
+      else
         p = srFindImageInRange("boards/installBlade.png", x, y, width, height, 5000);
-          if(p) then
-          safeClick(p[0]+15,p[1]+8);
+        if(p) then
+          safeClick(p[0]+10,p[1]+5);
           lsSleep(75);
           srReadScreen();
-            if bladeName == "Slate Blade" then
+          if bladeName == "Slate Blade" then
             p = srFindImage("boards/slateBlade.png", 5000);
-            elseif bladeName == "Flint Blade" then
+          elseif bladeName == "Flint Blade" then
             p = srFindImage("boards/flintBlade.png", 5000);
-            elseif bladeName == "Bone Blade" then
+          elseif bladeName == "Bone Blade" then
             p = srFindImage("boards/boneBlade.png", 5000);
-            elseif bladeName == "Carpentry Blade" then
+          elseif bladeName == "Carpentry Blade" then
             p = srFindImage("boards/carpentryBlade.png", 5000);
-            end
-              if(p) then
-              safeClick(p[0]+10,p[1]+10);
-              lsSleep(click_delay);
-              if bladeName == "Carpentry Blade" then
-              srReadScreen();
-              p = srFindImage("boards/quality.png", 5000);
-              if(p) then
-              safeClick(p[0]+4,p[1]+4);
-              lsSleep(click_delay);
-              srReadScreen();
-              end
-            end
+          end
+          if(p) then
+            safeClick(p[0]+10,p[1]+5);
+            lsSleep(click_delay);
           end
         end
       end
