@@ -330,7 +330,7 @@ end
 function findAnvil()
   waitAndClickText("This is [a-z]+ Anvil", nil, REGEX);
 
-  setCameraView(CARTOGRAPHER2CAM);
+  setCameraView(CLOSEWHEELINTHESKYCAM);
   lsSleep(100);
   srReadScreen();
 
@@ -432,7 +432,7 @@ function recordRecipe(existingRecipe)
 
       if lsButtonText(5, lsScreenY - 30, z, 80, 0xffffffff, "Start") then
         recipe.product = products[productIndex];
-        setCameraView(CARTOGRAPHER2CAM);
+        setCameraView(CLOSEWHEELINTHESKYCAM);
         break;
       end
 

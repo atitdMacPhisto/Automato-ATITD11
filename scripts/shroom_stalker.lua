@@ -475,7 +475,7 @@ function openCharacterMenu()
   local utility = findText("Utility...");
   if not utility then
     local startX, startY = srMousePos();
-    setCameraView(CARTOGRAPHER2CAM);
+    setCameraView(CLOSEWHEELINTHESKYCAM);
     lsSleep(100);
     local window = srGetWindowSize();
     srSetMousePos(window[0] / 2, window[1] / 2);

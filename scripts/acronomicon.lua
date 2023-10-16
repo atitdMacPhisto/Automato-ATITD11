@@ -519,7 +519,7 @@ function finish()
   if move then
     local nextLocation = getNextLocation();
     if (nextLocation) then
-      setCameraView(CARTOGRAPHER2CAM);
+      setCameraView(CLOSEWHEELINTHESKYCAM);
       walkTo(nextLocation);
     end
   end
