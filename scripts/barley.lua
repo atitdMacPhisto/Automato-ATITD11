@@ -345,7 +345,7 @@ function doit()
     lsPrintln("Start pos:" .. startPos[0] .. ", " .. startPos[1]);
   end
 
-  setCameraView(CARTOGRAPHER2CAM);
+  setCameraView(CLOSEWHEELINTHESKYCAM);
   drawWater();
   startTime = lsGetTimer();
 

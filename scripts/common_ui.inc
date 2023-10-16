@@ -444,12 +444,31 @@ function getElapsedTime(startTime)
         return string.format("%02d:%02d:%02d",hours,minutes,seconds);
 end
 
-GENERALCAM = 5; -- f5 view
-EXPLORERCAM = 6; -- f6 view
-BUILDERCAM = 7; -- f7 view
-DUELINGCAM = 8; -- f8 view
-CARTOGRAPHERCAM = 100; -- f8f8 view
-CARTOGRAPHER2CAM = 101; -- zoomed in f8f8 view
+-- Camera Constants
+GENERALCAM = 1
+EXPLORERCAM = 2
+DUELINGCAM = 3
+BUILDERCAM = 4
+WHEELINTHESKYCAM = 5
+CLOSEWHEELINTHESKYCAM = 6
+FREECAMERA = 7
+
+--[[
+  Camera Settings Table to match the constants above.
+
+  We cannot know what camera angle the user is currently set to, so add an
+  "incorrect" function key press to the start of each table to reset the
+  camera and end up with the correct view.
+--]]
+local cameraViewpoint = {
+  [GENERALCAM] = {6,5},
+  [EXPLORERCAM] = {5,6},
+  [DUELINGCAM] = {5,8,8,8},
+  [BUILDERCAM] = {5,7},
+  [WHEELINTHESKYCAM] = {5,8},
+  [CLOSEWHEELINTHESKYCAM] = {5,8,8},
+  [FREECAMERA] = {5,7,7}
+}
 -------------------------------------------------------------------------------
 -- setCameraView(viewName)
 --
@@ -458,28 +477,16 @@ CARTOGRAPHER2CAM = 101; -- zoomed in f8f8 view
 -- viewName - Constant representing the name of the view. Defaults to zoomed
 -- in cartographer's view.
 -------------------------------------------------------------------------------
-
 -- This works by going to an alternate view than the ideal view using the F
 -- keys, and then going to the ideal view.
 function setCameraView(viewName)
-   if viewName == nil then
-      error("No camera view specified");
-   end
-   if viewName == GENERALCAM then
-      srFunctionKeyEvent(6);
-      srFunctionKeyEvent(5);
-      return;
-   end
-   srFunctionKeyEvent(5);
-   if viewName ~= CARTOGRAPHERCAM and viewName ~= CARTOGRAPHER2CAM then
-      srFunctionKeyEvent(viewName);
-   else
-      srFunctionKeyEvent(8);
-      srFunctionKeyEvent(8);
-      if viewName == CARTOGRAPHER2CAM then
-         srFunctionKeyEvent(8);
-      end
-   end
+  if cameraViewpoint[viewName] == nil then
+    error("No camera view specified");
+  end
+
+  for i=1,#cameraViewpoint[viewName] do
+    srFunctionKeyEvent(cameraViewpoint[viewName][i]);
+  end
 end
 
 -------------------------------------------------------------------------------

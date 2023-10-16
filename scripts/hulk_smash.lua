@@ -138,7 +138,7 @@ if you don't have big hands.
 Hover over the ATITD window and press shift.
 ]]);
 
-  setCameraView(CARTOGRAPHER2CAM);
+  setCameraView(CLOSEWHEELINTHESKYCAM);
   lsSleep(1000);
   faceNorth();
 

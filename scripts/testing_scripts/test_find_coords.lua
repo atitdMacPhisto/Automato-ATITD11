@@ -110,11 +110,7 @@ function sleepWithStatus(delay_time, message, color, scale, waitMessage)
 	          sleepWithStatus(16, "Release Mouse !", nil, 0.7, "Preparing to Walk");
 	        end
 	    if not firstWalk then
-	      setCameraView(CARTOGRAPHERCAM); -- Set to F8 camera
-	      srClickMouse(5,5, 1); -- Right click to put ATITD back in focus
-	      lsSleep(100);
-	      srSetMousePos(0,0); -- Move Mouse to top left corner of screen
-	      sleepWithStatus(2000, "Please wait ...", nil, 0.7, "Zooming in slightly");
+	      setCameraView(CLOSEWHEELINTHESKYCAM); -- Set to F8 camera
 	      center = srGetWindowSize();
 	      srSetMousePos((center[0]/2)-50, (center[1]/2)+50); -- Move mouse away to stop zooming
 	      toPos = makePoint(tonumber(walkX), tonumber(walkY));

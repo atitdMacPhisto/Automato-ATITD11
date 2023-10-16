@@ -357,7 +357,7 @@ Hover over the ATITD window and press shift.
   lsDoFrame();
 
   if autorun > 1 then
-    setCameraView(CARTOGRAPHERCAM);
+    setCameraView(CLOSEWHEELINTHESKYCAM);
   end
 
   if spacing > 0 then
