@@ -561,7 +561,7 @@ function windowManager(title, message, allowCascade, allowUIGap, varWidth, varHe
       local y = 0;
       x, y = srMousePos();
       openAndPin(x, y, 500);
-      stashWindow(x, y, BOTTOM_RIGHT);
+      stashWindow(x + 15, y + 30, BOTTOM_RIGHT);
     end
     if lsButtonText(10, lsScreenY - 30, 0, 100, 0xFFFFFFff, "Done") then
       done = true;
