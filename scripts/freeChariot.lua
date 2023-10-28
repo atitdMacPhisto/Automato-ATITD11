@@ -12,7 +12,9 @@ function doit()
 			window = findText("Travel will be free");
 			dest = findText("Travel to");
 			if dest then
-			  chariot = string.match(dest[2], "Travel to (%a+)");
+				chariot = string.match(dest[2], "Travel to (%a+)");
+			else
+				chariot = "free house destination"
 			end
 			travelFree = findText("Travel now");
 
@@ -32,13 +34,13 @@ function doit()
 
 	    -- Add prompt to continue using Free Chariot macro
 	  end
-	   	lsPlaySound("trolley.wav");
+		lsPlaySound("trolley.wav");
 			if promptOkay("You have arrived at " .. chariot .. " !\n\nElapsed Time: " .. 
 				             getElapsedTime(startTime) .. "\n\nDo you want to keep traveling?", nil, 0.7, true, false) == nil then
 				lsPlaySound("complete.wav");
 	      error("Journey completed. Have a great day!");
 	    else
-	    	sleepWithStatus(2000,"Starting over...",nil, 0.7,nil);
+			sleepWithStatus(2000,"Starting over...",nil, 0.7,nil);
 	    end
   end
-end 
+end
