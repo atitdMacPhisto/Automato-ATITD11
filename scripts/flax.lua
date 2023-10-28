@@ -54,8 +54,8 @@ local offset = {};
 offset.x = 372;
 offset.y = 132;
 local bottomRightOffset = {};
-bottomRightOffset.x = 375;
-bottomRightOffset.y = 130;
+bottomRightOffset.x = 367;
+bottomRightOffset.y = 127;
 ----------------------------------------
 
 ----------------------------------------
