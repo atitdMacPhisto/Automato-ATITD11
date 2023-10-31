@@ -1087,7 +1087,7 @@ function default_deep_config()
       ['Garlic'] = {
         ["Apep's Reaping"] = {
           ["type"] = "Garlic",
-          ["waters"] = 2,
+          ["waters"] = 1,
           ["stages"] = 3,
           ["yield"] = 2,
           ["stage_advance_timings"] = {
@@ -1098,7 +1098,7 @@ function default_deep_config()
         },
         ["Heket's Crop"] = {
           ["type"] = "Garlic",
-          ["waters"] = 1,
+          ["waters"] = 2,
           ["stages"] = 3,
           ["yield"] = 1,
           ["stage_advance_timings"] = {
@@ -1109,26 +1109,26 @@ function default_deep_config()
         },
       },
       ['Leeks'] = {
-        ["Hapi's Grain"] = {
-          ["type"] = "Leeks",
-          ["waters"] = 1,
-          ["stages"] = 3,
-          ["yield"] = 4,
-          ["stage_advance_timings"] = {
-            [1] = 15000,
-            [2] = 13500,
-            [3] = 13500,
-          }
-        },
         ["Horus's Harvest"] = {
           ["type"] = "Leeks",
-          ["waters"] = 2,
+          ["waters"] = 3,
           ["stages"] = 3,
-          ["yield"] = 6,
+          ["yield"] = 2,
           ["stage_advance_timings"] = {
             [1] = 12000,
             [2] = 12000,
             [3] = 12000,
+          }
+        },
+        ["Hapi's Grain"] = {
+          ["type"] = "Leeks",
+          ["waters"] = 1,
+          ["stages"] = 3,
+          ["yield"] = 1,
+          ["stage_advance_timings"] = {
+            [1] = 15000,
+            [2] = 13500,
+            [3] = 13500,
           }
         },
       },
@@ -1137,7 +1137,7 @@ function default_deep_config()
           ["type"] = "Onions",
           ["waters"] = 2,
           ["stages"] = 3,
-          ["yield"] = 6,
+          ["yield"] = 2,
           ["stage_advance_timings"] = {
             [1] = 15768.55,
             [2] = 15065.37,
@@ -1148,7 +1148,7 @@ function default_deep_config()
           ["type"] = "Onions",
           ["waters"] = 1,
           ["stages"] = 3,
-          ["yield"] = 4,
+          ["yield"] = 1,
           ["stage_advance_timings"] = {
             [1] = 11872.1,
             [2] = 11372.2,
