@@ -41,9 +41,9 @@ end
 
 function writeDowseLog(x, y, region, name, exact)
   if exact then
-    status = name .. " at " .. x .. ". " .. y;
+    status = name .. " at " .. x .. ", " .. y;
   else
-    status = name .. " near " .. x .. ". " .. y;
+    status = name .. " near " .. x .. ", " .. y;
     if not nearby then
       return;
     end
@@ -61,16 +61,16 @@ function writeDowseLog(x, y, region, name, exact)
   local text;
   if format == 1 then
     text = "(" .. color .. ") " ..
-      string.gsub(x, "%.[0-9]+", "") .. "." ..
+      string.gsub(x, "%.[0-9]+", "") .. "," ..
       string.gsub(y, "%.[0-9]+", "") .. "," ..
-      name .. " @ (" .. x .. ". " .. y .. ") " .. region;
+      name .. " @ (" .. x .. ", " .. y .. ") " .. region;
   elseif format == 2 then
-    text = string.gsub(x, "%.[0-9]+", "") .. "." ..
+    text = string.gsub(x, "%.[0-9]+", "") .. "," ..
       string.gsub(y, "%.[0-9]+", "") .. "," ..
       region .. "," ..
       name;
   else
-    text = x .. "." ..
+    text = x .. "," ..
       y .. "," ..
       region .. "," ..
       name;
