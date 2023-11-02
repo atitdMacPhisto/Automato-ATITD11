@@ -866,7 +866,7 @@ function promptDelays()
     end
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff,
       "End script") then
-      error(quitMessage);
+      error(quit_message);
     end
     lsDoFrame();
     lsSleep(10);

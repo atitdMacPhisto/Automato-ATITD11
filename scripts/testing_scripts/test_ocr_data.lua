@@ -47,7 +47,7 @@ function doit()
     end
 
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 20, 100, 0xFFFFFFff, "End Script") then
-      error(quitMessage);
+      error(quit_message);
     end
 
     checkBreak();

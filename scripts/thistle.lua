@@ -502,7 +502,7 @@ function config()
 
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFF0000ff,
                     "End script") then
-      error(quitMessage);
+      error(quit_message);
     end
   lsDoFrame();
   lsSleep(10);
@@ -897,7 +897,7 @@ function fetchVoidsWarning()
     end
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFF0000ff,
                     "End script") then
-      error(quitMessage);
+      error(quit_message);
     end
   lsDoFrame();
   lsSleep(10);
