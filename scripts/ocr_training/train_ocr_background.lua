@@ -4,13 +4,10 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-offsetX = 102;
-offsetY = 72;
-
 function doit()
   askForWindow("Choose window.\n\nUse the results of this on a large blank background " ..
     "region in order to inform srSetWindowBackgroundColorRange() or srSetWindowInvertColorRange()");
-  
+
   while not lsControlHeld() do
     sleepWithStatus(16, "Move mouse to upper-left corner of background area, then press Ctrl.");
   end
@@ -44,7 +41,7 @@ function doit()
 
   while true do
     checkBreak();
-    
+
     local y0 = 60;
     local x = 10;
     local y = y0;
@@ -55,7 +52,7 @@ function doit()
     local ming = 255;
     local maxb = 0;
     local minb = 255;
-    
+
     for c, count in pairs(colors) do
       local r = (c & 0xFF0000) >> 16;
       local g = (c & 0xFF00) >> 8;
@@ -66,7 +63,7 @@ function doit()
       minr = math.min(minr, r);
       ming = math.min(ming, g);
       minb = math.min(minb, b);
-      
+
       lsPrint(x, y, 10, scale, scale, 0xFFFFFFff, string.format("%06X", c) .. " (" .. count .. ")")
       lsDrawRect(x - 20 * scale, y, x, y + 18 * scale, 0, c << 8 | 0xFF);
       y = y + 20 * scale;
@@ -75,13 +72,12 @@ function doit()
         x = x + 100;
       end
     end
-    
+
     lsPrint(10, 10, 1, 1, 1, 0xFFFFFFff, "MinColor = " .. string.format("%06X", minr << 16 | ming << 8 | minb));
     lsPrint(10, 30, 1, 1, 1, 0xFFFFFFff, "MaxColor = " .. string.format("%06X", maxr << 16 | maxg << 8 | maxb));
 
     lsDoFrame();
     lsSleep(50);
   end
-  
 end
 

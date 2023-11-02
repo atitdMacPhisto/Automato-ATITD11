@@ -5,9 +5,6 @@
 -- DO NOT INCLUDE THIS FILE! Include common.inc instead
 --
 
--- List of colors which mark the edge of a window.
--- T8: WINDOW_COLORS = {0x72502EFF, 0x714f2eff, 0x6f4e2dff, 0x785431ff};
-
 --This version includes changes to how OCR works
 lsRequireVersion(2,59);
 
@@ -36,6 +33,21 @@ srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColo
 -- The color range that is treated as window background and stripped in srStripRegion()
 minWindowBackgroundColorRange = 0x283C42;
 maxWindowBackgroundColorRange = 0xFFFFFA;
+srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
+
+-------------------------------------------------------------------------------
+-- Chat Window Stripping
+-------------------------------------------------------------------------------
+
+-- The colors that srStripRegion/Screen() looks for to decide it should invert (and
+-- treat as background when stripping the main chat window)
+minChatWindowInvertColorRange = 0x1E2E31;
+maxChatWindowInvertColorRange = 0x263539;
+srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
+
+-- The color range that is treated as window background for main chat and stripped in srStripRegion()
+minChatWindowBackgroundColorRange = 0x797070;
+maxChatWindowBackgroundColorRange = 0xFFFFFF;
 srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
 
 -------------------------------------------------------------------------------
