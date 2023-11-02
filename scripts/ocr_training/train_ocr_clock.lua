@@ -76,7 +76,7 @@ function findStuff()
 
   if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100,
                   0xFFFFFFff, "End Script") then
-    error(quitMessage);
+    error(quit_message);
   end
 
   lsDoFrame();
