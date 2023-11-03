@@ -12,7 +12,6 @@ function findCoords()
   local str = "";
   local clockRegion = findClockRegion();
   local lines = findAllText(nil, clockRegion);
-  srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
   for i=1,#lines do
     if i == 2 then
@@ -122,7 +121,6 @@ function getRegion()
   local str = "";
   local clockRegion = findClockRegion();
   local lines = findAllText(nil, clockRegion);
-  srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
   for i=1,#lines do
     if i == 2 then
@@ -156,7 +154,6 @@ function getTime(fmt)
   local time = nil;
   local datetime2 = nil;
   local t = findAllText("Year", findClockRegion());
-  srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
   if #t == 0 then
     return nil;
