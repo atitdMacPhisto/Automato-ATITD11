@@ -26,12 +26,10 @@ function findStuff()
     regions = findAllTextRegions();
     regions = regions[1];
     srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
-    srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
   else
     -- Values required for training the ocr from the main chat window.
     regions = findChatRegionReplacement();
-    srSetWindowInvertColorRange(minChatWindowInvertColorRange, maxChatWindowInvertColorRange);
-    srSetWindowBackgroundColorRange(minChatWindowBackgroundColorRange,maxChatWindowBackgroundColorRange);
+    srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
   end
 
   --sleepWithStatus(5000, regions[0] .. ", " .. regions[1] .. ", " .. regions[2] .. ", " .. regions[3]);
