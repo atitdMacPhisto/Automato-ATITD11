@@ -29,7 +29,7 @@ function findStuff()
   else
     -- Values required for training the ocr from the main chat window.
     regions = findChatRegionReplacement();
-    srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
+    srSetWindowBackgroundColorRange(0x797070,0xFFFFFA);
   end
 
   --sleepWithStatus(5000, regions[0] .. ", " .. regions[1] .. ", " .. regions[2] .. ", " .. regions[3]);
