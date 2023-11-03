@@ -5,6 +5,9 @@
 -- DO NOT INCLUDE THIS FILE! Include common.inc instead
 --
 
+-- List of colors which mark the edge of a window.
+-- T8: WINDOW_COLORS = {0x72502EFF, 0x714f2eff, 0x6f4e2dff, 0x785431ff};
+
 --This version includes changes to how OCR works
 lsRequireVersion(2,59);
 
@@ -31,8 +34,8 @@ maxSetWindowInvertColorRange = 0x929D8D;
 srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
 -- The color range that is treated as window background and stripped in srStripRegion()
-minWindowBackgroundColorRange = 0x797070;
-maxWindowBackgroundColorRange = 0xFFFFFF;
+minWindowBackgroundColorRange = 0x283C42;
+maxWindowBackgroundColorRange = 0xFFFFFA;
 srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
 
 -------------------------------------------------------------------------------
