@@ -31,22 +31,9 @@ maxSetWindowInvertColorRange = 0x929D8D;
 srSetWindowInvertColorRange(minSetWindowInvertColorRange, maxSetWindowInvertColorRange);
 
 -- The color range that is treated as window background and stripped in srStripRegion()
-minWindowBackgroundColorRange = 0x283C42;
-maxWindowBackgroundColorRange = 0xFFFFFA;
+minWindowBackgroundColorRange = 0x797070;
+maxWindowBackgroundColorRange = 0xFFFFFF;
 srSetWindowBackgroundColorRange(minWindowBackgroundColorRange,maxWindowBackgroundColorRange);
-
--------------------------------------------------------------------------------
--- Chat Window Stripping
--------------------------------------------------------------------------------
-
--- The colors that srStripRegion/Screen() looks for to decide it should invert (and
--- treat as background when stripping the main chat window)
-minChatWindowInvertColorRange = 0x1E2E31;
-maxChatWindowInvertColorRange = 0x263539;
-
--- The color range that is treated as window background for main chat and stripped in srStripRegion()
-minChatWindowBackgroundColorRange = 0x797070;
-maxChatWindowBackgroundColorRange = 0xFFFFFF;
 
 -------------------------------------------------------------------------------
 -- findAllImages(image_name, range, tol)
