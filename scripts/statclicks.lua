@@ -456,13 +456,17 @@ function combFlax()
 end
 
 function eatOnion()
+  foundOnion = false;
   srReadScreen();
   buffed = srFindImage("stats/enduranceBuff.png")
     if not buffed then
       srReadScreen();
       local consumeOnion = srFindImage("consume.png")
-      safeClick(consumeOnion[0],consumeOnion[1]);
-      waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+        if consumeOnion then
+	  foundOnion = true;
+	  safeClick(consumeOnion[0],consumeOnion[1]);
+	  waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+        end
     end
 end
 
@@ -830,6 +834,9 @@ function doTasks()
     end
     if didTask == false then
         lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting for task to be ready.");
+	  if autoOnion and not foundOnion then
+            lsPrint(10, 30, 0, 0.7, 0.7, 0xB0B0B0ff, "Auto eat: No pinned Onions found!");
+	  end
 
         if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff,
             "End script") then
