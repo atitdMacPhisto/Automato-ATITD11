@@ -283,7 +283,7 @@ WaypointColors[TinyOilPalm] = 0x356027FF;
 WaypointColors[Chicory] = 0x547707FF;
 WaypointColors[SpikedFishTree] = 0x94C34BFF;
 WaypointColors[PhoenixPalm] = 0xB49F54FF;
-WaypointColors[RedMaple] = 0x7B2101FF;
+WaypointColors[RedMaple] = 0x450000FF;
 WaypointColors[Elephantia] = 0x6B974FFF;
 WaypointColors[Passam] = 0x93AA90FF;
 WaypointColors[SpindleTree] = 0x394314FF;
@@ -322,7 +322,7 @@ WaypointColors[Katsura] = 0xE08300FF;
 WaypointColors[Khaya] = 0x57570DFF;
 WaypointColors[Mimosa] = 0x598742FF;
 WaypointColors[MontereyPine] = 0x775701FF;
-WaypointColors[MontuMaple] = 0xAE4600FF;
+WaypointColors[MontuMaple] = 0xB96B00FF;
 WaypointColors[Oranje] = 0xCC761AFF;
 WaypointColors[Parrotia] = 0xF5C70BFF;
 WaypointColors[PnCMaple] = 0xE64500FF;
@@ -375,7 +375,7 @@ This macro will automatically configure ATITD Interface, Video, and One Click Op
 
 Hover ATITD window and press Shift to start.
   ]]);
-  
+
   math.randomseed(lsGetTimer());
   gather_randomNumber = math.random();
 
@@ -1890,7 +1890,7 @@ function updateStatus()
     lsPrintWrapped(10, 80, 0, lsScreenX - 20, 0.8, 0.8, color, statusMessage);
     lsPrintWrapped(10, lsScreenY-100, 0, lsScreenX - 20, 0.8, 0.8, 0xffd0d0ff,error_status);
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100,0xFFFFFFff, "End script") then
-        stopMoving();        
+        stopMoving();
         error(quit_message);
     end
 
