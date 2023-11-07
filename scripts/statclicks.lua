@@ -288,14 +288,18 @@ end
 function gather(resource)
   if resource == "Limestone" then
     srcImg = "limestone.png"
+    xOffset = 0
+    yOffset = 0
   elseif resource == "Dirt" then
     srcImg = "dirt.png"
+    xOffset = 0
+    yOffset = 10
   end
 
   srReadScreen();
-  local material = srFindImage(srcImg, 7000);
+  local material = srFindImage(srcImg);
     if material ~= nil then
-      safeClick(material[0], material[1]);
+      safeClick(material[0]+xOffset, material[1]+yOffset);
       lsSleep(100);
       gatherCounter = gatherCounter + 1
       if stashRawMaterials then
