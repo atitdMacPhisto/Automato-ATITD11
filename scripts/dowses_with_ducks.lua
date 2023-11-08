@@ -90,7 +90,7 @@ function checkIfMain()
 end
 
 function getOreFromLine(line)
-  local sand = string.match(line, " detect nothing but sand");
+  local sand = string.match(line, " sand");
   if sand then
     return "Sand";
   end
