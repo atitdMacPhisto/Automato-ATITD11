@@ -623,6 +623,9 @@ function chatRead()
 	  oreFound = true;
 	  oreGathered = string.match(lastLine2, "(%d+) " .. ore);
 	  findBrokenStone() -- Do pixel checks and find which nodes have poofed.
+	elseif string.sub(lastLineParse2, 1, 15) == "Your knowledge" and lastLineParse ~= lastLineParse2 then
+	  oreFound = true;
+	  oreGathered = string.match(lastLine, "(%d+) " .. ore);
 	elseif string.sub(lastLineParse, 1, 13) == "Your workload" then
 	  --TESTING : Comment below 2 lines if you want to test this macro on a Sand Mine (Select: Iron), to see nodes break more quickly and test if it detects nodes are breaking, easier (brokenStoneCheck).
 	  oreFound = true;
