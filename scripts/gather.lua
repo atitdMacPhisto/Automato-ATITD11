@@ -1625,7 +1625,7 @@ end
 function getSiltClusters()
   srReadScreen();
   local xyWindowSize = srGetWindowSize();
-  return lsAnalyzeCustom(25, 400, false, xyWindowSize[0] * 0.85, 0xA39C90ff, 0xB0A99Cff, true);
+  return lsAnalyzeCustom(25, 400, false, xyWindowSize[0] * 0.85, 0x9C948AFF, 0xA0988EFF, true);
 end
 
 function checkSilt()
