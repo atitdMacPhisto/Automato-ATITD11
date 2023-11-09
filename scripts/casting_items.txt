@@ -1713,13 +1713,6 @@ return
 			["q"] = 20,
 		}
 		,
-		["Iron Cookpot"] =
-		{
-			["metal"] = "Iron",
-			["prod"] = 1,
-			["q"] = 20,
-		}
-		,
 		["Stainless Steel Pot"] =
 		{
 			["masterOnly"] = true,
