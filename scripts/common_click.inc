@@ -543,6 +543,30 @@ function centerMouse()
   srSetMousePos(mid[0],mid[1]);
 end
 
+-------------------------------------------------------------------------------
+-- loadSimpleResource()
+--
+-- Load a single resource into a building via the window provided
+--
+-- window - window for the building we wish to load the resource into.
+-- clickString - String to click, within the window provided
+-- loadVolume - Volume of the material to load
+--
+-------------------------------------------------------------------------------
+
+function loadSimpleResource(window, clickString, loadVolume)
+  clickText(findText(clickString,window));
+  waitForImage("max.png");
+  srKeyEvent(loadVolume);
+  
+  srReadScreen();
+  local addOK = srFindImage("ok2.png")
+  if addOK then
+    srClickMouseNoMove(addOK[0] + 5, addOK[1]);
+  end
+
+  waitForNoImage("max.png");
+end
 
 -------------------------------------------------------------------------------
 -- pixelBlockCheck(x, y, color, rgbTol, hueTol, size)
