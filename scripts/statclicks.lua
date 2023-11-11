@@ -108,7 +108,7 @@ function getClickActions()
   while not done do
     checkBreak();
     y = 10;
-    lsSetCamera(0, 0, lsScreenX * 1.7, lsScreenY * 1.7);
+    lsSetCamera(0, 0, lsScreenX * 1.5, lsScreenY * 1.5);
     lsPrint(5, y, z, 1.2, 1.2, 0xFFFFFFff, "Ensure that all menus are pinned!");
     y = y + 50;
     for i = 1, #statNames do
@@ -170,19 +170,20 @@ function getClickActions()
       end
     end
 
-    y = y + 45;
+    y = y + 15;
+    lsSetCamera(0, 0, lsScreenX * 1.3, lsScreenY * 1.3);
     autoOnion = readSetting("autoOnion",autoOnion);
-    autoOnion = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically eat onions", autoOnion);
+    autoOnion = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically Eat Onions?", autoOnion);
     writeSetting("autoOnion",autoOnion);
 
     if autoOnion then
-      y = y + 10
+      y = y + 7
       lsPrintWrapped(5, y, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
     end
 
     lsDoFrame();
     lsSleep(tick_delay);
-    if lsButtonText(150, 58, z, 100, 0x00ff00ff, "OK") then
+    if lsButtonText(150, 55, z, 100, 0x00ff00ff, "OK") then
       done = true;
     end
   end
