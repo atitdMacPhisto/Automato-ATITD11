@@ -407,6 +407,8 @@ local function makeItem(currentItem, window)
     else
       text = "Make a " .. name;
     end
+  elseif lastParent == "Pots" then
+    text = "Make an " .. name;
   elseif lastParent == "Make some Treated Metal Sheeting" then
     text = "From";
   elseif text == nil then
