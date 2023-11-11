@@ -725,10 +725,11 @@ function runGrid()
     for i=1, #windows do
       local charcoalText = findText("in the chamber", windows[i]);
       if charcoalText then
+        local cc = 0;
         if ancientForging then
-          local cc = tonumber(string.match(charcoalText[2], "(%d+) Orichalcum Pellet in the chamber."));
+          cc = tonumber(string.match(charcoalText[2], "(%d+) Orichalcum Pellet in the chamber."));
         else
-          local cc = tonumber(string.match(charcoalText[2], "(%d+) Charcoal in the chamber"));
+          cc = tonumber(string.match(charcoalText[2], "(%d+) Charcoal in the chamber"));
         end
           if cc and cc <= 10 then
             t = findText("Fill this ", windows[i]);
@@ -743,7 +744,7 @@ function runGrid()
           end
       end
       
-      t = findText("is cooling", windows[i]);
+      t = findText("cooling", windows[i]);
       if t == nil then
         if findText("Master's Casting Box", windows[i]) then
           buildingType = "Master's Casting Box";
