@@ -168,8 +168,13 @@ function waitForStats()
     checkBreak();
     srReadScreen();
     local stats = srFindImage("stats/endurance.png");
+    local buff = srFindImage("stats/enduranceBuff.png");
+    local message = "Waiting for Endurance timer to be visible and white";
+    if autoOnion and buff == nil then
+      message = message .. "\n\nYou checked Auto-Eat onions.\nCan\'t find pinned grilled onion!";
+    end
     if stats then
-      sleepWithStatus(999, "Waiting for Endurance timer to be visible and white");
+      sleepWithStatus(999, message);
     else
       break;
     end
@@ -188,8 +193,10 @@ function eatOnion()
     if not buffed then
       srReadScreen();
       local consumeOnion = srFindImage("consume.png")
-      safeClick(consumeOnion[0],consumeOnion[1]);
-      waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+      if consumeOnion ~= nil then
+        safeClick(consumeOnion[0],consumeOnion[1]);
+        waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+      end
     end
 end
 
