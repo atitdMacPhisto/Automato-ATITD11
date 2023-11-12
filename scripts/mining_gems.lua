@@ -578,7 +578,7 @@ function workMine(skipSettle)
   if noMouseMove then
     srClickMouseNoMove(mineX, mineY);
     lsSleep(clickDelay);
-    clickAllText("Work this Mine", 20, 2, 1); -- offsetX, offsetY, rightClick (1 = true)
+    clickAllText("Work this Mine", 20, 2); -- offsetX, offsetY
   else
     srSetMousePos(mineX, mineY);
     lsSleep(clickDelay);

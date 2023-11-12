@@ -1,7 +1,7 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too). Time consuming but it works!\n\nMAIN chat tab MUST be showing and wide enough so that each line doesn't wrap.\n\n" .. chat_minimized .. "Options/Interface Options: 'Use Flyaway message for some things' - OFF\n\nOptional: Pin the mine's Take... Ore... menu (\"All Ore\" will appear in pinned window) and it will refresh every round.\n\nWARNING: If you use the Dual Monitor option, uncheck in Interface Options: Right-Click opens a menu as pinned.";
+info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too). Time consuming but it works!\n\nMAIN chat tab MUST be showing and wide enough so that each line doesn't wrap.\n\n" .. chat_minimized .. "Options/Interface Options: 'Use Flyaway message for some things' - OFF\n\nOptional: Pin the mine's Take... Ore... menu (\"All Ore\" will appear in pinned window) and it will refresh every round.";
 
 
 -- Start don't alter these ...
@@ -449,7 +449,7 @@ function workMine()
     if noMouseMove then
       srClickMouseNoMove(mineX, mineY);
       lsSleep(clickDelay);
-      clickAllText("Work this Mine", 20, 2, 1); -- offsetX, offsetY, rightClick (1 = true)
+      clickAllText("Work this Mine", 20, 2); -- offsetX, offsetY, rightClick (1 = true)
     else
       srSetMousePos(mineX, mineY);
       lsSleep(clickDelay);
@@ -689,9 +689,7 @@ function promptDelays()
         y = y + 16;
         lsPrint(10, y, 0, 0.6, 0.6, 0xffffffff, "ore already in the mine. Set to value of ore in mine");
         y = y + 22;
-        lsPrint(10, y, 0, 0.6, 0.6, 0xffffffff, "Dual Monitor: Don\'t move mouse over nodes.");
-        y = y + 16;
-        lsPrint(10, y, 0, 0.6, 0.6, 0xffffffff, "instead rightClick nodes and click menus.");
+        lsPrint(10, y, 0, 0.6, 0.6, 0xffffffff, "Dual Monitor: Doeesn\'t move mouse over nodes.");
         y = y + 16;
         lsPrint(10, y, 0, 0.6, 0.6, 0xffffffff, "This lets you move mouse on second monitor.");
         y = y + 22;
