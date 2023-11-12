@@ -760,11 +760,11 @@ function clickSequence()
           chatRead();
           lastLineFound = lastLineParse;
           lastLineFound2 = lastLineParse2;
-          clickAllText("[S]", 20, 2, 1); -- offsetX, offsetY, rightClick (1 = true)
+          clickAllText("[S]", 20, 2, 0); -- offsetX, offsetY, rightClick (1 = true)
         else
           srClickMouseNoMove(clickList[currentIndex][1], clickList[currentIndex][2]);
           lsSleep(clickDelay);
-          clickAllText("[A]", 20, 2, 1); -- offsetX, offsetY, rightClick (1 = true)
+          clickAllText("[A]", 20, 2, 0); -- offsetX, offsetY, rightClick (1 = true)
         end
 
       else -- noMouseMove
