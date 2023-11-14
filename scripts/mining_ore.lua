@@ -751,13 +751,13 @@ function TakeOreWindowRefresh()
 		if not autoWorkMine then
 	         sleepWithStatus(1000, "Refreshing pinned Ore menu ..."); -- Let pinned window catchup. If autowork mine, there is already a 1000 delay on workMine()
 		end
-	 safeClick(findAllOre[0],findAllOre[1]);
+	 safeClick(findAllOre[0]-3,findAllOre[1]-3);
 	end
 	if findAllMetal then
 		if not autoWorkMine then
 	         sleepWithStatus(1000, "Refreshing pinned Metal menu ..."); -- Let pinned window catchup. If autowork mine, there is already a 1000 delay on workMine()
 		end
-	 safeClick(findAllMetal[0],findAllMetal[1]);
+	 safeClick(findAllMetal[0]-3,findAllMetal[1]-3);
 	end
 end
 
