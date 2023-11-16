@@ -307,7 +307,7 @@ lastPlantPos = nil;
 
 function getPlantWindowPos()
   srReadScreen();
-  local plantPos = findText("Plant");
+  local plantPos = srFindImage("plant.png",6000);
   if plantPos then
     plantPos[0] = plantPos[0] + 20;
     plantPos[1] = plantPos[1] + 10;
@@ -319,7 +319,7 @@ function getPlantWindowPos()
     end
   end
   if not plantPos then
-    error 'Could not find \'Barley\' on plant window';
+    error "Could not find plant window"
   end
   lastPlantPos = plantPos;
   return plantPos;
