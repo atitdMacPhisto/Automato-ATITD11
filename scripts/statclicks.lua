@@ -1,11 +1,10 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-gatherCounter = 0
+local gatherCounter = 0
 
-fuelList = {"Coal", "Charcoal", "Petroleum"};
-metalList = {"Silver", "Aluminum"};
-
+local fuelList = {"Coal", "Charcoal", "Petroleum"};
+local metalList = {"Silver", "Aluminum"};
 local stashList = {
   insect   = {"Insect.", "All Insect"},
   wood     = {"Limestone ("},
@@ -13,88 +12,329 @@ local stashList = {
   cuttable = {"Dirt ("},
 };
 
-items = {
+local items = {
         --strength
-        {"",
-          "Coconuts",
-          "Wet Paper",
-        },
-        --end
-        {"",
-          "Barrel Grinder",
-          "Churn Butter",
-          "Dig Hole",
-          "Dirt",
-          "Excavate Blocks",
-          "Flax Comb",
-          "Hackling Rake",
-          "Limestone",
-          "Oil (Flax Seed)",
-          "Pump Aqueduct",
-          "Push Pyramid",
-          "Recycle Tattered Sail",
-          "Stir Cement",
-          "Weave Canvas",
-          "Weave Linen",
-          "Weave Papy Basket",
-          "Weave Silk",
-          "Weave Wool Cloth",
-        },
-        --con
-        {"",
-          "Gun Powder",
-          "Ink",
-        },
-        --foc
-        {"",
-          "Barrel Tap",
-          "Bottle Stopper",
-          "Clay Lamp",
-          "Crudely Carved Handle",
-          "Flint Hatchet",
-          "Flint Hammer",
-          "Flint Chisel",
-          "Heavy Mallet",
-          "Large Crude Handle",
-          "Long Sharp Stick",
-          "Personal Chit",
-          "Rawhide Strips",
-          "Search Rotten Wood",
-          "Sharpened Stick",
-          "Slate Shovel",
-          "Spore Paper",
-          "Tackle Block",
-          "Tap Rods",
-          "Tinder",
-          "Wooden Cog",
-          "Wooden Dowsing Rod",
-          "Wooden Peg",
-          "Wooden Pestle",
-        },
-};
+          ["Coconuts"] = {
+            ["stat"] = "STR",
+            ["workFn"] = function() clickText(findText("Harvest the Coconut Meat")) end
+          },
+          ["Wet Paper"] = {
+            ["stat"] = "STR",
+            ["workFn"] = function () wetPaper() end
+          },
 
-local lagBound = {};
-lagBound["Dig Hole"] = true;
-lagBound["Survey (Uncover)"] = true;
+        --endurance        
+          ["Barrel Grinder"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () grindMetal() end
+          },
+          ["Churn Butter"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () churnButter() end
+          },
+          ["Dig Hole"] = {
+            ["stat"] = "END",
+            ["delay"] = 3000,
+            ["workFn"] = function () digHole() end
+          },
+          ["Dirt"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () gather("Dirt") end
+          },
+          ["Excavate Blocks"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () excavateBlocks() end
+          },
+          ["Flax Comb"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () combFlax() end
+          },
+          ["Hackling Rake"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () hacklingRake() end
+          },
+          ["Limestone"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () gather("Limestone") end
+          },
+          ["Oil (Flax Seed)"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () flaxOil() end
+          },
+          ["Pump Aqueduct"] = {
+            ["stat"] = "END",
+            ["workFn"] = function() clickText(findText("Pump the Aqueduct")) end
+          },
+          ["Push Pyramid"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () pyramidPush() end
+          },
+          ["Recycle Tattered Sail"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("TatteredSail") end
+          },
+          ["Stir Cement"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () stirCement() end
+          },
+          ["Weave Canvas"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("Canvas") end
+          },
+          ["Weave Linen"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("Linen") end
+          },
+          ["Weave Papy Basket"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("Basket") end
+          },
+          ["Weave Silk"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("Silk") end
+          },
+          ["Weave Wool Cloth"] = {
+            ["stat"] = "END",
+            ["workFn"] = function () weave("Wool") end
+          },
+        
+        --constitution
+          ["Gun Powder"] = {
+            ["stat"] = "CON",
+            ["workFn"] = function() clickText(findText("Gunpowder")) end
+          },
+          ["Ink"] = {
+            ["stat"] = "CON",
+            ["workFn"] = function() clickText(findText("Ink")) end
+          },
+        
+        --focus        
+          ["Barrel Tap"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Barrel Tap") end
+          },
+          ["Bottle Stopper"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Bottle Stopper") end
+          },
+          ["Clay Lamp"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Clay Lamp") end
+          },
+          ["Crudely Carved Handle"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Crudely Carved Handle") end
+          },
+          ["Flint Hatchet"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Flint Hatchet") end
+          },
+          ["Flint Hammer"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Flint Hammer") end
+          },
+          ["Flint Chisel"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Flint Chisel") end
+          },
+          ["Heavy Mallet"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Heavy Mallet") end
+          },
+          ["Large Crude Handle"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Large Crude Handle") end
+          },
+          ["Long Sharp Stick"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Long Sharp Stick") end
+          },
+          ["Personal Chit"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Personal Chit") end
+          },
+          ["Rawhide Strips"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Rawhide Strips") end
+          },
+          ["Search Rotten Wood"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Search for Bugs") end
+          },
+          ["Sharpened Stick"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Sharpened Stick") end
+          },
+          ["Slate Shovel"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Slate Shovel") end
+          },
+          ["Spore Paper"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () sporePaper() end
+          },
+          ["Tackle Block"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Tackle Block") end
+          },
+          ["Tap Rods"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () tapRods() end
+          },
+          ["Tinder"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Tinder") end
+          },
+          ["Wooden Cog"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Wooden Cog") end
+          },
+          ["Wooden Dowsing Rod"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Wooden Dowsing Rod") end
+          },
+          ["Wooden Peg"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Wooden Peg") end
+          },
+          ["Wooden Pestle"] = {
+            ["stat"] = "FOC",
+            ["workFn"] = function () findAndClickText("Wooden Pestle") end
+          }      
+};
+local selectedTasks = {};
+
+
+-- This is built in to the items as a delay key
+--local lagBound = {};
+--lagBound["Dig Hole"] = true;
+--lagBound["Survey (Uncover)"] = true;
 
 -- Due to a window refresh bug (T9) rods can be lost when auto retrieve is enabled
 -- disabling it and manually refreshing the rod window bypasses this bug.
-retrieveRods = true;
-
-local textLookup = {};
-textLookup["Coconuts"] = "Harvest the Coconut Meat";
-textLookup["Gun Powder"] = "Gunpowder";
-textLookup["Ink"] = "Ink";
-textLookup["Pump Aqueduct"] = "Pump the Aqueduct";
-statNames = {"strength", "endurance", "constitution", "focus"};
-statTimer = {};
-askText = singleLine([[
+local retrieveRods = true;
+local dropdown_item_values = { -- This is filled with filterTasksForDropdowns()
+  --strength
+  ["strength"] = {""},
+  --end
+  ["endurance"] = {""},
+  --con
+  ["constitution"] = {""},
+  --foc
+  ["focus"] = {""},
+};
+local statNames = {"strength", "endurance", "constitution", "focus"};
+local statTimer = {};
+local askText = singleLine([[
    Repeatedly performs stat-dependent tasks. Can perform several tasks at once as long as they use different attributes.
    Will also eat food from a kitchen grilled veggies once food is up if a kitchen is pinned.
    Ensure that windows of tasks you are performing are pinned and press shift.
 ]]
-
 );
+
+function doit()
+  filterTasksForDropdowns();
+  getClickActions();
+    if items[tasks[2]] == "Push Pyramid" then
+      pyramidXCoord = promptNumber("Pyramid x coordinate:");
+      pyramidYCoord = promptNumber("Pyramid y coordinate:");
+    end
+  local mousePos = askForWindow(askText);
+  windowSize = srGetWindowSize();
+  done = false;
+    while done == false do
+      doTasks();
+      checkBreak();
+      lsSleep(80);
+    end
+end
+
+function filterTasksForDropdowns() 
+  local strArr = dropdown_item_values.strength;
+  local endArr = dropdown_item_values.endurance;
+  local conArr = dropdown_item_values.constitution;
+  local focArr = dropdown_item_values.focus;
+  for key, value in pairs(items) do
+    items[key].id = key;
+    if (value.stat == 'STR') then
+      strArr[#strArr+1] = key;
+    elseif (value.stat == 'END') then
+      endArr[#endArr+1] = key;
+    elseif (value.stat == 'CON') then
+      conArr[#conArr+1] = key;
+    elseif (value.stat == 'FOC') then
+      focArr[#focArr+1] = key;
+    end
+  end
+  table.sort(strArr);
+  table.sort(endArr);
+  table.sort(conArr);
+  table.sort(focArr);
+end
+
+function doTasks()
+  didTask = false;
+  for i = 1, 4 do
+    task_key = selectedTasks[i]    
+    if task_key ~= "" then
+      curTask = items[task_key];
+      --print(dump(curTask));
+      srReadScreen();
+      statImg = srFindImage("stats/" .. statNames[i] .. ".png");
+      if statTimer[i] ~= nil then
+          timeDiff = lsGetTimer() - statTimer[i];
+      else
+          timeDiff = 999999999;
+      end
+      local delay = curTask.delay or 1400;
+
+      if not statImg and timeDiff > delay then
+        --check for special cases, like flax.
+        lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Working on " .. curTask.id);
+
+        if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff, "End script") then
+          error "Clicked End Script button";
+        end
+        lsDoFrame();
+
+        if autoOnion then
+          eatOnion();
+        end
+
+        curTask.workFn();
+
+        statTimer[i] = lsGetTimer();
+        didTask = true;
+      end
+    end
+  end
+
+  if didTask == false then
+    lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting for task to be ready.");
+    if autoOnion and not buffed then
+      if alertNoOnions then 
+        lsPlaySound("siren.wav");
+      end
+      lsPrint(10, 30, 0, 0.7, 0.7, 0xB0B0B0ff, "Auto eat: No pinned Onions found!");
+      lsSetCamera(0, 0, lsScreenX * 1.4, lsScreenY * 1.4);
+      alertNoOnions = lsCheckBox(15, 60, z, 0xFFFFFFff, " Keep playing no Onion alert!!", alertNoOnions);
+      lsSetCamera(0, 0, lsScreenX, lsScreenY);
+    end
+
+    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff,
+        "End script") then
+        error "Clicked End Script button";
+    end
+
+      lsDoFrame();
+  else
+      srReadScreen();
+      --closeEmptyAndErrorWindows();
+      closePopUp();
+      lsSleep(per_tick);
+  end
+end
+
 function getClickActions()
   local scale = 1.4;
   local z = 0;
@@ -114,10 +354,15 @@ function getClickActions()
     for i = 1, #statNames do
       lsPrint(5, y, z, 1, 1, 0xFFFFFFff, statNames[i]:gsub("^%l", string.upper) .. ":");
       y = y + 24;
-      tasks[i] = lsDropdown(statNames[i], 5, y, 0, 200, tasks[i], items[i]);
+      tasks[i] = lsDropdown(statNames[i], 5, y, 0, 200, tasks[i], dropdown_item_values[statNames[i]]);
       y = y + 32;
 
-      if items[i][tasks[i]] == "Stir Cement" then
+      selectedTasks[i] = dropdown_item_values[statNames[i]][tasks[i]];
+      if (selectedTasks[i] == "") then
+        goto continue;
+      end
+
+      if selectedTasks[i] == "Stir Cement" then
         y = y + 35;
         stirMaster = readSetting("stirMaster",stirMaster);
         stirMaster = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Clinker Vat", stirMaster);
@@ -131,30 +376,28 @@ function getClickActions()
           end
       end
 
-      if items[i][tasks[i]] == "Weave Canvas" or items[i][tasks[i]] == "Weave Linen"
-        or items[i][tasks[i]] == "Weave Papy Basket" or items[i][tasks[i]] == "Weave Wool Cloth"
-        or items[i][tasks[i]] == "Weave Silk" then
+      if selectedTasks[i]:match("Weave %w+") then
         y = y + 35;
         reloadLoom = readSetting("reloadLoom",reloadLoom);
         reloadLoom = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically reload Loom", reloadLoom);
         writeSetting("reloadLoom",reloadLoom);
       end
 
-      if items[i][tasks[i]] == "Tap Rods" then
+      if selectedTasks[i] == "Tap Rods" then
         y = y + 35;
         retrieveRods = readSetting("retrieveRods",retrieveRods);
         retrieveRods = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically retrieve rods", retrieveRods);
         writeSetting("retrieveRods",retrieveRods);
       end
 
-      if items[i][tasks[i]] == "Limestone" or items[i][tasks[i]] == "Dirt" then
+      if selectedTasks[i] == "Limestone" or selectedTasks[i] == "Dirt" then
         y = y + 35;
         stashRawMaterials = readSetting("stashRawMaterials",stashRawMaterials);
         stashRawMaterials = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically stash while digging (Pin WH)", stashRawMaterials);
         writeSetting("stashRawMaterials",stashRawMaterials);
       end
 
-      if items[i][tasks[i]] == "Barrel Grinder" then
+      if selectedTasks[i] == "Barrel Grinder" then
         y = y + 35;
         refilGrinder = readSetting("refilGrinder",refilGrinder);
         refilGrinder = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Barrel Grinder", refilGrinder);
@@ -168,6 +411,8 @@ function getClickActions()
           y = y + 65;
         end
       end
+
+      ::continue::
     end
 
     y = y + 15;
@@ -175,10 +420,14 @@ function getClickActions()
     autoOnion = readSetting("autoOnion",autoOnion);
     autoOnion = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically Eat Onions?", autoOnion);
     writeSetting("autoOnion",autoOnion);
-
     if autoOnion then
-      y = y + 7
-      lsPrintWrapped(5, y, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
+      y = y + 10
+      lsPrintWrapped(15, y+5, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
+
+      y = y + 15;
+      alertNoOnions = readSetting("alertNoOnions",alertNoOnions);
+      alertNoOnions = lsCheckBox(15, y-32, z, 0xFFFFFFff, " Play sound if no Onions left!", alertNoOnions);
+      writeSetting("alertNoOnions",alertNoOnions);
     end
 
     lsDoFrame();
@@ -265,11 +514,11 @@ function weave(clothType)
     end
 end
 
-function carve(item)
+function findAndClickText(item)
   srReadScreen();
-  carveItem = findText(item);
-    if carveItem ~= nil then
-      safeClick(carveItem[0]+5,carveItem[1]+3);
+  itemAnchor = findText(item);
+    if  itemAnchor ~= nil then
+      safeClick(itemAnchor[0]+5,itemAnchor[1]+3);
       lsSleep(per_tick);
       srReadScreen();
       closePopUp();
@@ -344,16 +593,6 @@ function stashAll()
   srKeyEvent(escape); -- Closing the stash window
 end
 
-function searchRottenWood()
-  searchForBugs = findText("Search for Bugs");
-    if searchForBugs ~= nil then
-      clickText(searchForBugs);
-      lsSleep(per_tick);
-      srReadScreen();
-      closePopUp();
-      lsSleep(per_tick);
-    end
-end
 
 function grindMetal()
 
@@ -454,7 +693,7 @@ function combFlax()
       elseif clean then
         safeClick(clean[0], clean[1]);
       else
-        lsPrint(5, 0, 10, 1, 1, "Found Stats");
+        lsPrint(5, 0, 10, 1, 1, 0xFFFFFFFF, "Found Stats");
         lsDoFrame();
         lsSleep(2000);
       end
@@ -503,7 +742,7 @@ function hacklingRake()
       elseif clean then
         clickText(clean);
       else
-        lsPrint(5, 0, 10, 1, 1, "Found Stats");
+        lsPrint(5, 0, 10, 1, 1, 0xFFFFFF, "Found Stats");
         lsDoFrame();
         lsSleep(2000);
       end
@@ -720,141 +959,6 @@ function sporePaper()
   end
 end
 
-function doTasks()
-  didTask = false;
-  for i = 1, 4 do
-    curTask = items[i][tasks[i]];
-    if curTask ~= "" then
-      srReadScreen();
-      statImg = srFindImage("stats/" .. statNames[i] .. ".png");
-      if statTimer[i] ~= nil then
-          timeDiff = lsGetTimer() - statTimer[i];
-      else
-          timeDiff = 999999999;
-      end
-      local delay = 1400;
-      if lagBound[curTask] then
-          delay = 3000;
-      end
-      if not statImg and timeDiff > delay then
-        --check for special cases, like flax.
-        lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Working on " .. curTask);
-        lsDoFrame();
-
-        if autoOnion then
-          eatOnion();
-        end
-
-        if curTask == "Dig Hole" then
-          digHole();
-        elseif curTask == "Tinder" then
-          carve(curTask);
-        elseif curTask == "Rawhide Strips" then
-          carve(curTask);
-        elseif curTask == "Wooden Dowsing Rod" then
-          carve(curTask);
-        elseif curTask == "Slate Shovel" then
-          carve(curTask);
-        elseif curTask == "Long Sharp Stick" then
-          carve(curTask);
-        elseif curTask == "Sharpened Stick" then
-          carve(curTask);
-        elseif curTask == "Barrel Tap" then
-          carve(curTask);
-        elseif curTask == "Bottle Stopper" then
-          carve(curTask);
-        elseif curTask == "Crudely Carved Handle" then
-          carve(curTask);
-        elseif curTask == "Large Crude Handle" then
-          carve(curTask);
-        elseif curTask == "Personal Chit" then
-          carve(curTask);
-        elseif curTask == "Flint Hammer" then
-          carve(curTask);
-        elseif curTask == "Flint Hatchet" then
-          carve(curTask);
-        elseif curTask == "Flint Chisel" then
-          carve(curTask);
-        elseif curTask == "Heavy Mallet" then
-          carve(curTask);
-        elseif curTask == "Wooden Peg" then
-          carve(curTask);
-        elseif curTask == "Wooden Pestle" then
-          carve(curTask);
-        elseif curTask == "Clay Lamp" then
-          carve(curTask);
-        elseif curTask == "Tackle Block" then
-          carve(curTask);
-        elseif curTask == "Wooden Cog" then
-          carve(curTask);
-        elseif curTask == "Flax Comb" then
-          combFlax();
-        elseif curTask == "Hackling Rake" then
-          hacklingRake();
-        elseif curTask == "Oil (Flax Seed)" then
-          flaxOil();
-        elseif curTask == "Weave Canvas" then
-          weave("Canvas");
-        elseif curTask == "Weave Linen" then
-          weave("Linen");
-        elseif curTask == "Recycle Tattered Sail" then
-          weave("TatteredSail");
-        elseif curTask == "Weave Wool Cloth" then
-          weave("Wool");
-        elseif curTask == "Weave Papy Basket" then
-          weave("Basket");
-        elseif curTask == "Weave Silk" then
-          weave("Silk");
-        elseif curTask == "Limestone" then
-          gather("Limestone");
-        elseif curTask == "Dirt" then
-          gather("Dirt");
-        elseif curTask == "Barrel Grinder" then
-          grindMetal();
-        elseif curTask == "Churn Butter" then
-          churnButter();
-        elseif curTask == "Stir Cement" then
-          stirCement();
-        elseif curTask == "Search Rotten Wood" then
-          searchRottenWood();
-        elseif curTask == "Excavate Blocks" then
-          excavateBlocks();
-        elseif curTask == "Push Pyramid" then
-          pyramidPush();
-        elseif curTask == "Tap Rods" then
-          tapRods();
-        elseif curTask == "Wet Paper" then
-          wetPaper();
-        elseif curTask == "Spore Paper" then
-          sporePaper();
-        else
-          clickText(findText(textLookup[curTask]));
-        end
-        statTimer[i] = lsGetTimer();
-        didTask = true;
-      end
-    end
-  end
-  if didTask == false then
-    lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting for task to be ready.");
-  if autoOnion and not buffed then
-    lsPrint(10, 30, 0, 0.7, 0.7, 0xB0B0B0ff, "Auto eat: No pinned Onions found!");
-  end
-
-      if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff,
-          "End script") then
-          error "Clicked End Script button";
-      end
-
-      lsDoFrame();
-  else
-      srReadScreen();
-      --closeEmptyAndErrorWindows();
-      closePopUp();
-      lsSleep(per_tick);
-  end
-end
-
 function closePopUp()
   while 1 do -- Perform a loop in case there are multiple pop-ups behind each other; this will close them all before continuing.
       checkBreak();
@@ -943,18 +1047,15 @@ function stripCharacters(s)
 	return s;
 end
 
-function doit()
-    getClickActions();
-      if items[2][tasks[2]] == "Push Pyramid" then
-        pyramidXCoord = promptNumber("Pyramid x coordinate:");
-        pyramidYCoord = promptNumber("Pyramid y coordinate:");
-      end
-    local mousePos = askForWindow(askText);
-    windowSize = srGetWindowSize();
-    done = false;
-      while done == false do
-        doTasks();
-        checkBreak();
-        lsSleep(80);
-      end
+function dump(o)
+  if type(o) == 'table' then
+     local s = '{ '
+     for k,v in pairs(o) do
+        if type(k) ~= 'number' then k = '"'..k..'"' end
+        s = s .. '['..k..'] = ' .. dump(v) .. ','
+     end
+     return s .. '} '
+  else
+     return tostring(o)
+  end
 end
