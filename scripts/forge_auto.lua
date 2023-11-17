@@ -233,14 +233,15 @@ function chooseItems(itemList, multiple)
       end
 
     batchItemName = leafParentsString .. currentItem.name;    
-    local acceptAmount = nil
+    local acceptAmount = nil;
     repeat
       currentItem.num = promptNumber(string.format("Number of %s%s\n", leafParentsString, currentItem.name),nil,0.75, string.format("Enter the amount of %s you would like to make.\n\nThis is NOT asking for a number of loops to run.", currentItem.name));
-      print(dump(currentItem));
+      --print(dump(currentItem));
+      --print(currentItem.num < currentItem.item.prod);
       if (currentItem.num < currentItem.item.prod) then
         acceptAmount = lsMessageBox("Incorrect value?", string.format("You requested to make %s %s.\nA single (1) forge makes a minimum of %s.\n\nIs this what you really wanted?", currentItem.num, currentItem.name, currentItem.item.prod), MB_YES + MB_NO)
       end
-    until (acceptAmount == MB_YES)
+    until (acceptAmount == MB_YES or (currentItem.num >= currentItem.item.prod))
     acceptAmount = nil;
 
     if multiple then

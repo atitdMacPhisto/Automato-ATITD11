@@ -1709,7 +1709,7 @@ return
 		{
 			["metal"] = "Iron",
 			["prod"] = 1,
-			["q"] = 20,
+			["q"] = 10,
 		}
 		,
 		["Stainless Steel Pot"] =
