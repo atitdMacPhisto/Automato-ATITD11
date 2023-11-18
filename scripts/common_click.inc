@@ -12,20 +12,14 @@
 -------------------------------------------------------------------------------
 
 function drag(sourceX, sourceY, destX, destY)
-  local timeout;
   if not sourceX or not sourceY or not destX or not destY then
     error("Incorrect number of arguments for drag()");
   end
-  if not timeout then
-    timeout = 500;
-  end
-  local spot = getWaitSpot(destX, destY);
-  srSetMousePos(sourceX, sourceY);
+  srSetMousePos(sourceX, sourceY);  
   srMouseDown(sourceX, sourceY, 0);
   srSetMousePos(destX, destY);
-  local result = waitForChange(spot, timeout);
+  lsSleep(60);
   srMouseUp(destX, destY, 0);
-  return result;
 end
 
 -------------------------------------------------------------------------------
@@ -80,7 +74,7 @@ function safeDrag(sourceX, sourceY, destX, destY)
     error("Incorrect number of arguments for safeDrag()");
   end
   safeBegin();
-  return drag(sourceX, sourceY, destX, destY, timeout);
+  drag(sourceX, sourceY, destX, destY, timeout);
 end
 
 -------------------------------------------------------------------------------
