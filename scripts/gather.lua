@@ -393,147 +393,158 @@ end
 route = 0;
 
 function queryRoute()
-  local z = 0;
-  local done = false;
+    local z = 0;
+    local done = false;
 
-  while not done do
-    local showEditRoute = nil;
-    checkBreak();
-    local y = 5;
+    while not done do
+        local showEditRoute = nil;
+        checkBreak();
+        local y = 5;
 
-    slate = readSetting("slate", slate);
-    slate = lsCheckBox(5, y, z, 0xFFFFFFff, " Slate", slate);
-    writeSetting("slate", slate);
-    grass = readSetting("grass", grass);
-    grass = lsCheckBox(155, y, z, 0xFFFFFFff, " Grass", grass);
-    writeSetting("grass", grass);
-    y = y + 25;
+        grass = readSetting("grass", grass);
+        grass = lsCheckBox(155, y, z, 0xFFFFFFff, " Grass", grass);
+        writeSetting("grass", grass);
+        y = y + 25;
 
-    clay = readSetting("clay", clay);
-    clay = lsCheckBox(5, y, z, 0xFFFFFFff, " Clay (Flint)", clay);
-    writeSetting("clay", clay);
-
-    if movement == 4 then
-      wood = readSetting("wood", wood);
-      wood = lsCheckBox(155, y, z, 0xFFFFFFff, " Wood", wood);
-      writeSetting("wood", wood);
-    else
-      wood = false;
-    end
-    y = y + 25;
-
-    if movement == 1 or movement == 3 or movement == 4 then
-      silt = readSetting("silt",silt);
-      silt = lsCheckBox(5, y, z, 0xFFFFFFff, " Silt", silt);
-      writeSetting("silt",silt);
-      stones = readSetting("stones", stones);
-      stones = lsCheckBox(155, y, z, 0xFFFFFFff, " Stones", stones);
-      writeSetting("stones", stones);
-    else
-      silt = false;
-      stones = false;
-    end
-    y = y + 25;
-
-    if movement == 1 or movement == 4 then
-      papy = readSetting("papy", papy);
-      papy = lsCheckBox(5, y, z, 0xFFFFFFff, " Papy", papy);
-      writeSetting("papy", papy);
-      y = y + 25;
-
-      if movement == 4 then
-        plantPapy = readSetting("plantPapy", plantPapy);
-        plantPapy = lsCheckBox(5, y, z, 0xFFFFFFff, " Plant Papy", plantPapy);
-        writeSetting("plantPapy", plantPapy);
-
-        if plantPapy then
-          plantPapyDelay = readSetting("delay", plantPapyDelay);
-          local delayColor = 0xFFFFFFff;
-          if not plantPapyDelay then
-            delayColor = 0xFF0000ff;
-          end
-          lsPrint(155, y, z, 1, 1, delayColor, "Delay (s): ");
-          _, plantPapyDelay = lsEditBox("delay", 245, y, z, 30, 0, 1.0, 1.0, 0x000000ff, plantPapyDelay);
-          if not tonumber(plantPapyDelay) then
-            plantPapyDelay = nil;
-          end
-          writeSetting("delay", plantPapyDelay);
+        if movement == 4 then
+            wood = readSetting("wood", wood);
+            wood = lsCheckBox(155, y, z, 0xFFFFFFff, " Wood", wood);
+            writeSetting("wood", wood);
+        else
+            wood = false;
         end
-      end
-    else
-      plantPapy = false;
-      plantPapyDelay = nil;
-    end
+        y = y + 25;
 
-    movement = readSetting("movement", movement);
-    lsPrint(5, lsScreenY - 150, z, 1, 1, 0xFFFFFFff, "Move:");
-    movement = lsDropdown("movement" .. unique, 75, lsScreenY - 150, 0, 100, movement, movements);
-    writeSetting("movement", movement);
+        if movement == 1 or movement == 3 or movement == 4 then
+            silt = readSetting("silt",silt);
+            silt = lsCheckBox(5, y, z, 0xFFFFFFff, " Silt", silt);
+            writeSetting("silt",silt);
 
-    if movement == 3 then
-      spiralRadius = readSetting("spiralRadius", spiralRadius);
-      lsPrint(5, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "Radius:");
-      _, spiralRadius = lsEditBox("spiralRadius", 75, lsScreenY - 120, z, 40, 0, 1.0, 1.0, 0x000000ff, spiralRadius);
-      lsPrint(125, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "coords");
-      writeSetting("spiralRadius", spiralRadius);
+            stones = readSetting("stones", stones);
+            stones = lsCheckBox(155, y, z, 0xFFFFFFff, " Stones", stones);
+            writeSetting("stones", stones);
+        else
+            silt = false;
+            stones = false;
+        end
+        y = y + 25;
 
-      repeatForever = readSetting("repeatForever", repeatForever);
-      repeatForever = lsCheckBox(75, lsScreenY - 60, z, 0xFFFFFFff, " Repeat forever", repeatForever);
-      writeSetting("repeatForever", repeatForever);
-    elseif movement == 4 then
-      route = readSetting("route",route);
-      lsPrint(5, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "Route:");
-      route = lsDropdown("routeToWalk" .. unique, 75, lsScreenY - 120, 0, lsScreenX - 80, route, routeNames);
-      writeSetting("route",route);
+        if movement == 1 or movement == 4 then
+            slate = readSetting("slate", slate);
+            slate = lsCheckBox(5, y-75, z, 0xFFFFFFff, " Slate", slate);
+            writeSetting("slate", slate);
 
-      if lsButtonText(75, lsScreenY - 90, z, 70, 0xFFFFFFff, "New") then
-        showEditRoute = #routeNames+1;
-      end
-      if lsButtonText(150, lsScreenY - 90, z, 70, 0xFFFFFFff, "Edit") then
-        showEditRoute = route;
-      end
-      if lsButtonText(225, lsScreenY - 90, z, 70, 0xFFFFFFff, "Delete") then
-        if(promptOkay("Are you sure you want to delete route \"" .. routeNames[route] .. "\"?")) then
-          if(deleteRoute(route)) then
-            route = route - 1;
-            if(route < 1) then
-              route = 1;
+            clay = readSetting("clay", clay);
+            clay = lsCheckBox(5, y-50, z, 0xFFFFFFff, " Clay (Flint)", clay);
+            writeSetting("clay", clay);
+
+            papy = readSetting("papy", papy);
+            papy = lsCheckBox(5, y, z, 0xFFFFFFff, " Papy", papy);
+            writeSetting("papy", papy);
+            y = y + 25;
+
+            if movement == 4 then
+                plantPapy = readSetting("plantPapy", plantPapy);
+                plantPapy = lsCheckBox(5, y, z, 0xFFFFFFff, " Plant Papy", plantPapy);
+                writeSetting("plantPapy", plantPapy);
+
+                if plantPapy then
+                    plantPapyDelay = readSetting("delay", plantPapyDelay);
+                    local delayColor = 0xFFFFFFff;
+
+                    if not plantPapyDelay then
+                        delayColor = 0xFF0000ff;
+                    end
+
+                    lsPrint(155, y, z, 1, 1, delayColor, "Delay (s): ");
+                    _, plantPapyDelay = lsEditBox("delay", 245, y, z, 30, 0, 1.0, 1.0, 0x000000ff, plantPapyDelay);
+
+                    if not tonumber(plantPapyDelay) then
+                        plantPapyDelay = nil;
+                    end
+                    writeSetting("delay", plantPapyDelay);
+                end
             end
-            updateUnique();
-          end
+        else
+            plantPapy = false;
+            plantPapyDelay = nil;
         end
-      end
-      repeatForever = readSetting("repeatForever", repeatForever);
-      repeatForever = lsCheckBox(75, lsScreenY - 60, z, 0xFFFFFFff, " Repeat forever", repeatForever);
-      writeSetting("repeatForever", repeatForever);
-    end
 
-    if lsButtonText(5, lsScreenY - 30, z, 100, 0x00FF00ff, "GO!") then
-      handleOptions();
-      if movement == 1 then
-        gather();
-      elseif movement == 2 then
-        oneCoord();
-      elseif movement == 3 then
-        spiral();
-      elseif movement == 4 then
-        followRoute(route);
-      end
-      end
-    if lsButtonText(lsScreenX - 105, lsScreenY - 30, z, 100, 0xFFFFFFff, "End Script") then
-      done = true;
-      return;
+        movement = readSetting("movement", movement);
+        lsPrint(5, lsScreenY - 150, z, 1, 1, 0xFFFFFFff, "Move:");
+        movement = lsDropdown("movement" .. unique, 75, lsScreenY - 150, 0, 100, movement, movements);
+        writeSetting("movement", movement);
+
+        if movement == 3 then
+            spiralRadius = readSetting("spiralRadius", spiralRadius);
+            lsPrint(5, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "Radius:");
+            _, spiralRadius = lsEditBox("spiralRadius", 75, lsScreenY - 120, z, 40, 0, 1.0, 1.0, 0x000000ff, spiralRadius);
+            lsPrint(125, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "coords");
+            writeSetting("spiralRadius", spiralRadius);
+
+            repeatForever = readSetting("repeatForever", repeatForever);
+            repeatForever = lsCheckBox(75, lsScreenY - 60, z, 0xFFFFFFff, " Repeat forever", repeatForever);
+            writeSetting("repeatForever", repeatForever);
+        elseif movement == 4 then
+            route = readSetting("route",route);
+            lsPrint(5, lsScreenY - 120, z, 1, 1, 0xFFFFFFff, "Route:");
+            route = lsDropdown("routeToWalk" .. unique, 75, lsScreenY - 120, 0, lsScreenX - 80, route, routeNames);
+            writeSetting("route",route);
+
+            if lsButtonText(75, lsScreenY - 90, z, 70, 0xFFFFFFff, "New") then
+                showEditRoute = #routeNames+1;
+            end
+
+            if lsButtonText(150, lsScreenY - 90, z, 70, 0xFFFFFFff, "Edit") then
+                showEditRoute = route;
+            end
+
+        if lsButtonText(225, lsScreenY - 90, z, 70, 0xFFFFFFff, "Delete") then
+            if(promptOkay("Are you sure you want to delete route \"" .. routeNames[route] .. "\"?")) then
+                if(deleteRoute(route)) then
+                    route = route - 1;
+                    if(route < 1) then
+                        route = 1;
+                    end
+                        updateUnique();
+                    end
+                end
+            end
+            repeatForever = readSetting("repeatForever", repeatForever);
+            repeatForever = lsCheckBox(75, lsScreenY - 60, z, 0xFFFFFFff, " Repeat forever", repeatForever);
+            writeSetting("repeatForever", repeatForever);
+        end
+
+        if lsButtonText(5, lsScreenY - 30, z, 100, 0x00FF00ff, "GO!") then
+            handleOptions();
+
+            if movement == 1 then
+                gather();
+            elseif movement == 2 then
+                oneCoord();
+            elseif movement == 3 then
+                spiral();
+            elseif movement == 4 then
+                followRoute(route);
+            end
+        end
+
+        if lsButtonText(lsScreenX - 105, lsScreenY - 30, z, 100, 0xFFFFFFff, "End Script") then
+            done = true;
+            return;
+        end
+
+        lsDoFrame();
+        lsSleep(tick_delay);
+
+        if(showEditRoute) then
+            if(editRoute(showEditRoute)) then
+                route = showEditRoute;
+                updateUnique();
+            end
+            showEditRoute = nil;
+        end
     end
-    lsDoFrame();
-    lsSleep(tick_delay);
-    if(showEditRoute) then
-      if(editRoute(showEditRoute)) then
-          route = showEditRoute;
-          updateUnique();
-      end
-      showEditRoute = nil;
-    end
-  end
 end
 
 function handleOptions()
@@ -1577,7 +1588,7 @@ function checkClay()
     local pos = srFindImage("clay.png",5000);
     if(pos) then
         safeClick(pos[0] + 3, pos[1] + 3);
-        sleepWithBreak(1250);
+        sleepWithBreak(60);
         return true;
     end
     return false;
