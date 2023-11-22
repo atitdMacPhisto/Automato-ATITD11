@@ -708,6 +708,8 @@ function eatOnion()
         if consumeOnion ~= nil then
           safeClick(consumeOnion[0],consumeOnion[1]);
           waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
+          srClickMouseNoMove(consumeOnion[0]-5,consumeOnion[1]-10); -- Click the window again, to refresh, so we now see accurate count of food remaining, on pinned food menu.
+        lsSleep(click_delay);
         end
     end
 end
