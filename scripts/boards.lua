@@ -23,8 +23,8 @@ function promptParameters()
   arrangeWindows = true;
   unpinWindows = true;
   carpShop = true;
-  scale = 1.1;
-
+  scale = 1.2;
+  local y = 0;
   local z = 0;
   local is_done = nil;
   -- Edit box and text display
@@ -34,8 +34,10 @@ function promptParameters()
     local y = 5;
     lsSetCamera(0,0,lsScreenX*scale,lsScreenY*scale);
 
-    lsPrint(10, y, 0, scale, scale, 0xd0d0d0ff, "Blade:");
-    blade = lsDropdown("Blade", 90, y, 0, 180, blade, bladeList);
+    lsPrint(10, y+3, 0, scale, scale, 0xd0d0d0ff, "Blade:");
+    blade = readSetting("blade",blade);
+    blade = lsDropdown("Blade", 90, y+5, 0, 180, blade, bladeList);
+    writeSetting("blade",blade);
 
     if blade == 1 then
         bladeName = "Slate Blade"
@@ -47,33 +49,37 @@ function promptParameters()
         bladeName = "Carpentry Blade"
     end
 
+    y = 60;
     carpShop = readSetting("carpShop",carpShop);
-    carpShop = lsCheckBox(10, 40, z, 0xFFFFFFff, "Use carpentry shop", carpShop);
+    carpShop = lsCheckBox(10, y, z, 0xFFFFFFff, " Use Carpentry Shop", carpShop);
     writeSetting("carpShop",carpShop);
 
-    lsPrintWrapped(10, 60, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
-      "Will use Carpentry Shops instead of Wood Planes to plane boards.");
+    lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "Use Carpentry Shops instead of Wood Planes to plane boards.");
 
+    y = 130;
     autoOnion = readSetting("autoOnion",autoOnion);
-    autoOnion = lsCheckBox(10, 100, z, 0xFFFFFFff, "Automatically eat onions", autoOnion);
+    autoOnion = lsCheckBox(10, y, z, 0xFFFFFFff, " Automatically Eat Onions", autoOnion);
     writeSetting("autoOnion",autoOnion);
 
-    lsPrintWrapped(10, 120, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
-      "(Pin the 'Grilled Onion' window)\nWill automatically eat an onion, everytime the endurance buff is not visible.");
+    lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "(Pin the 'Grilled Onion' window)\nAutomatically eat an onion, everytime the endurance buff is not visible.");
 
+    y = 220;
     arrangeWindows = readSetting("arrangeWindows",arrangeWindows);
-    arrangeWindows = lsCheckBox(10, 180, z, 0xFFFFFFff, "Arrange windows", arrangeWindows);
+    arrangeWindows = lsCheckBox(10, y, z, 0xFFFFFFff, " Arrange Windows", arrangeWindows);
     writeSetting("arrangeWindows",arrangeWindows);
 
-    lsPrintWrapped(10, 200, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+    lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
       "Will sort your pinned Wood Planes or Carpentry Shops into a grid on your screen.");
 
+    y = 300;
     unpinWindows = readSetting("unpinWindows",unpinWindows);
-    unpinWindows = lsCheckBox(10, 240, z, 0xFFFFFFff, "Unpin windows on exit", unpinWindows);
+    unpinWindows = lsCheckBox(10, y, z, 0xFFFFFFff, " Unpin Windows on Exit", unpinWindows);
     writeSetting("unpinWindows",unpinWindows);
 
-    lsPrintWrapped(10, 260, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
-      "On exit will close all windows when you close this macro.");
+    lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "Close all pinned windows when you exit/end this macro.");
 
     if lsButtonText(10, (lsScreenY - 30) * scale, z, 100, 0x00ff00ff, "OK") then
       is_done = 1;
