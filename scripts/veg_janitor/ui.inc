@@ -1049,7 +1049,7 @@ function default_deep_config()
         },
       },
       ["Cucumbers"] = {
-        ["Wadjet's Garden"] = {
+        ["Wadjet's Plow"] = {
           ["type"] = "Cucumbers",
           ["waters"] = 2,
           ["stages"] = 3,
@@ -1060,7 +1060,7 @@ function default_deep_config()
             [3] = 13000,
           }
         },
-        ["Ma'ats Plow"] = {
+        ["Ma'ats Garden"] = {
           ["type"] = "Cucumbers",
           ["waters"] = 1,
           ["stages"] = 3,
@@ -1169,7 +1169,7 @@ function default_deep_config()
             [4] = 13000,
           }
         },
-        ["Ptah's Breed"] = {
+        ["Ptah's Fire"] = {
           ["type"] = "Peppers",
           ["waters"] = 2,
           ["stages"] = 3,
@@ -1180,7 +1180,7 @@ function default_deep_config()
             [3] = 13000,
           }
         },
-        ["Ra's Fire"] = {
+        ["Ra's Breed"] = {
           ["type"] = "Peppers",
           ["waters"] = 1,
           ["stages"] = 3,
@@ -1241,7 +1241,7 @@ function default_deep_config()
             [4] = 13000,
           }
         },
-        ["Qetesh's Soil"] = {
+        ["Qetesh's Seed"] = {
           ["type"] = "Eggplant",
           ["waters"] = 2,
           ["stages"] = 3,
@@ -1252,7 +1252,7 @@ function default_deep_config()
             [3] = 13000,
           }
         },
-        ["Isis' Bounty"] = {
+        ["Isis' Soil"] = {
           ["type"] = "Eggplant",
           ["waters"] = 3,
           ["stages"] = 4,
