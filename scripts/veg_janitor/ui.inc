@@ -1001,7 +1001,7 @@ function default_deep_config()
   return {
     ["plants"] = {
       ['Cabbages'] = {
-        ["Mut's Fruiton"] = {
+        ["Mut's Yielding"] = {
           ["type"] = "Cabbages",
           ["waters"] = 1,
           ["stages"] = 3,
@@ -1012,7 +1012,7 @@ function default_deep_config()
             [3] = 15000,
           }
         },
-        ["Bastet's Yielding"] = {
+        ["Bastet's Fruiton"] = {
           ["type"] = "Cabbages",
           ["waters"] = 2,
           ["stages"] = 3,
