@@ -1205,7 +1205,7 @@ function default_deep_config()
             [4] = 13000,
           }
         },
-        ["Set's Vintage"] = {
+        ["Set's Produce"] = {
           ["type"] = "Watermelon",
           ["waters"] = 2,
           ["stages"] = 3,
@@ -1216,7 +1216,7 @@ function default_deep_config()
             [3] = 13000,
           }
         },
-        ["Geb's Produce"] = {
+        ["Geb's Vintage"] = {
           ["type"] = "Watermelon",
           ["waters"] = 1,
           ["stages"] = 3,
