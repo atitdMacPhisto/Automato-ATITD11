@@ -711,7 +711,13 @@ function gatherVeggies(config)
       sleepWithStatus(3000, "WARNING VEG JANITOR IS ABOUT TO START DO NOT USE MOUSE OR KEYBOARD")
       pause_after_this_run = false
     else
-      sleepWithStatus(config.end_of_run_wait, "Running at " .. total .. " veg per hour. ")
+
+      -- Dont add this unnecesary end_of_run_wait (defined in vegjanitor/ui.inc) default delay for one plant.
+      -- This delay mainly helps to catch up the Watering animation, sometimes; not applicable with one plant.
+      if not config.calibration_mode then
+        sleepWithStatus(config.end_of_run_wait, "Running at " .. total .. " veg per hour. ")
+      end
+
     end
     srReadScreen()
     local not_suitables = findAllImages('veg_janitor/not_suitable.png')
