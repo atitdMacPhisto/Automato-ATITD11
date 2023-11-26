@@ -2,7 +2,7 @@ dofile("common.inc");
 
 local flavorTest = false;
 local alsoTend = true;
-local alsoCutting = false;
+local alsoCutting = true;
 local alsoHarvest = false;
 local harvestFlag = 0;
 local vineForReplanting = 1;
@@ -25,8 +25,8 @@ local knownVineNames = {
     image = "Balance"
   },
   {
-    name = "Brilliance",
-    image = "Brilliance"
+    name = "Contemplation",
+    image = "Contemplation"
   },
   {
     name = "Distraction",
