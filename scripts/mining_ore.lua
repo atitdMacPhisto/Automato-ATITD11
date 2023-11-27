@@ -619,7 +619,7 @@ function chatRead()
    lastLine2 = chatText[#chatText-1][2];
    lastLineParse2 = string.sub(lastLine2,string.find(lastLine2,"m]")+3,string.len(lastLine2));
 
-	if string.sub(lastLineParse, 1, 17) == "You got some coal" or string.sub(lastLineParse2, 1, 17) == "You got some coal" then
+	if string.sub(lastLineParse, 1, 9) == "You got a" or string.sub(lastLineParse2, 1, 9) == "You got a" then
 	  oreFound = true;
 	  oreGathered = string.match(lastLine2, "(%d+) " .. ore);
 	  findBrokenStone() -- Do pixel checks and find which nodes have poofed.
