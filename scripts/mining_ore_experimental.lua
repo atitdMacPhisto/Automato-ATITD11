@@ -9,10 +9,12 @@ local find = string.find;
 local match = string.match;
 local sub = string.sub;
 local gsub = string.gsub;
-local noop = function(...) return nil; end
--- assumes the T is an array, i.e., all the keys are
--- successive integers - otherwise #T will fail
-local enum = function(T)
+
+function noop (...) return nil; end
+
+function enum (T) 
+  -- assumes the T is an array, i.e., all the keys are
+  -- successive integers - otherwise #T will fail
   local length = #T
   for i = 1, length do
       local v = T[i]
@@ -22,12 +24,13 @@ local enum = function(T)
   return T
 end
 
+
 WHITE = 0xFFFFFFff;
 RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.17-MacDreamy';
+local version = '0.18-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -44,14 +47,15 @@ local WARNING = {
   [[ 4. Zoom out enough to see all the stones in the ore field!']],
   [[ 5. Press ALT-L to lock the camera so it doesn't move accidentally]],
   [[ 6. MAIN chat must be showing!!]],
-  [[ 7. Move off of MAIN chat to quickly pause the macro]],
+  [[ 7. ALT*SHIFT will quickly pause the macro]],
+  [[ 8. Moving off of MAIN chat will also pause the macro]],
   [[   * Press F9 or F10 to move over a tab (Game window must be active)]],
   [[   * While macro is paused you may chat in other tabs.]],
   [[   * You will have 5 seconds to reset once you select MAIN again.]],
-  [[ 8. Do not move once the macro is running]],
-  [[ 9. Do not use the mouse whilst the macro is running]],
+  [[ 9. Do not move once the macro is running]],
+  [[10. Do not use the mouse whilst the macro is running]],
   [[   * Unless in DualMonitorMode]],
-  [[10. (Optional) Pin the mine's Take...Ore... menu]],
+  [[11. (Optional) Pin the mine's Take...Ore... menu]],
   [[   * It will refresh every round]],
   [[   * "All Ore" will appear in the pinned window]],
   '',
@@ -61,6 +65,10 @@ local WARNING = {
   [[IT IS FUNCTIONAL BUT NOT PERFECT. USE AT YOUR OWN RISK!]],
   '',
   [[Press CONTINUE to accept]],
+  '',
+  '',
+  '',
+  '',
   '',
   '',
   '',
