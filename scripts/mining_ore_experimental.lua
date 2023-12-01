@@ -123,9 +123,9 @@ local rgbTol = 50; --50?  Was 150
 local hueTol = 50; --10?  Was 75
 
 local minResultDelay = 150; -- The minimum delay time used during waitForResult() function
-local oreMatchPattern = '[^%d]+(%d+)[-A-Za-z]+%sOre';
+local oreMatchPattern = '[^%d]+(%d+)[-A-Za-z ]+Ore';
 --local gemMatchPattern = 'You got [%a+] ([%a+]) ([%a+])';
-local chatReadTimeOut = 2000; -- Maximum Time(ms) to wait before moving on to the next workload.
+local chatReadTimeOut = 3500; -- Maximum Time(ms) to wait before moving on to the next workload.
 --End Customizable
 
 ----------------------------------------
@@ -1591,12 +1591,24 @@ function openChat(active, white, red)
     return false;
   end
 
-  if not minimizeChat() then error "Unable to minimize chat"; end
+  local min = srFindImage("chat/chat_min.png");
+  if min then
+    srKeyDown(VK_RETURN);
+    lsSleep(10);
+    srKeyUp(VK_RETURN);
+    lsSleep(10);
+  end
+
+  if waitForNoImage("chat/chat_min.png", 2000) then
+    lsPrintln("Chat failed to start");
+    return false;
+  end
+
   return true;
 end
 
 function minimizeChat()
-  lsSleep(65); -- Give the system a little time if it's going to minimize chat itself!
+  lsSleep(100); -- Give the system a little time if it's going to minimize chat itself!
   srReadScreen();
 
   local min = srFindImage("chat/chat_min.png");
@@ -1607,7 +1619,7 @@ function minimizeChat()
     lsSleep(10);
   end
 
-  if waitForNoImage("chat/chat_min.png", 2000) then
+  if not waitForImage("chat/chat_min.png", 2000) then
     lsPrintln("Chat failed to minimize");
     return false;
   end
