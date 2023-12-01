@@ -77,7 +77,7 @@ local WARNING = {
   [[With a rebel yell, "Ore, ore, ore]],
   [[Ore, ore, ore"]]
 };
-
+lsCtr
 -- Start don't alter these ...
 local oreGathered = 0;
 local oreGatheredTotal = 0;
@@ -87,7 +87,7 @@ local timesworked = 0;
 local miningTimeTotal = 0;
 local dropdown_key_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 local key_strings = {"tap SHIFT", "tap CTRL", "tap ALT", "click MWHEEL"};
-local key_functions = {lsShiftHeld, lsCtrlHeld, lsAltHeld, function() lsMouseIsDown(2); end}
+local key_functions = {lsShiftHeld, lsControlHeld, lsAltHeld, function() lsMouseIsDown(2); end}
 local dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Coal (10)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
 local cancelButton = 0;
 
@@ -285,6 +285,7 @@ function promptDelays()
     lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Total Ore Found Starting Value:");
     
     y = y + 22;
+    
     is_done, oreGatheredTotal = lsEditBox("oreGatheredTotal", 15, y, 0, 80, 30, 1.0, 1.0, 0x000000ff, 0);
     oreGatheredTotal = tonumber(oreGatheredTotal);
     if not oreGatheredTotal then
@@ -573,6 +574,7 @@ function getPoints()
 
         if ButtonText(120, lsScreenY -30, z, 80, 0xffffffff, "Config") then
             cancelButton = 1;
+            lsEditBoxSetText("oreGatheredTotal", oreGatheredTotal);
             setup();
         end
 
