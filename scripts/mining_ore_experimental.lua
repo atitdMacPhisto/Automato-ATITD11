@@ -1,6 +1,6 @@
-----------------------------------------------
--- mining_ore_experimental - MacDreamy Edition
-----------------------------------------------
+----------------------------------------------------
+-- mining_ore_experimental - Livin' the MacDream! --
+----------------------------------------------------
 
 dofile("common.inc");
 dofile("settings.inc");
@@ -30,32 +30,35 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.18-MacDreamy';
+local version = '0.19-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
 
 local WARNING = {  
-  [[ 1. In Options -> Interface Options]],
+  [[ 1. You MUST pull a fresh workload every time you start the macro!!]],
+  [[   * YES, even if you just started working the mine and closed and reopend the macro!]],
+  [[   * "Worked the {something} Mine" MUST be the most recent message in main chat before picking stone locations]],
+  [[ 2. In Options -> Interface Options]],
   [[   * SET: UI Size to Normal]],
   [[   * SET: Transparencies to 0% (double-check this!!)]],
   [[   * ENABLE : Use the chat area instead of popups for many messages]],
   [[   * DISABLE: Use Flyaway Messages for some things]],
   [[   * ENABLE : Suppress the flyaway messages, only use console]],
-  [[ 2. You probably want to disable chat bubbles in Options -> Chat-Related]],
-  [[ 3. Press F8 F8 to set the camera in top down mode]],
-  [[ 4. Zoom out enough to see all the stones in the ore field!']],
-  [[ 5. Press ALT-L to lock the camera so it doesn't move accidentally]],
-  [[ 6. MAIN chat must be showing!!]],
-  [[ 7. ALT*SHIFT will quickly pause the macro]],
-  [[ 8. Moving off of MAIN chat will also pause the macro]],
+  [[ 3. You probably want to disable chat bubbles in Options -> Chat-Related]],
+  [[ 4. Press F8 F8 to set the camera in top down mode]],
+  [[ 5. Zoom out enough to see all the stones in the ore field!']],
+  [[ 6. Press ALT-L to lock the camera so it doesn't move accidentally]],
+  [[ 7. MAIN chat must be showing!!]],
+  [[ 8. ALT*SHIFT will quickly pause the macro]],
+  [[ 9. Moving off of MAIN chat will also pause the macro]],
   [[   * Press F9 or F10 to move over a tab (Game window must be active)]],
   [[   * While macro is paused you may chat in other tabs.]],
   [[   * You will have 5 seconds to reset once you select MAIN again.]],
-  [[ 9. Do not move once the macro is running]],
-  [[10. Do not use the mouse whilst the macro is running]],
+  [[10. Do not move once the macro is running]],
+  [[11. Do not use the mouse whilst the macro is running]],
   [[   * Unless in DualMonitorMode]],
-  [[11. (Optional) Pin the mine's Take...Ore... menu]],
+  [[12. (Optional) Pin the mine's Take...Ore... menu]],
   [[   * It will refresh every round]],
   [[   * "All Ore" will appear in the pinned window]],
   '',
@@ -77,7 +80,7 @@ local WARNING = {
   [[With a rebel yell, "Ore, ore, ore]],
   [[Ore, ore, ore"]]
 };
-lsCtr
+
 -- Start don't alter these ...
 local oreGathered = 0;
 local oreGatheredTotal = 0;
@@ -126,6 +129,7 @@ local minResultDelay = 150; -- The minimum delay time used during waitForResult(
 local oreMatchPattern = '[^%d]+(%d+)[-A-Za-z ]+Ore';
 --local gemMatchPattern = 'You got [%a+] ([%a+]) ([%a+])';
 local chatReadTimeOut = 3500; -- Maximum Time(ms) to wait before moving on to the next workload.
+local chatParseTargets = {"Worked", "Year"}
 --End Customizable
 
 ----------------------------------------
@@ -153,7 +157,7 @@ end
 function Stone:use ()
   self.workloads = self.workloads + 1;
   
-  if(self.workloads >= self.breakThreshold) then
+  if(self.workloads >= self.breakThreshold or self:isCleared()) then
     self:setBroken(); 
   end
 end
@@ -285,7 +289,6 @@ function promptDelays()
     lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Total Ore Found Starting Value:");
     
     y = y + 22;
-    
     is_done, oreGatheredTotal = lsEditBox("oreGatheredTotal", 15, y, 0, 80, 30, 1.0, 1.0, 0x000000ff, 0);
     oreGatheredTotal = tonumber(oreGatheredTotal);
     if not oreGatheredTotal then
@@ -472,24 +475,34 @@ function getPoints()
     local ny = 0;
     local pixelColor = 0xFFFFFF;
     local z = 0;
-    local was_shifted = userKeyFn();
+    local skipValidCheck = false;
+    local invalidStateCount = 0;
+    local was_shifted = userKeyFn();    
     while not is_done do
         nx, ny = srMousePos();  
         pixelColor = srReadPixel(nx, ny);      
         local is_shifted = userKeyFn();
         if is_shifted and not was_shifted then
-          local index = #clickList+1;
-          local s = Stone:new({
-            id = index,
-            x = nx,
-            y = ny,
-            pointColor = pixelColor
-          });
-          clickList[index] = s;
-    
-          mines[index] = {};
-          mines[index].trait = {};
-          nodeleft = nodeleft - 1;
+          if (skipValidCheck or chatStateIsValid()) then
+            skipValidCheck = true;
+            local index = #clickList+1;
+            local s = Stone:new({
+              id = index,
+              x = nx,
+              y = ny,
+              pointColor = pixelColor
+            });
+            clickList[index] = s;
+            
+            mines[index] = {};
+            mines[index].trait = {};
+            nodeleft = nodeleft - 1;
+          else
+            invalidStateCount = invalidStateCount + 1;
+            -- Why are you setting up with a previously used workload?!?
+            -- Even if you didn't use it... it must be reset to maintain consistent state!
+            lsMessageBox("Invalid State" .. (invalidStateCount>1 and ' x'..invalidStateCount or ''), "Invalid selection, pull a fresh set of ore nodes");
+          end
         end
         
         was_shifted = is_shifted;
@@ -574,13 +587,13 @@ function getPoints()
 
         if ButtonText(120, lsScreenY -30, z, 80, 0xffffffff, "Config") then
             cancelButton = 1;
-            lsEditBoxSetText("oreGatheredTotal", oreGatheredTotal);
             setup();
         end
 
         if #clickList > 0 then
             if ButtonText(10, lsScreenY - 30, z, 100, 0xff8080ff, "Reset") then
-                reset();
+                getPoints();
+                return;
             end
         end
 
@@ -717,7 +730,7 @@ function waitForResult()
     checkBreak();
     -- Find chat messages
     --print('['..loopCount..'] Checking main chat...');
-    chatRead();
+    parseChat();
       
     if (not oreFound) then
       -- Find and Close Popup
@@ -775,14 +788,10 @@ function findClosePopUpOld()
     end
 end
 
-local chatPause = false;
-function chatRead()
-  srReadScreen();
-
-  pauseForChat();
-
-  local chatText = getChatText();
-  if (find(chatText[#chatText][2], "Year") or find(chatText[#chatText][2], "Worked")) then
+function parseChat()
+  local chatText = getChat();
+  local lastLine = chatText and chatText[#chatText][2];
+  if (lastLine and lastLine:findAny(chatParseTargets)) then
     -- We haven't received any 
     --if (not messageReceived) then -- Don't fill the console with the same message over and over and over and...
       --print('Workload has no value.'); 
@@ -813,7 +822,7 @@ function chatRead()
     idx = idx-1;
     currentLine = gsub(chatText[idx][2],'.+] ','');
     lsSleep(1); -- Yes this is too fast to do anything. It just gives me the warm/fuzzies
-  until (find(currentLine, "Year") or find(currentLine, "Worked")); 
+  until (currentLine:findAny(chatParseTargets)); 
 end
 
 function round(num, numDecimalPlaces)
@@ -1559,7 +1568,7 @@ end
 
 --------------------- Chat Related Functions
 function initChat()
-  if not openChat("chat/main_chat.png", "ocr/mainChatWhite.png", "ocr/mainChatRed.png") then
+  if not openChat("chat/main_chat.png", "ocr/mainChatWhite.png", "ocr/mainChatRed.png") then    
     return false;
   end
   
@@ -1572,10 +1581,11 @@ end
 
 function openChat(active, white, red)
   srReadScreen();
-
   if not srFindImage(active) then
+    --print("Couldn't find [active] image");
     local chat = srFindImage(white);
     if not chat then
+      --print("Couldn't find [white] image");
       chat = srFindImage(red);
     end
 
@@ -1588,11 +1598,12 @@ function openChat(active, white, red)
     lsSleep(100);
   end
 
-  if not waitForImage(active, 2000) then
-    lsPrintln("Chat tab failed to open");
+  if not waitForImage(active, 2500) then
+    --print("Chat tab failed to open");
     return false;
   end
 
+  srReadScreen();
   local min = srFindImage("chat/chat_min.png");
   if min then
     srKeyDown(VK_RETURN);
@@ -1602,7 +1613,7 @@ function openChat(active, white, red)
   end
 
   if waitForNoImage("chat/chat_min.png", 2000) then
-    lsPrintln("Chat failed to start");
+    --print("Chat failed to start");
     return false;
   end
 
@@ -1632,6 +1643,7 @@ end
 
 function isChatMain()
   local active = srFindImage("chat/main_chat.png");
+  --print('Active: ' .. dump(active));
   return (active ~= nil);
 end
 function isChatMinimized()
@@ -1654,7 +1666,6 @@ function say(msg)
   if not minimizeChat() then error "Unable to minimize chat"; end
 end
 
-
 function chatcmd(cmd) 
   if not openChat("chat/main_chat.png", "ocr/mainChatWhite.png", "ocr/mainChatRed.png") then
     return;
@@ -1674,8 +1685,22 @@ function chatcmd(cmd)
   if not minimizeChat() then error "Unable to minimize chat"; end
 end
 
+function getChat()
+  srReadScreen();
+  pauseForChat();
+  return getChatText();
+end
+
+function chatStateIsValid()
+  local chatText = getChat();
+  --print(dump(chatText));
+  local lastLine = chatText[#chatText] and chatText[#chatText][2] or nil;
+  return lastLine and lastLine:findAny(chatParseTargets);
+end
+
 function pauseForChat()
   if (isChatMain()) then return; end
+  local chatPause = false;
 
   -- Wait for Main chat screen and alert user if its not showing
   local playedSound = false
@@ -1706,6 +1731,17 @@ function pauseForChat()
   until (isChatMain())  
 end
 ---------------------
+function string:findAny(T)
+  --print('String: '..self ..'\nTargets: '..dump(T))
+  if (type(T) == 'table') then
+    for i=1,#T do
+      if find(self, T[i]) then return true; end
+    end
+  else
+    return find(self, T);
+  end
+  return false;
+end
 
 function dump(o)
   if type(o) == 'table' then
