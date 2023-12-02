@@ -23,7 +23,7 @@ local items = {
             ["workFn"] = function () wetPaper() end
           },
 
-        --endurance        
+        --endurance
           ["Barrel Grinder"] = {
             ["stat"] = "END",
             ["workFn"] = function () grindMetal() end
@@ -751,7 +751,6 @@ function hacklingRake()
 end
 
 function stirCement()
-
   if stirFuel == 1 then
     fuelType = "Coal"
   elseif stirFuel == 2 then
@@ -761,156 +760,155 @@ function stirCement()
   end
 
   t = waitForText("Stir the cement", 2000);
-    if t then
-      safeClick(t[0]+20,t[1]);
-    else
-      clickText(findText("This is [a-z]+ Clinker Vat", nil, REGEX));
-      lsSleep(500);
-      if stirMaster then
-          take = findText("Take...")
-            if take then
-              clickText(waitForText("Take..."));
-              clickText(waitForText("Everything"));
-            end
-          sleepWithStatus(1750, "Adding Bauxite to the Clinker Vat")
-          clickText(waitForText("Load the vat with Bauxite"));
-          waitForImage("max.png", 3000);
-          srCharEvent("10\n");
-          waitForNoImage("max.png");
-          sleepWithStatus(1750, "Adding Gypsum to the Clinker Vat")
-          clickText(waitForText("Load the vat with Gypsum"));
-          waitForImage("max.png", 3000);
-          srCharEvent("10\n");
-          waitForNoImage("max.png");
-          sleepWithStatus(1750, "Adding Clinker to the Clinker Vat")
-          clickText(waitForText("Load the vat with Clinker"));
-          waitForImage("max.png", 3000);
-          srCharEvent("800\n");
-          waitForNoImage("max.png");
-
-          lsSleep(250);
-          clickText(findText("This is [a-z]+ Clinker Vat", nil, REGEX));
-          fuel = findText("Fuel level")
-          if not fuel then
-            sleepWithStatus(1750, "Adding " .. fuelType .. " to the Clinker Vat")
-            clickText(waitForText("Load the vat with " .. fuelType));
-            waitForImage("max.png", 3000);
-              if fuelType == "Coal" or fuelType == "Charcoal" then
-                srCharEvent("800\n");
-              elseif fuelType == "Petroleum" then
-                srCharEvent("40\n");
-              end
-            waitForNoImage("max.png");
+  if t then
+    safeClick(t[0]+20,t[1]);
+  else
+    clickText(findText("This is [a-z]+ Clinker Vat", nil, REGEX));
+    lsSleep(500);
+    if stirMaster then
+        take = findText("Take...")
+          if take then
+            clickText(waitForText("Take..."));
+            clickText(waitForText("Everything"));
           end
-          sleepWithStatus(1750, "Mixing a batch of Cement")
-          clickText(waitForText("Make a batch of Cement"));
-      end
-    end
-end
+        sleepWithStatus(1750, "Adding Bauxite to the Clinker Vat")
+        clickText(waitForText("Load the vat with Bauxite"));
+        waitForImage("max.png", 3000);
+        srCharEvent("10\n");
+        waitForNoImage("max.png");
+        sleepWithStatus(1750, "Adding Gypsum to the Clinker Vat")
+        clickText(waitForText("Load the vat with Gypsum"));
+        waitForImage("max.png", 3000);
+        srCharEvent("10\n");
+        waitForNoImage("max.png");
+        sleepWithStatus(1750, "Adding Clinker to the Clinker Vat")
+        clickText(waitForText("Load the vat with Clinker"));
+        waitForImage("max.png", 3000);
+        srCharEvent("800\n");
+        waitForNoImage("max.png");
 
+        lsSleep(250);
+        clickText(findText("This is [a-z]+ Clinker Vat", nil, REGEX));
+        fuel = findText("Fuel level")
+        if not fuel then
+          sleepWithStatus(1750, "Adding " .. fuelType .. " to the Clinker Vat")
+          clickText(waitForText("Load the vat with " .. fuelType));
+          waitForImage("max.png", 3000);
+            if fuelType == "Coal" or fuelType == "Charcoal" then
+              srCharEvent("800\n");
+            elseif fuelType == "Petroleum" then
+              srCharEvent("40\n");
+            end
+          waitForNoImage("max.png");
+        end
+        sleepWithStatus(1750, "Mixing a batch of Cement")
+        clickText(waitForText("Make a batch of Cement"));
+    end
+  end
+end
 
 function pyramidPush()
-   local curCoords = findCoords();
-   local t, u;
-   if curCoords[0] > pyramidXCoord + 2 then
-      t = findText("Push this block West");
-      if t ~= nil then u = t end;
-   elseif curCoords[0] < pyramidXCoord - 2 then
-      t = findText("Push this block East");
-      if t ~= nil then u = t end;
-   else
-      t = findText("Turn this block to face North-South");
-      if t ~= nil then u = t end;
-   end
-   if curCoords[1] > pyramidYCoord + 2 then
-      t = findText("Push this block South");
-      if t ~= nil then u = t end;
-   elseif curCoords[1] < pyramidYCoord - 2 then
-      t = findText("Push this block North");
-      if t ~= nil then u = t end;
-   else
-      t = findText("Turn this block to face East-West");
-      if t ~= nil then u = t end;
-   end
-   if u ~= nil then
-      clickText(u);
-   end
+  local curCoords = findCoords();
+  local t, u;
+  if curCoords[0] > pyramidXCoord + 2 then
+    t = findText("Push this block West");
+    if t ~= nil then u = t end;
+  elseif curCoords[0] < pyramidXCoord - 2 then
+    t = findText("Push this block East");
+    if t ~= nil then u = t end;
+  else
+    t = findText("Turn this block to face North-South");
+    if t ~= nil then u = t end;
+  end
+  if curCoords[1] > pyramidYCoord + 2 then
+    t = findText("Push this block South");
+    if t ~= nil then u = t end;
+  elseif curCoords[1] < pyramidYCoord - 2 then
+    t = findText("Push this block North");
+    if t ~= nil then u = t end;
+  else
+    t = findText("Turn this block to face East-West");
+    if t ~= nil then u = t end;
+  end
+  if u ~= nil then
+    clickText(u);
+  end
 end
 
-local function tapRods()
-    local window = findText("This is [a-z]+ Bore Hole", nil, REGION + REGEX);
-      if window == nil then
-        return;
-      end
-    local t = findText("Tap the Bore Rod", window);
-    local foundOne = false;
-      if t then
-        clickText(t);
-        foundOne = true;
-      end
-    t = waitForText("Crack an outline", 300);
-      if t then
-        clickText(t);
-        foundOne = true;
-      end
-    if foundOne == false and retrieveRods == true then
-      t = findText("Retrieve the bore", window);
-        if t then
-          clickText(t);
-        end
-    end
-end
-
-local function excavateBlocks()
-    local window = findAllText("Pyramid Block");
-      if window then
-        for i = 1, #window do
-          srClickMouseNoMove(window[i][0],window[i][1],1)
-        end
-        srReadScreen();
-      end
-    local t = findText("Dig around");
-      if t then
-        clickText(t);
-      end
-    t = waitForText("Slide a rolling rack", 300);
-      if t then
-        clickText(t);
-        t = waitForText("Pyramid Block", 300);
-          if t then
-            srClickMouseNoMove(t[0],t[1],1)
-          end
-      end
+function tapRods()
+  local window = findText("This is [a-z]+ Bore Hole", nil, REGION + REGEX);
+  if window == nil then
     return;
+  end
+  local t = findText("Tap the Bore Rod", window);
+  local foundOne = false;
+  if t then
+    clickText(t);
+    foundOne = true;
+  end
+  t = waitForText("Crack an outline", 300);
+  if t then
+    clickText(t);
+    foundOne = true;
+  end
+  if foundOne == false and retrieveRods == true then
+    t = findText("Retrieve the bore", window);
+    if t then
+      clickText(t);
+    end
+  end
+end
+
+function excavateBlocks()
+  local window = findAllText("Pyramid Block");
+  if window then
+    for i = 1, #window do
+      srClickMouseNoMove(window[i][0],window[i][1],1)
+    end
+    srReadScreen();
+  end
+  local t = findText("Dig around");
+  if t then
+    clickText(t);
+  end
+  t = waitForText("Slide a rolling rack", 300);
+  if t then
+    clickText(t);
+    t = waitForText("Pyramid Block", 300);
+    if t then
+      srClickMouseNoMove(t[0],t[1],1)
+    end
+  end
+  return;
 end
 
 function churnButter()
   local t = srFindImage("statclicks/churn.png");
-    if t then
-      srClickMouseNoMove(t[0]+5, t[1]+60);
-    end
+  if t then
+    srClickMouseNoMove(t[0]+5, t[1]+60);
+  end
   srReadScreen();
   local take = findText("Take...")
-    if take then
-      clickText(waitForText("Take..."));
-      clickText(waitForText("Everything"));
-      lsSleep(75);
-      srReadScreen();
-      local drain = findText("Drain")
-        if drain then
-          srClickMouseNoMove(drain[0], drain[1]-25, 1);
-        end
+  if take then
+    clickText(waitForText("Take..."));
+    clickText(waitForText("Everything"));
+    lsSleep(75);
+    srReadScreen();
+    local drain = findText("Drain")
+    if drain then
+      srClickMouseNoMove(drain[0], drain[1]-25, 1);
     end
+  end
 end
 
 function wetPaper()
   drawWater();
   srReadScreen();
   local take = findText("Take...")
-    if take then
-      clickText(take);
-      clickText(waitForText("Everything"));
-    end
+  if take then
+    clickText(take);
+    clickText(waitForText("Everything"));
+  end
 
   srReadScreen();
   clickText(findText("This is [a-z]+ Certificate Press", nil, REGEX));
@@ -932,10 +930,10 @@ end
 function sporePaper()
   srReadScreen();
   local mushroom = findText("Mushrooms")
-    if mushroom then
-      clickText(mushroom);
-      clickText(waitForText("Inspect"));
-    end
+  if mushroom then
+    clickText(mushroom);
+    clickText(waitForText("Inspect"));
+  end
 
   local rw = waitForImage("spores/which.png");
 	rw.x = rw[0]-155;
