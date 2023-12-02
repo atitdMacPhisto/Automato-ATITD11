@@ -288,6 +288,7 @@ function noCuttings()
   local hasNoCuttings = waitForImage("OK.png",250,"Waiting for popup");
   if hasNoCuttings then
     safeClick(hasNoCuttings[0] + 10, hasNoCuttings[1] + 10);
+    lsSleep(100);
     return "No Cuttings";
   else
     return vineyardActions[3]
