@@ -30,7 +30,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.20-MacDreamy';
+local version = '0.21-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -685,7 +685,7 @@ function workMine()
       WriteLog("\nWorking Mine...");
     end
     sleepWithStatus(1000, "Working mine (Fetching new nodes)", nil, 0.7, "Refreshing Nodes");
-    findClosePopUpOld();
+    closePopUp();
 end
 
 
@@ -770,22 +770,6 @@ function waitForResult()
 
     lsSleep(sleepDelay);
   end
-end
-
-
-function findClosePopUpOld()
-    while 1 do
-        checkBreak();
-        srReadScreen();
-        lsSleep(10);
-        OK = srFindImage("OK.png");
-        if OK then
-            srClickMouseNoMove(OK[0]+2,OK[1]+2);
-            lsSleep(clickDelay);
-        else
-            break;
-        end
-    end
 end
 
 function parseChat()
@@ -932,7 +916,7 @@ function threeStoneCombo()
         -- I'm only keeping skipWork because it's used in writeLogFile section below (for now)
         if (skipWork) then goto CONTINUE; end
 
-        findClosePopUpOld(); --Extra precaution to check for remaining popup before working the nodes
+        closePopUp(); --Extra precaution to check for remaining popup before working the nodes
         if checkAbort() then return; end
 
         startSetTime = lsGetTimer();
@@ -1027,7 +1011,7 @@ function fourStoneCombo()
   local stone4 = nil;
 
   for a=1,#oreNodes4 do
-    findClosePopUpOld(); --Extra precaution to check for remaining popup before working the nodes
+    closePopUp(); --Extra precaution to check for remaining popup before working the nodes
 
     i = oreNodes4[a][1];
     stone1 = clickList[i];    
@@ -1136,7 +1120,7 @@ function setsCombo()
     z = sets[i][4]
 
 		for j=1, #sets[i] do
-      findClosePopUpOld(); --Extra precaution to check for remaining popup before working the nodes
+      closePopUp(); --Extra precaution to check for remaining popup before working the nodes
       startSetTime = lsGetTimer();
       key = (j == #sets[i] and "S" or "A");    
       stones[j] = clickList[sets[i][j]];
@@ -1213,7 +1197,7 @@ function parseColor(color)
 	rgb[2] = math.floor(c1 - (rgb[1] * 256));
 	return rgb;
 end
-
+findBrokenStone
 
 function WriteLog(Text)
 	logfile = io.open("mining_ore_Logs.txt","a+");
@@ -1477,27 +1461,6 @@ function progressBar(y)
 end
 
 
-function findBrokenStone()
-  --sleepWithStatus(100, "Searching for Broken Nodes", nil, 0.7);
-  findClosePopUpOld(); -- Double check for any leftover popups that might be covering a node and prevent proper detection
-  brokenStones = {} -- Flush array
-  for i=1, #clickList do
-    thisColor = srReadPixel(clickList[i][1], clickList[i][2])
-      if(not compareColorEx(thisColor, clickListColor[i][1], rgbTol, hueTol)) then
-      table.insert(brokenStones, i);
-      end -- if(not compare...
-  end -- for i
-
-    if writeLogFile and #brokenStones > 1 then
-      -- Plural
-      WriteLog("\n**** Found Coal/Gem message (within past 2 lines - Recheck pixel check on ALL nodes)!\nNodes: " .. table.concat(brokenStones,", ") .. " are no longer present.\n")
-      -- Singular
-    elseif writeLogFile and #brokenStones == 1 then
-      WriteLog("\n**** Found Coal/Gem message! Node: " .. table.concat(brokenStones,", ") .. " is no longer present.\n")
-    end
-end
-
-
 function parseOreNodes()
   if writeLogFile then WriteLog("\n**** " .. #oreNodes .. "/" .. TotalCombos .. " Combos produced Ore:") end;
     for a=1, #oreNodes do
@@ -1666,7 +1629,7 @@ function say(msg)
   if not minimizeChat() then error "Unable to minimize chat"; end
 end
 
-function chatcmd(cmd) 
+function chatTimeCmd(cmd) 
   if not openChat("chat/main_chat.png", "ocr/mainChatWhite.png", "ocr/mainChatRed.png") then
     return;
   end
@@ -1675,8 +1638,10 @@ function chatcmd(cmd)
   lsSleep(10);
   srKeyUp(VK_DIVIDE);
   lsSleep(10);
+
   srKeyEvent(cmd);
   lsSleep(100);
+  
   srKeyDown(VK_RETURN);
   lsSleep(10);
   srKeyUp(VK_RETURN);
