@@ -797,7 +797,7 @@ function parseChat()
     if (oreGathered) then -- We found ore!
       oreFound = true;
       --print("Ore gathered: "..oreGathered);
-      chatcmd("time");
+      chatCmd("time");
       break;
     else
       oreFound = nil;
@@ -1197,7 +1197,6 @@ function parseColor(color)
 	rgb[2] = math.floor(c1 - (rgb[1] * 256));
 	return rgb;
 end
-findBrokenStone
 
 function WriteLog(Text)
 	logfile = io.open("mining_ore_Logs.txt","a+");
@@ -1629,23 +1628,18 @@ function say(msg)
   if not minimizeChat() then error "Unable to minimize chat"; end
 end
 
-function chatTimeCmd(cmd) 
+function chatCmd(cmd) 
   if not openChat("chat/main_chat.png", "ocr/mainChatWhite.png", "ocr/mainChatRed.png") then
     return;
   end
 
-  srKeyDown(VK_DIVIDE);
-  lsSleep(10);
-  srKeyUp(VK_DIVIDE);
-  lsSleep(10);
-
-  srKeyEvent(cmd);
-  lsSleep(100);
-  
-  srKeyDown(VK_RETURN);
-  lsSleep(10);
-  srKeyUp(VK_RETURN);
-  lsSleep(10)
+  local cmdKeys = cmdKeyMap.cmd;
+  for i=1,#cmdKeys do
+    srKeyDown(cmdKeys[i]);
+    lsSleep(10);
+    srKeyUp(cmdKeys[i]);
+    lsSleep(10);
+  end
 
   if not minimizeChat() then error "Unable to minimize chat"; end
 end
@@ -1696,6 +1690,10 @@ function pauseForChat()
   until (isChatMain())  
 end
 ---------------------
+local cmdKeyMap = {
+  ["time"] = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN}
+}
+
 function string:findAny(T)
   --print('String: '..self ..'\nTargets: '..dump(T))
   if (type(T) == 'table') then
