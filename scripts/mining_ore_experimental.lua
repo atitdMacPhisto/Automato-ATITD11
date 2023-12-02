@@ -30,7 +30,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.19-MacDreamy';
+local version = '0.20-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -1046,42 +1046,42 @@ function fourStoneCombo()
 
     if noMouseMove then -- Check for dual monitor option - don't move mouse cursor over each node and send keyEvents. Instead do rightClick popup menus        
       -- 1st Node
-      srClickMouseNoMove(clickList[oreNodes4[a][1]][1], clickList[oreNodes4[a][1]][2]);
+      srClickMouseNoMove(stone1.x, stone1.y);
       lsSleep(clickDelay);
       clickAllText("[A]", 20, 2);
 
       -- 2nd Node
-      srClickMouseNoMove(clickList[oreNodes4[a][2]][1], clickList[oreNodes4[a][2]][2]);
+      srClickMouseNoMove(stone2.x, stone2.y);
       lsSleep(clickDelay);
       clickAllText("[A]", 20, 2);
 
       -- 3rd Node
-      srClickMouseNoMove(clickList[oreNodes4[a][3]][1], clickList[oreNodes4[a][3]][2]);
+      srClickMouseNoMove(stone3.x, stone3.y);
       lsSleep(clickDelay);
       clickAllText("[A]", 20, 2);
 
       -- 4th Node
-      srClickMouseNoMove(clickList[oreNodes4[a][4]][1], clickList[oreNodes4[a][4]][2]);
+      srClickMouseNoMove(stone4.x, stone4.y);
       lsSleep(clickDelay);
       clickAllText("[S]", 20, 2);
     else -- noMouseMove is false
       -- 1st Node
-      srSetMousePos(clickList[oreNodes4[a][1]][1], clickList[oreNodes4[a][1]][2]);
+      srSetMousePos(stone1.x, stone1.y);
       lsSleep(clickDelay);
       srKeyEvent('A');
 
       -- 2nd Node
-      srSetMousePos(clickList[oreNodes4[a][2]][1], clickList[oreNodes4[a][2]][2]);
+      srSetMousePos(stone2.x, stone2.y);
       lsSleep(clickDelay);
       srKeyEvent('A');
 
       -- 3rd Node
-      srSetMousePos(clickList[oreNodes4[a][3]][1], clickList[oreNodes4[a][3]][2]);
+      srSetMousePos(stone3.x, stone3.y);
       lsSleep(clickDelay);
       srKeyEvent('A');
 
       -- 4th Node
-      srSetMousePos(clickList[oreNodes4[a][4]][1], clickList[oreNodes4[a][4]][2]);
+      srSetMousePos(stone4.x, stone4.y);
       lsSleep(clickDelay);
       srKeyEvent('S');
     end -- end noMouseMove check
