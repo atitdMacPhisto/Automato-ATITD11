@@ -13,194 +13,196 @@ local stashList = {
 };
 
 local items = {
-        --strength
-          ["Coconuts"] = {
-            ["stat"] = "STR",
-            ["workFn"] = function() clickText(findText("Harvest the Coconut Meat")) end
-          },
-          ["Wet Paper"] = {
-            ["stat"] = "STR",
-            ["workFn"] = function () wetPaper() end
-          },
+  --strength
+    ["Coconuts"] = {
+      ["stat"] = "STR",
+      ["workFn"] = function() clickText(findText("Harvest the Coconut Meat")) end
+    },
+    ["Wet Paper"] = {
+      ["stat"] = "STR",
+      ["workFn"] = function () wetPaper() end
+    },
 
-        --endurance
-          ["Barrel Grinder"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () grindMetal() end
-          },
-          ["Churn Butter"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () churnButter() end
-          },
-          ["Dig Hole"] = {
-            ["stat"] = "END",
-            ["delay"] = 3000,
-            ["workFn"] = function () digHole() end
-          },
-          ["Dirt"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () gather("Dirt") end
-          },
-          ["Excavate Blocks"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () excavateBlocks() end
-          },
-          ["Flax Comb"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () combFlax() end
-          },
-          ["Hackling Rake"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () hacklingRake() end
-          },
-          ["Limestone"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () gather("Limestone") end
-          },
-          ["Oil (Flax Seed)"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () flaxOil() end
-          },
-          ["Pump Aqueduct"] = {
-            ["stat"] = "END",
-            ["workFn"] = function() clickText(findText("Pump the Aqueduct")) end
-          },
-          ["Push Pyramid"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () pyramidPush() end
-          },
-          ["Recycle Tattered Sail"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("TatteredSail") end
-          },
-          ["Stir Cement"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () stirCement() end
-          },
-          ["Weave Canvas"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("Canvas") end
-          },
-          ["Weave Linen"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("Linen") end
-          },
-          ["Weave Papy Basket"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("Basket") end
-          },
-          ["Weave Silk"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("Silk") end
-          },
-          ["Weave Wool Cloth"] = {
-            ["stat"] = "END",
-            ["workFn"] = function () weave("Wool") end
-          },
-        
-        --constitution
-          ["Gun Powder"] = {
-            ["stat"] = "CON",
-            ["workFn"] = function() clickText(findText("Gunpowder")) end
-          },
-          ["Ink"] = {
-            ["stat"] = "CON",
-            ["workFn"] = function() clickText(findText("Ink")) end
-          },
-        
-        --focus        
-          ["Barrel Tap"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Barrel Tap") end
-          },
-          ["Bottle Stopper"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Bottle Stopper") end
-          },
-          ["Clay Lamp"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Clay Lamp") end
-          },
-          ["Crudely Carved Handle"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Crudely Carved Handle") end
-          },
-          ["Flint Hatchet"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Flint Hatchet") end
-          },
-          ["Flint Hammer"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Flint Hammer") end
-          },
-          ["Flint Chisel"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Flint Chisel") end
-          },
-          ["Heavy Mallet"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Heavy Mallet") end
-          },
-          ["Large Crude Handle"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Large Crude Handle") end
-          },
-          ["Long Sharp Stick"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Long Sharp Stick") end
-          },
-          ["Personal Chit"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Personal Chit") end
-          },
-          ["Rawhide Strips"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Rawhide Strips") end
-          },
-          ["Search Rotten Wood"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Search for Bugs") end
-          },
-          ["Sharpened Stick"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Sharpened Stick") end
-          },
-          ["Slate Shovel"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Slate Shovel") end
-          },
-          ["Spore Paper"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () sporePaper() end
-          },
-          ["Tackle Block"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Tackle Block") end
-          },
-          ["Tap Rods"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () tapRods() end
-          },
-          ["Tinder"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Tinder") end
-          },
-          ["Wooden Cog"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Wooden Cog") end
-          },
-          ["Wooden Dowsing Rod"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Wooden Dowsing Rod") end
-          },
-          ["Wooden Peg"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Wooden Peg") end
-          },
-          ["Wooden Pestle"] = {
-            ["stat"] = "FOC",
-            ["workFn"] = function () findAndClickText("Wooden Pestle") end
-          }      
+  --endurance
+    ["Barrel Grinder"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () grindMetal() end
+    },
+    ["Churn Butter"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () churnButter() end
+    },
+    ["Dig Hole"] = {
+      ["stat"] = "END",
+      ["delay"] = 3000,
+      ["workFn"] = function () digHole() end
+    },
+    ["Dirt"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () gather("Dirt") end
+    },
+    ["Excavate Blocks"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () excavateBlocks() end
+    },
+    ["Flax Comb"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () combFlax() end
+    },
+    ["Hackling Rake"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () hacklingRake() end
+    },
+    ["Limestone"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () gather("Limestone") end
+    },
+    ["Oil (Flax Seed)"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () flaxOil() end
+    },
+    ["Pump Aqueduct"] = {
+      ["stat"] = "END",
+      ["workFn"] = function() clickText(findText("Pump the Aqueduct")) end
+    },
+    ["Push Pyramid"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () pyramidPush() end,
+      ["x"] = nil,
+      ["y"] = nil
+    },
+    ["Recycle Tattered Sail"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("TatteredSail") end
+    },
+    ["Stir Cement"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () stirCement() end
+    },
+    ["Weave Canvas"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("Canvas") end
+    },
+    ["Weave Linen"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("Linen") end
+    },
+    ["Weave Papy Basket"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("Basket") end
+    },
+    ["Weave Silk"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("Silk") end
+    },
+    ["Weave Wool Cloth"] = {
+      ["stat"] = "END",
+      ["workFn"] = function () weave("Wool") end
+    },
+
+  --constitution
+    ["Gun Powder"] = {
+      ["stat"] = "CON",
+      ["workFn"] = function() clickText(findText("Gunpowder")) end
+    },
+    ["Ink"] = {
+      ["stat"] = "CON",
+      ["workFn"] = function() clickText(findText("Ink")) end
+    },
+
+  --focus
+    ["Barrel Tap"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Barrel Tap") end
+    },
+    ["Bottle Stopper"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Bottle Stopper") end
+    },
+    ["Clay Lamp"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Clay Lamp") end
+    },
+    ["Crudely Carved Handle"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Crudely Carved Handle") end
+    },
+    ["Flint Hatchet"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Flint Hatchet") end
+    },
+    ["Flint Hammer"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Flint Hammer") end
+    },
+    ["Flint Chisel"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Flint Chisel") end
+    },
+    ["Heavy Mallet"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Heavy Mallet") end
+    },
+    ["Large Crude Handle"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Large Crude Handle") end
+    },
+    ["Long Sharp Stick"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Long Sharp Stick") end
+    },
+    ["Personal Chit"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Personal Chit") end
+    },
+    ["Rawhide Strips"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Rawhide Strips") end
+    },
+    ["Search Rotten Wood"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Search for Bugs") end
+    },
+    ["Sharpened Stick"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Sharpened Stick") end
+    },
+    ["Slate Shovel"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Slate Shovel") end
+    },
+    ["Spore Paper"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () sporePaper() end
+    },
+    ["Tackle Block"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Tackle Block") end
+    },
+    ["Tap Rods"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () tapRods() end
+    },
+    ["Tinder"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Tinder") end
+    },
+    ["Wooden Cog"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Wooden Cog") end
+    },
+    ["Wooden Dowsing Rod"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Wooden Dowsing Rod") end
+    },
+    ["Wooden Peg"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Wooden Peg") end
+    },
+    ["Wooden Pestle"] = {
+      ["stat"] = "FOC",
+      ["workFn"] = function () findAndClickText("Wooden Pestle") end
+    }
 };
 local selectedTasks = {};
 
@@ -235,10 +237,6 @@ local askText = singleLine([[
 function doit()
   filterTasksForDropdowns();
   getClickActions();
-    if items[tasks[2]] == "Push Pyramid" then
-      pyramidXCoord = promptNumber("Pyramid x coordinate:");
-      pyramidYCoord = promptNumber("Pyramid y coordinate:");
-    end
   local mousePos = askForWindow(askText);
   windowSize = srGetWindowSize();
   done = false;
@@ -249,7 +247,7 @@ function doit()
     end
 end
 
-function filterTasksForDropdowns() 
+function filterTasksForDropdowns()
   local strArr = dropdown_item_values.strength;
   local endArr = dropdown_item_values.endurance;
   local conArr = dropdown_item_values.constitution;
@@ -275,7 +273,7 @@ end
 function doTasks()
   didTask = false;
   for i = 1, 4 do
-    task_key = selectedTasks[i]    
+    task_key = selectedTasks[i]
     if task_key ~= "" then
       curTask = items[task_key];
       --print(dump(curTask));
@@ -298,11 +296,12 @@ function doTasks()
         lsDoFrame();
 
         if autoOnion then
-          eatOnion();
+          eatVegetable("Onion");
+        elseif autoGarlic then
+          eatVegetable("Garlic");
         end
 
         curTask.workFn();
-
         statTimer[i] = lsGetTimer();
         didTask = true;
       end
@@ -342,7 +341,7 @@ function getClickActions()
   -- initializeTaskList
   tasks = {};
   for i = 1, 4 do
-      tasks[i] = 1;
+    tasks[i] = 1;
   end
 
   while not done do
@@ -362,7 +361,44 @@ function getClickActions()
         goto continue;
       end
 
-      if selectedTasks[i] == "Stir Cement" then
+      if statNames[i] == "endurance" then
+        y = y + 15;
+        autoOnion = readSetting("autoOnion",autoOnion);
+        autoOnion = lsCheckBox(5, y-10, z, 0xFFFFFFff, " Automatically Eat Onions", autoOnion);
+        writeSetting("autoOnion",autoOnion);
+        if autoOnion then
+          y = y + 20
+          alertNoOnions = readSetting("alertNoOnions",alertNoOnions);
+          alertNoOnions = lsCheckBox(15, y, z, 0xFFFFFFff, " Play sound if no Onions left!", alertNoOnions);
+          writeSetting("alertNoOnions",alertNoOnions);
+
+          y = y + 25;
+          lsPrintWrapped(15, y, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
+        end
+        lsPrint(5, y+15, 10, scale, scale, 0xffff40ff,
+        " - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+        y = y + 40;
+      elseif statNames[i] == "focus" then
+        y = y + 15;
+        autoGarlic = readSetting("autoGarlic",autoGarlic);
+        autoGarlic = lsCheckBox(5, y-10, z, 0xFFFFFFff, " Automatically Eat Garlic", autoGarlic);
+        writeSetting("autoGarlic",autoGarlic);
+        if autoGarlic then
+          y = y + 20
+          alertNoGarlic = readSetting("alertNoGarlic",alertNoGarlic);
+          alertNoGarlic = lsCheckBox(15, y, z, 0xFFFFFFff, " Play sound if no Garlic left!", alertNoGarlic);
+          writeSetting("alertNoGarlic",alertNoGarlic);
+
+          y = y + 25;
+          lsPrintWrapped(15, y, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Garlic' window.");
+        end
+        lsPrint(5, y+15, 10, scale, scale, 0xffff40ff,
+        " - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+        y = y + 40;
+      end
+
+      local task = items[selectedTasks[i]];
+      if task.id == "Stir Cement" then
         y = y + 35;
         stirMaster = readSetting("stirMaster",stirMaster);
         stirMaster = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Clinker Vat", stirMaster);
@@ -376,28 +412,44 @@ function getClickActions()
           end
       end
 
-      if selectedTasks[i]:match("Weave %w+") then
+      if task.id:match("Weave %w+") then
         y = y + 35;
         reloadLoom = readSetting("reloadLoom",reloadLoom);
         reloadLoom = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically reload Loom", reloadLoom);
         writeSetting("reloadLoom",reloadLoom);
       end
 
-      if selectedTasks[i] == "Tap Rods" then
+      if task.id == "Push Pyramid" then
+        lsPrint(5, y+4, 0, 1, 1, 0xffffffff, "Pyramid Coords");
+        lsPrint(155, y+4, 0, 1, 1, 0x00ff00ff, " X:");
+        task.x = readSetting("pyramidXCoord",task.x);
+        _, task.x = lsEditBox("pyramidXCoord", 185, y, z, 85, 0, scale, scale, 0x000000ff, task.x)
+        task.x = tonumber(task.x)
+        writeSetting("pyramidXCoord",task.x);
+
+        lsPrint(280, y+4, 0, 1, 1, 0x00ff00ff, "Y:");
+        task.y = readSetting("pyramidYCoord",task.y);
+        _, task.y = lsEditBox("pyramidYCoord", 300, y, z, 85, 0, scale, scale, 0x000000ff, task.y)
+        task.y = tonumber(task.y)
+        writeSetting("pyramidYCoord",task.y);
+        y = y + 35;
+      end
+
+      if task.id == "Tap Rods" then
         y = y + 35;
         retrieveRods = readSetting("retrieveRods",retrieveRods);
         retrieveRods = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically retrieve rods", retrieveRods);
         writeSetting("retrieveRods",retrieveRods);
       end
 
-      if selectedTasks[i] == "Limestone" or selectedTasks[i] == "Dirt" then
+      if task.id == "Limestone" or task.id == "Dirt" then
         y = y + 35;
         stashRawMaterials = readSetting("stashRawMaterials",stashRawMaterials);
         stashRawMaterials = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically stash while digging (Pin WH)", stashRawMaterials);
         writeSetting("stashRawMaterials",stashRawMaterials);
       end
 
-      if selectedTasks[i] == "Barrel Grinder" then
+      if task.id == "Barrel Grinder" then
         y = y + 35;
         refilGrinder = readSetting("refilGrinder",refilGrinder);
         refilGrinder = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically fill the Barrel Grinder", refilGrinder);
@@ -413,21 +465,6 @@ function getClickActions()
       end
 
       ::continue::
-    end
-
-    y = y + 15;
-    lsSetCamera(0, 0, lsScreenX * 1.3, lsScreenY * 1.3);
-    autoOnion = readSetting("autoOnion",autoOnion);
-    autoOnion = lsCheckBox(5, y-30, z, 0xFFFFFFff, " Automatically Eat Onions?", autoOnion);
-    writeSetting("autoOnion",autoOnion);
-    if autoOnion then
-      y = y + 10
-      lsPrintWrapped(15, y+5, 0, lsScreenX - 20, 1.0, 1.0, 0xFFFF80ff, "Pin the 'Grilled Onion' window.");
-
-      y = y + 15;
-      alertNoOnions = readSetting("alertNoOnions",alertNoOnions);
-      alertNoOnions = lsCheckBox(15, y-32, z, 0xFFFFFFff, " Play sound if no Onions left!", alertNoOnions);
-      writeSetting("alertNoOnions",alertNoOnions);
     end
 
     lsDoFrame();
@@ -517,22 +554,22 @@ end
 function findAndClickText(item)
   srReadScreen();
   itemAnchor = findText(item);
-    if  itemAnchor ~= nil then
-      safeClick(itemAnchor[0]+5,itemAnchor[1]+3);
-      lsSleep(per_tick);
-      srReadScreen();
-      closePopUp();
-      lsSleep(per_tick);
-    end
+  if  itemAnchor ~= nil then
+    safeClick(itemAnchor[0]+5,itemAnchor[1]+3);
+    lsSleep(per_tick);
+    srReadScreen();
+    closePopUp();
+    lsSleep(per_tick);
+  end
 end
 
 function digHole()
   srReadScreen();
   local digdeeper = srFindImage("statclicks/dig_deeper.png");
-    if digdeeper ~= nil then
-      safeClick(digdeeper[0], digdeeper[1])
-      lsSleep(per_tick);
-    end
+  if digdeeper ~= nil then
+    safeClick(digdeeper[0], digdeeper[1])
+    lsSleep(per_tick);
+  end
 end
 
 function gather(resource)
@@ -567,12 +604,12 @@ function clickMenus(menus)
     checkBreak();
     srReadScreen();
     local found = findText(menu);
-      if found then
-        clickText(found);
-        lsSleep(200);
-      else
-        return false;
-      end
+    if found then
+      clickText(found);
+      lsSleep(200);
+    else
+      return false;
+    end
   end
   return true;
 end
@@ -595,7 +632,6 @@ end
 
 
 function grindMetal()
-
   if metalGrind == 1 then
     metalType = "Silver"
   elseif metalGrind == 2 then
@@ -607,62 +643,62 @@ function grindMetal()
 
   clickText(findText("This is [a-z]+ Barrel Grinder", nil, REGEX));
 
-    if startGrinder and repairGrinder then
-      clickText(repairGrinder);
-      lsSleep(per_tick);
-    elseif startGrinder and not repairGrinder then
-      clickText(startGrinder);
-      lsSleep(per_tick);
-    else
-      srReadScreen();
-      local wind = findText("Wind");
-        if wind ~= nil then
-          if refilGrinder then
-            srReadScreen();
-            local loadGrinder = findText("Grinder with " .. metalType);
-              if loadGrinder then
-                local metalWindow = findText("All Metal", nil, REGION);
-                  if metalType == "Silver" then
-                    local grindingMetal = findText("Silver", metalWindow);
-                    safeClick(grindingMetal[0]+150,grindingMetal[1]+5);
-                    metalVolume = tonumber(string.match(grindingMetal[2], "([-0-9]+)"));
-                  elseif metalType == "Aluminum" then
-                    local grindingMetal = findText("Aluminum", metalWindow);
-                    safeClick(grindingMetal[0]+150,grindingMetal[1]+5);
-                    metalVolume = tonumber(string.match(grindingMetal[2], "([-0-9]+)"));
-                  end
-                    if metalVolume < 50 then
-                      clickText(loadGrinder);
-                      waitForImage("max.png");
-                      srReadScreen();
-                      local maxButton = srFindImage("max.png");
-                        if(maxButton) then
-                          srClickMouseNoMove(maxButton[0]+5,maxButton[1]);
-                        else
-                          fatalError("Unable to find the Max button");
-                        end
-                        waitForNoImage("max.png");
-                    end
-              end
-          end
-          clickText(wind);
-          lsSleep(per_tick);
-          srReadScreen();
-          closePopUp();
-          lsSleep(per_tick);
-          srReadScreen();
+  if startGrinder and repairGrinder then
+    clickText(repairGrinder);
+    lsSleep(per_tick);
+  elseif startGrinder and not repairGrinder then
+    clickText(startGrinder);
+    lsSleep(per_tick);
+  else
+    srReadScreen();
+    local wind = findText("Wind");
+    if wind ~= nil then
+      if refilGrinder then
+        srReadScreen();
+        local loadGrinder = findText("Grinder with " .. metalType);
+        if loadGrinder then
+          local metalWindow = findText("All Metal", nil, REGION);
+            if metalType == "Silver" then
+              local grindingMetal = findText("Silver", metalWindow);
+              safeClick(grindingMetal[0]+150,grindingMetal[1]+5);
+              metalVolume = tonumber(string.match(grindingMetal[2], "([-0-9]+)"));
+            elseif metalType == "Aluminum" then
+              local grindingMetal = findText("Aluminum", metalWindow);
+              safeClick(grindingMetal[0]+150,grindingMetal[1]+5);
+              metalVolume = tonumber(string.match(grindingMetal[2], "([-0-9]+)"));
+            end
+            if metalVolume < 50 then
+              clickText(loadGrinder);
+              waitForImage("max.png");
+              srReadScreen();
+              local maxButton = srFindImage("max.png");
+                if(maxButton) then
+                  srClickMouseNoMove(maxButton[0]+5,maxButton[1]);
+                else
+                  fatalError("Unable to find the Max button");
+                end
+                waitForNoImage("max.png");
+            end
         end
+      end
+      clickText(wind);
+      lsSleep(per_tick);
+      srReadScreen();
+      closePopUp();
+      lsSleep(per_tick);
+      srReadScreen();
     end
+  end
 end
 
 function flaxOil()
   srReadScreen();
   local seperateoil = srFindImage("statclicks/seperate_oil.png");
-    if seperateoil ~= nil then
-      safeClick(seperateoil[0], seperateoil[1])
-      lsSleep(per_tick);
-      closePopUp();
-    end
+  if seperateoil ~= nil then
+    safeClick(seperateoil[0], seperateoil[1])
+    lsSleep(per_tick);
+    closePopUp();
+  end
 end
 
 function combFlax()
@@ -699,55 +735,64 @@ function combFlax()
       end
 end
 
-function eatOnion()
+function eatVegetable(vegetable)
   srReadScreen();
-  buffed = srFindImage("stats/enduranceBuff.png")
+
+  if vegetable == "Onion" then
+    buffed = srFindImage("stats/enduranceBuff.png")
+    stat = "Endurance"
+  elseif vegetable == "Garlic" then
+    buffed = srFindImage("stats/focusBuff.png")
+    stat = "Focus"
+  end
+
     if not buffed then
       srReadScreen();
-      local consumeOnion = srFindImage("consume.png")
-        if consumeOnion ~= nil then
-          safeClick(consumeOnion[0],consumeOnion[1]);
-          waitForImage("stats/enduranceBuff.png", 5000, "Waiting for Endurance Buff icon")
-          srClickMouseNoMove(consumeOnion[0]-5,consumeOnion[1]-10); -- Click the window again, to refresh, so we now see accurate count of food remaining, on pinned food menu.
-        lsSleep(click_delay);
+      local consume = srFindImage("consume.png")
+        if consume ~= nil then
+          safeClick(consume[0],consume[1]);
+          waitForImage(buffed, 5000, "Waiting for " .. stat .. " Buff icon")
+          -- Click the window again, to refresh, so we now see accurate count of food remaining, on pinned food menu.
+          safeClick(consume[0]-5,consume[1]-10);
+          lsSleep(click_delay);
         end
     end
 end
 
 function hacklingRake()
-    expressionToFind = "This is [a-z]+[ Improved]* Hackling Rake";
-    flaxReg = findText(expressionToFind, nil, REGION + REGEX);
-      if flaxReg == nil then
-          return;
-      end
-    flaxText = findText(expressionToFind, flaxReg, REGEX);
-    clickText(flaxText);
-    lsSleep(100);
+  expressionToFind = "This is [a-z]+[ Improved]* Hackling Rake";
+  flaxReg = findText(expressionToFind, nil, REGION + REGEX);
+  if flaxReg == nil then
+      return;
+  end
+  flaxText = findText(expressionToFind, flaxReg, REGEX);
+  clickText(flaxText);
+  lsSleep(100);
+  srReadScreen();
+  local fix = findText("Repair");
+  if (fix) then
+    repairRake("hackling");
+    lsSleep(75);
     srReadScreen();
-    local fix = findText("Repair");
-      if (fix) then
-        repairRake("hackling");
-        lsSleep(75);
-        srReadScreen();
-        clickText(flaxText, flaxReg);
-        lsSleep(75);
-      end
-    srReadScreen();
+    clickText(flaxText, flaxReg);
+    lsSleep(75);
+  end
+  srReadScreen();
 
-    s1 = findText("Separate Rotten", flaxReg);
-    s23 = findText("Continue processing", flaxReg);
-    clean = findText("Clean the", flaxReg);
-      if s1 then
-        clickText(s1);
-      elseif s23 then
-        clickText(s23);
-      elseif clean then
-        clickText(clean);
-      else
-        lsPrint(5, 0, 10, 1, 1, 0xFFFFFF, "Found Stats");
-        lsDoFrame();
-        lsSleep(2000);
-      end
+  s1 = findText("Separate Rotten", flaxReg);
+  s23 = findText("Continue processing", flaxReg);
+  clean = findText("Clean the", flaxReg);
+  if s1 then
+    clickText(s1);
+  elseif s23 then
+    clickText(s23);
+  elseif clean then
+    clickText(clean);
+  else
+    lsPrint(5, 0, 10, 1, 1, 0xFFFFFF, "Found Stats");
+    lsDoFrame();
+    lsSleep(2000);
+  end
 end
 
 function stirCement()
@@ -808,22 +853,24 @@ function stirCement()
 end
 
 function pyramidPush()
+  task = items["Push Pyramid"];
+
   local curCoords = findCoords();
   local t, u;
-  if curCoords[0] > pyramidXCoord + 2 then
+  if curCoords[0] > task.x + 2 then
     t = findText("Push this block West");
     if t ~= nil then u = t end;
-  elseif curCoords[0] < pyramidXCoord - 2 then
+  elseif curCoords[0] < task.x - 2 then
     t = findText("Push this block East");
     if t ~= nil then u = t end;
   else
     t = findText("Turn this block to face North-South");
     if t ~= nil then u = t end;
   end
-  if curCoords[1] > pyramidYCoord + 2 then
+  if curCoords[1] > task.y + 2 then
     t = findText("Push this block South");
     if t ~= nil then u = t end;
-  elseif curCoords[1] < pyramidYCoord - 2 then
+  elseif curCoords[1] < task.y - 2 then
     t = findText("Push this block North");
     if t ~= nil then u = t end;
   else
