@@ -30,7 +30,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.21-MacDreamy';
+local version = '0.22-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -90,7 +90,7 @@ local timesworked = 0;
 local miningTimeTotal = 0;
 local dropdown_key_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 local key_strings = {"tap SHIFT", "tap CTRL", "tap ALT", "click MWHEEL"};
-local key_functions = {lsShiftHeld, lsControlHeld, lsAltHeld, function() lsMouseIsDown(2); end}
+local key_functions = {lsShiftHeld, lsControlHeld, lsAltHeld, function() return lsMouseIsDown(2); end}
 local dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Coal (10)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
 local cancelButton = 0;
 
@@ -130,6 +130,10 @@ local oreMatchPattern = '[^%d]+(%d+)[-A-Za-z ]+Ore';
 --local gemMatchPattern = 'You got [%a+] ([%a+]) ([%a+])';
 local chatReadTimeOut = 3500; -- Maximum Time(ms) to wait before moving on to the next workload.
 local chatParseTargets = {"Worked", "Year"}
+local cmdKeyMap = {
+  time = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN},
+  qc = {VK_DIVIDE, VK_Q, VK_C, VK_RETURN}
+}
 --End Customizable
 
 ----------------------------------------
@@ -1633,7 +1637,7 @@ function chatCmd(cmd)
     return;
   end
 
-  local cmdKeys = cmdKeyMap.cmd;
+  local cmdKeys = cmdKeyMap[cmd];
   for i=1,#cmdKeys do
     srKeyDown(cmdKeys[i]);
     lsSleep(10);
@@ -1690,9 +1694,6 @@ function pauseForChat()
   until (isChatMain())  
 end
 ---------------------
-local cmdKeyMap = {
-  ["time"] = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN}
-}
 
 function string:findAny(T)
   --print('String: '..self ..'\nTargets: '..dump(T))
