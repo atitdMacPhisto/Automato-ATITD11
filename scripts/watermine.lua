@@ -9,7 +9,7 @@ flip1 = readSetting("flip1",flip1);
 flip2 = readSetting("flip2",flip2);
 change_pitch_time = readSetting("change_pitch_time",change_pitch_time);
 
-wind_time = 7920000;  	-- 2 hours teppy time
+wind_time = 3960000;  	-- 1 hour teppy time
 check_time = 10000;   	-- 10 seconds
 
 srdelay = 100;  	--how long to wait after interacting before assuming the screen has finished changing
