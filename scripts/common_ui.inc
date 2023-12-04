@@ -534,8 +534,8 @@ end
 --
 -- Allow scaling of lsCheckBox()
 --
--- x -- x coordinates to place button
--- y -- y coordinates to place button
+-- x -- x coordinates to place check box
+-- y -- y coordinates to place check box
 -- z -- z affects if two or more objects are overlapping. The highest z will display instead of overlapping object with lower z.
 -- color (optional) -- color of message (defaults to white)
 -- text -- string giving the user a message
@@ -567,4 +567,53 @@ function CheckBox(x, y, z, color, text, value, xsc, ysc)
   else
     lsSetCamera(0,0, lsScreenX, lsScreenY);
   end
+end
+
+
+-- Default edit box validator functions
+local EditBoxValidator = {
+  NUMERIC = function (key, value, default)
+    -- This is basic if the input is not a number at any point it will be reverted to the supplied default value
+    -- in this case it's the last valid number that was entered
+    -- More advanced versions could use regex, enforce a minimun value, run a chain of validators, etc...
+    local num = tostring(tonumber(value) or default);
+    if (num~=value) then
+      lsEditBoxSetText(key, floor(num));
+    end
+  
+    return num;
+  end
+}
+
+-------------------------------------------------------------------------------
+-- EditBox(key, x, y, z, width, height, default, color, xsc, ysc, validatorFn)
+--
+-- Allow validation of lsEditBox()
+--
+-- key -- name of the edit box
+-- x -- x coordinates to place edit box
+-- y -- y coordinates to place edit box
+-- z -- z affects if two or more objects are overlapping. The highest z will display instead of overlapping object with lower z.
+-- width -- width if the edit box
+-- height -- height of the edit box
+-- default -- initial/default value of the edit box
+-- color (optional) -- color of text (defaults to black)
+-- xsc (optional) -- x scaling -- x and y should typically be same
+-- ysc (optional) -- y scaling -- x and y should typically be same
+-- validatorFn (optional) -- function to validate the edit box input. Function will be passed (key, value, default).
+--
+-- ex: EditBox('my_edit_box', 100, 50, 0, 50, 30, defaultValue, nil, nil, nil, EditBoxValidator.NUMERIC)
+--
+-------------------------------------------------------------------------------
+function EditBox(key, x, y, z, width, height, default, color, xsc, ysc, validatorFn)
+  z = z or 0;
+  color = color or 0x000000FF;
+  xsc = xsc or 1.0;
+  ysc = ysc or 1.0;
+
+  local is_done, value = lsEditBox(key, x, y, z, width, height, xsc, ysc, color, default);
+  if (validFn) then 
+    value = validFn(key, value, default);
+  end;
+  return is_done, value;
 end
