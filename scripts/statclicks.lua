@@ -738,11 +738,14 @@ end
 function eatVegetable(vegetable)
   srReadScreen();
 
+  local statImg;
   if vegetable == "Onion" then
-    buffed = srFindImage("stats/enduranceBuff.png")
+    statImg = "stats/enduranceBuff.png";
+    buffed = srFindImage(statImg);
     stat = "Endurance"
   elseif vegetable == "Garlic" then
-    buffed = srFindImage("stats/focusBuff.png")
+    statImg = "stats/focusBuff.png";
+    buffed = srFindImage(statImg);
     stat = "Focus"
   end
 
@@ -751,7 +754,7 @@ function eatVegetable(vegetable)
       local consume = srFindImage("consume.png")
         if consume ~= nil then
           safeClick(consume[0],consume[1]);
-          waitForImage(buffed, 5000, "Waiting for " .. stat .. " Buff icon")
+          waitForImage(statImg, 5000, "Waiting for " .. stat .. " Buff icon")
           -- Click the window again, to refresh, so we now see accurate count of food remaining, on pinned food menu.
           safeClick(consume[0]-5,consume[1]-10);
           lsSleep(click_delay);

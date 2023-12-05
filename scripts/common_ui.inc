@@ -571,7 +571,7 @@ end
 
 
 -- Default edit box validator functions
-local EditBoxValidator = {
+EditBoxValidator = {
   NUMERIC = function (key, value, default)
     -- This is basic if the input is not a number at any point it will be reverted to the supplied default value
     -- in this case it's the last valid number that was entered
@@ -586,7 +586,7 @@ local EditBoxValidator = {
 }
 
 -------------------------------------------------------------------------------
--- EditBox(key, x, y, z, width, height, default, color, xsc, ysc, validatorFn)
+-- EditBox(key, x, y, z, width, height, default, xsc, ysc, color, validatorFn)
 --
 -- Allow validation of lsEditBox()
 --
@@ -597,23 +597,23 @@ local EditBoxValidator = {
 -- width -- width if the edit box
 -- height -- height of the edit box
 -- default -- initial/default value of the edit box
--- color (optional) -- color of text (defaults to black)
 -- xsc (optional) -- x scaling -- x and y should typically be same
 -- ysc (optional) -- y scaling -- x and y should typically be same
+-- color (optional) -- color of text (defaults to black)
 -- validatorFn (optional) -- function to validate the edit box input. Function will be passed (key, value, default).
 --
 -- ex: EditBox('my_edit_box', 100, 50, 0, 50, 30, defaultValue, nil, nil, nil, EditBoxValidator.NUMERIC)
 --
 -------------------------------------------------------------------------------
-function EditBox(key, x, y, z, width, height, default, color, xsc, ysc, validatorFn)
+function EditBox(key, x, y, z, width, height, default, xsc, ysc, color, validatorFn)
   z = z or 0;
   color = color or 0x000000FF;
   xsc = xsc or 1.0;
   ysc = ysc or 1.0;
 
   local is_done, value = lsEditBox(key, x, y, z, width, height, xsc, ysc, color, default);
-  if (validFn) then 
-    value = validFn(key, value, default);
+  if (validatorFn) then 
+    value = validatorFn(key, value, default);
   end;
   return is_done, value;
 end
