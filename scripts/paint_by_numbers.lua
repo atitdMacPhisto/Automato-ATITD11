@@ -242,13 +242,13 @@ function getColor(building)
 
   local rgb = {0, 0, 0};
   for index, value in pairs(rgb) do
-    for i = 1, 306 do
+    for i = 1, 357 do
       local color = readRGB(x + i, y);
       local total = color[1] + color[2] + color[3];
       if color[index] < total / 2 then
         break;
       end
-      rgb[index] = round(i / 306 * 255);
+      rgb[index] = round(i / 357 * 255);
     end
     y = y + 10;
   end
