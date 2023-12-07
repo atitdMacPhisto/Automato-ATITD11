@@ -802,7 +802,7 @@ function parseChat()
     if (oreGathered) then -- We found ore!
       oreFound = true;
       --print("Ore gathered: "..oreGathered);
-      chatCmd("time");
+      chatCmd('time');
       break;
     else
       oreFound = nil;
@@ -1638,7 +1638,7 @@ function chatCmd(cmd)
     return;
   end
 
-  local cmdKeys = cmdKeyMap[cmd];
+  local cmdKeys = cmdKeyMap[cmd:lower()];
   for i=1,#cmdKeys do
     srKeyDown(cmdKeys[i]);
     lsSleep(10);
