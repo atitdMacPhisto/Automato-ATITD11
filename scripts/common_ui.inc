@@ -578,7 +578,7 @@ EditBoxValidator = {
     -- More advanced versions could use regex, enforce a minimun value, run a chain of validators, etc...
     local num = tostring(tonumber(value) or default);
     if (num~=value) then
-      lsEditBoxSetText(key, floor(num));
+      lsEditBoxSetText(key, math.floor(num));
     end
   
     return num;

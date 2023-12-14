@@ -845,7 +845,7 @@ function stirCement()
             if fuelType == "Coal" or fuelType == "Charcoal" then
               srCharEvent("800\n");
             elseif fuelType == "Petroleum" then
-              srCharEvent("40\n");
+              srCharEvent("150\n");
             end
           waitForNoImage("max.png");
         end
