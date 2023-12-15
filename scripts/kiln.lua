@@ -6,7 +6,7 @@ dofile("settings.inc");
 ----------------------------------------
 dropdown_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 kilnList = {"True Kiln","Reinforced Kiln"};
-productNames = { "Wet Clay Bricks", "Wet Clay Mortars", "Wet Firebricks", "Wet Jugs", "Wet Claypots" };
+productNames = { "Wet Clay Bricks", "Wet Clay Mortars", "Wet Firebricks", "Wet Jugs", "Wet Claypots", "Faience" };
 dropdown_cur_value = 1;
 total_delay_time = 155000;
 
@@ -202,8 +202,12 @@ function start()
     if productNames[typeOfProduct] == "Wet Jugs" then
       srReadScreen();
       clickAllImages("kiln/wetJugs.png");
+    elseif productNames[typeOfProduct] == "Faience" then
+      srReadScreen();
+      clickAllImages("kiln/faience.png");
+    else
+      clickAllText(productNames[typeOfProduct]);
     end
-    clickAllText(productNames[typeOfProduct]);
     sleepWithStatus(1000,"Firing all kilns");
     clickAllText("Fire the Kiln");
     refreshWindows();
@@ -225,10 +229,10 @@ function takeFromKilns()
         lsSleep(refresh_time);
         srReadScreen();
         local e = findText("Everything");
-          if (e) then
-            safeClick(e[0]+4,e[1]+4);
-            lsSleep(refresh_time);
-          end
+        if (e) then
+          safeClick(e[0]+4,e[1]+4);
+          lsSleep(refresh_time);
+        end
     end
   end
 end
