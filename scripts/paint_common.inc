@@ -17,7 +17,7 @@ per_click_delay = 10;
 
 -- bar_width: This should be 307. If we get Red/Green Cloth added to menu, around Xmas time (like on T8), this will likely need to be set to 328.
 -- When they added Red/Green Cloth, this caused the window to be wider, hence increasing width of bars.
-bar_width = 307;
+bar_width = 357;
 
 function find_button_index(ingred_name)
     for i, v in pairs(button_names) do

@@ -1820,4 +1820,12 @@ return
 		,
 	}
 	,
+	["Gold Rivet"] =
+	{
+		["metal"] = "Gold",
+		["prod"] = 1,
+		["q"] = 8,
+		["time"] = 3,
+	}
+  ,
 }

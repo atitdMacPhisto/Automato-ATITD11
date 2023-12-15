@@ -9,6 +9,7 @@ local find = string.find;
 local match = string.match;
 local sub = string.sub;
 local gsub = string.gsub;
+local floor = math.floor;
 
 function noop (...) return nil; end
 
@@ -30,7 +31,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.22-MacDreamy';
+local version = '0.24-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -126,9 +127,15 @@ local rgbTol = 50; --50?  Was 150
 local hueTol = 50; --10?  Was 75
 
 local minResultDelay = 150; -- The minimum delay time used during waitForResult() function
-local oreMatchPattern = '[^%d]+(%d+)[-A-Za-z ]+Ore';
---local gemMatchPattern = 'You got [%a+] ([%a+]) ([%a+])';
-local chatReadTimeOut = 3500; -- Maximum Time(ms) to wait before moving on to the next workload.
+local matchPatterns = {
+  default = '[^%d]+(%d+)[-A-Za-z ]+Ore',
+  silver = '(%d+) Silver',
+  coal = '(%d+) Coal',
+  sand = '(%d+) Sand',
+  gems = 'You got [%a+] ([%a+]) ([%a+])'
+}
+local oreMatchPattern = matchPatterns.default;
+local chatReadTimeOut = 2500; -- Maximum Time(ms) to wait before moving on to the next workload.
 local chatParseTargets = {"Worked", "Year"}
 local cmdKeyMap = {
   time = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN},
@@ -180,7 +187,8 @@ function Stone:isCleared ()
 end
 ----------------------------------------
 
-function doit()   
+function doit()
+  lsRequireVersion();
   displayInstructions();
   askForWindow(info);
   setup();
@@ -343,11 +351,7 @@ function processInput()
   userKeyStr = key_strings[dropdown_cur_value_key];
   ore, stonecount = dropdown_ore_values[dropdown_ore_cur_value]:match('(%a+)%s*%((%d+)%)');
   stonecount = stonecount and tonumber(stonecount) or -1;
-
-  if (ore == "Silver") then  oreMatchPattern = '(%d+) Silver'; 
-  elseif (ore == "Coal") then oreMatchPattern = '(%d+) Coal'
-  --elseif (ore == "Sand") then oreMatchPattern = '(%d+) Sand'; 
-  end
+  oreMatchPattern = matchPatterns[ore:lower()] or matchPatterns.default;
 end
 
 function getMineLoc()
@@ -591,6 +595,7 @@ function getPoints()
 
         if ButtonText(120, lsScreenY -30, z, 80, 0xffffffff, "Config") then
             cancelButton = 1;
+            lsEditBoxSetText("oreGatheredTotal", floor(oreGatheredTotal));
             setup();
         end
 
@@ -613,13 +618,9 @@ end
 
 
 function clickSequence()
-    oreGatheredLast = 0;
-    oreGathered = 0;
-    worked = 0;
+    worked, oreGathered, oreGatheredLast = 0, 0, 0;
     logResult = "";
-    brokenStones = {};
-    oreNodes = {};
-    oreNodesFour = {};
+    brokenStones, oreNodes, oreNodesFour = {}, {}, {};
     brokenStoneInfo = "";
     startMiningTime = lsGetTimer();
 
@@ -630,7 +631,7 @@ function clickSequence()
     if noMouseMove then
       sleepWithStatus(3000, "Starting...\n\nNow is your chance to move your mouse to second monitor!", nil, 0.7, "Attention");
     else
-      sleepWithStatus(150, "Starting...\n\nDon\'t move mouse!", nil, 0.7, "Attention");
+      sleepWithStatus(250, "Starting...\n\nDon\'t move mouse!", nil, 0.7, "Attention");
     end
 
     if checkAbort() then return; end
@@ -792,7 +793,7 @@ function parseChat()
  
   local idx = #chatText;
   --print('Line to parse: '..chatText[idx][2]);
-  local currentLine = gsub(chatText[idx][2], '.+] ','');
+  local currentLine = lastLine;--gsub(chatText[idx][2], '.+] ','');
   repeat -- loop backwards though the lines until we find the messages we want or the time
     --print('Current ['..idx..'] Line: '..currentLine);    
     --gemSize, gemType = currentLine:match(gemMatchPattern);    
@@ -801,14 +802,14 @@ function parseChat()
     if (oreGathered) then -- We found ore!
       oreFound = true;
       --print("Ore gathered: "..oreGathered);
-      chatCmd("time");
+      chatCmd('time');
       break;
     else
       oreFound = nil;
     end 
            
     idx = idx-1;
-    currentLine = gsub(chatText[idx][2],'.+] ','');
+    currentLine = chatText[idx][2];
     lsSleep(1); -- Yes this is too fast to do anything. It just gives me the warm/fuzzies
   until (currentLine:findAny(chatParseTargets)); 
 end
@@ -1637,7 +1638,7 @@ function chatCmd(cmd)
     return;
   end
 
-  local cmdKeys = cmdKeyMap[cmd];
+  local cmdKeys = cmdKeyMap[cmd:lower()];
   for i=1,#cmdKeys do
     srKeyDown(cmdKeys[i]);
     lsSleep(10);
