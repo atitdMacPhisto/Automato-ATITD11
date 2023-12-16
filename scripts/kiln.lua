@@ -104,6 +104,14 @@ function promptParameters()
           is_done, claypotHotkey = lsEditBox("claypotHotkey", 140, y-15, 0, 50, 30, 1.0, 1.0, 0x000000ff, 100);
           writeSetting("claypotHotkey",claypotHotkey);
         end
+
+        if hotkeyTask == 6 then
+          y = y + 32;
+          faienceHotkey = readSetting("faienceHotkey",faienceHotkey);
+          lsPrint(10, y-14, z, 0.8, 0.8, 0xffffffff, "Faience Hotkey:");
+          is_done, faienceHotkey = lsEditBox("faienceHotkey", 140, y-15, 0, 50, 30, 1.0, 1.0, 0x000000ff, 100);
+          writeSetting("faienceHotkey",faienceHotkey);
+        end
     else
       hotkeyMode = false;
     end
@@ -390,6 +398,8 @@ function kilnAction()
     inputkey = "j"
   elseif hotkeyTask == 5 then
     inputkey = claypotHotkey
+  elseif hotkeyTask == 6 then
+    inputkey = faienceHotkey
   end
 
   checkBreak();
