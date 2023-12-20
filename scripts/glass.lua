@@ -250,8 +250,8 @@ function glassTick(window_pos, state)
 
 	if state.benchTicksConfirmed and showTicks then
 	  state.status = state.status .. " <Ticks:".. state.benchTicks .. "|DV:" .. state.DV .. "|HV:" .. state.HV
-    .. "|Min/MaxTemp:" .. 1600 - state.HV + state.DV .. "-" .. 2399 - state.HV
-    .. "|LastSpike:" .. state.lastSpike .. ">";
+    .. "|LastSpike:" .. state.lastSpike
+    .. "|Min-MaxTemp:" .. 1600 - state.HV + state.DV .. "-" .. 2399 - state.HV  .. ">";
 	end
 
 	state.last_temp = temp;
@@ -483,7 +483,7 @@ function doit()
     " Suspend Cooking (Maintain Heat, no New Projects)", maintainHeatNoCook);
 	end
 
-	  showTicks = lsCheckBox(200, lsScreenY - 70, 10, 0xFFFFFFff, " Display Ticks/HV/DV", showTicks);
+	  showTicks = lsCheckBox(200, lsScreenY - 70, 10, 0xFFFFFFff, " Display Ticks/HV/DV/LastSpike", showTicks);
 	  glazierBenchSpec = readSetting("glazierBenchSpec",glazierBenchSpec);
 	  glazierBenchSpec = lsCheckBox(200, lsScreenY - 40, 10, 0xFFFFFFff,
     " Have Glazier\'s Bench Handling Spec?", glazierBenchSpec);
@@ -577,7 +577,7 @@ function doit()
 		    maintainHeatNoCook = lsCheckBox(200, lsScreenY - 100, 10, 0xFFFFFFff,
         " Suspend Cooking (Maintain Heat, no New Projects)", maintainHeatNoCook);
 		  end
-		    showTicks = lsCheckBox(200, lsScreenY - 70, 10, 0xFFFFFFff, " Display Ticks/HV/DV", showTicks);
+		    showTicks = lsCheckBox(200, lsScreenY - 70, 10, 0xFFFFFFff, " Display Ticks/HV/DV/LastSpike", showTicks);
 		    glazierBenchSpec = lsCheckBox(200, lsScreenY - 40, 10, 0xFFFFFFff,
         " Have Glazier\'s Bench Handling Spec?", glazierBenchSpec);
 
