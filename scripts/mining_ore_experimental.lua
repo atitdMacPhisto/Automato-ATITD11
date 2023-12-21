@@ -735,9 +735,9 @@ function waitForResult()
     checkBreak();
     -- Find chat messages
     --print('['..loopCount..'] Checking main chat...');
-    parseChat();
-      
-    if (not oreFound) then
+    if parseChat() then
+      startTime = lsGetTimer();
+    else
       -- Find and Close Popup
       --print('['..loopCount..'] Looking for Popup...');
       OK = srFindImage("OK.png");
@@ -754,18 +754,16 @@ function waitForResult()
     local curTime = lsGetTimer() - startTime;
     if (oreFound) or (curTime > chatReadTimeOut)  then
       logResult = logResult .. ((curTime > chatReadTimeOut) and 'Timed Out' or 'Normal Break');
-
-      if (curTime > chatReadTimeOut) then
-        -- We really shouldn't get in here anymore except under the most exceptional circumstances
-        -- If we actually timeout we're going to assume some misclicks occurred and force no ore found
-        oreFound = nil;
-        oreGathered = nil;
-      end
-
+      
       if oreFound and oreGathered ~= nil then
         oreGatheredTotal = oreGatheredTotal + oreGathered;
         oreGatheredLast = oreGatheredLast + oreGathered;
-        logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";
+        logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";    
+      elseif (curTime > chatReadTimeOut) then
+        -- We really shouldn't get in here anymore except under the most exceptional circumstances
+        -- If we actually timeout we're going to assume some misclicks occurred and force no ore found
+        oreFound = nil;
+        oreGathered = 0;     
       end
 
       --print(logResult);
@@ -812,6 +810,8 @@ function parseChat()
     currentLine = chatText[idx][2];
     lsSleep(1); -- Yes this is too fast to do anything. It just gives me the warm/fuzzies
   until (currentLine:findAny(chatParseTargets)); 
+
+  return oreFound;
 end
 
 function round(num, numDecimalPlaces)
