@@ -311,7 +311,7 @@ function doTasks()
   if didTask == false then
     lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting for task to be ready.");
     if autoOnion and not buffed then
-      if alertNoOnions then 
+      if alertNoOnions then
         lsPlaySound("siren.wav");
       end
       lsPrint(10, 30, 0, 0.7, 0.7, 0xB0B0B0ff, "Auto eat: No pinned Onions found!");
@@ -935,7 +935,7 @@ end
 function churnButter()
   local t = srFindImage("statclicks/churn.png");
   if t then
-    srClickMouseNoMove(t[0]+5, t[1]+60);
+    srClickMouseNoMove(t[0]+10, t[1]+15);
   end
   srReadScreen();
   local take = findText("Take...")
