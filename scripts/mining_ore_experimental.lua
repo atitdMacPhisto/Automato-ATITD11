@@ -758,6 +758,7 @@ function waitForResult()
       if oreFound and oreGathered ~= nil then
         oreGatheredTotal = oreGatheredTotal + oreGathered;
         oreGatheredLast = oreGatheredLast + oreGathered;
+        chatCmd('time');
         logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";    
       elseif (curTime > chatReadTimeOut) then
         -- We really shouldn't get in here anymore except under the most exceptional circumstances
@@ -800,7 +801,6 @@ function parseChat()
     if (oreGathered) then -- We found ore!
       oreFound = true;
       --print("Ore gathered: "..oreGathered);
-      chatCmd('time');
       break;
     else
       oreFound = nil;
