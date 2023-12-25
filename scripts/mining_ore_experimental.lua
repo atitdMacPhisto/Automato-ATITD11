@@ -31,7 +31,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.25-MacDreamy';
+local version = '0.27-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -93,6 +93,7 @@ local dropdown_key_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Cl
 local key_strings = {"tap SHIFT", "tap CTRL", "tap ALT", "click MWHEEL"};
 local key_functions = {lsShiftHeld, lsControlHeld, lsAltHeld, function() return lsMouseIsDown(2); end}
 local dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Coal (10)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
+local dropdown_cmd_values = {'qc', 'time'};
 local cancelButton = 0;
 
 local userKeyFn = key_functions[1];
@@ -118,6 +119,7 @@ local extraStones = readSetting("extraStones",1);
 local noMouseMove = readSetting("noMouseMove",0); 
 local muteSoundEffects = readSetting("noMouseMove",1);
 local clickDelay = readSetting("clickDelay",125);
+local cmdKey = readSetting("cmdKey", 2);
 
 -- Useful for debugging. If true, will write log file to mining_ore.txt
  local writeLogFile = readSetting("writeLogFile",0);
@@ -136,11 +138,12 @@ local matchPatterns = {
 }
 local oreMatchPattern = matchPatterns.default;
 local chatReadTimeOut = 2500; -- Maximum Time(ms) to wait before moving on to the next workload.
-local chatParseTargets = {"Worked", "Year"}
+local chatParseTargets = {"Worked", "Year"};
+local usrChatCmd = 'time';
 local cmdKeyMap = {
   time = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN},
   qc = {VK_DIVIDE, VK_Q, VK_C, VK_RETURN}
-}
+};
 --End Customizable
 
 ----------------------------------------
@@ -297,6 +300,13 @@ function promptDelays()
     end
     writeSetting("clickDelay",clickDelay);
     
+    y = y + 35;
+    lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Chat cmd on successful workload:");
+
+    y = y + 22;
+    cmdKey = lsDropdown("cmdKey", 15, y, 0, 320, cmdKey, dropdown_cmd_values);
+    writeSetting("cmdKey",cmdKey);
+    
     y = y + 40;
     lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Total Ore Found Starting Value:");
     
@@ -352,6 +362,7 @@ function processInput()
   ore, stonecount = dropdown_ore_values[dropdown_ore_cur_value]:match('(%a+)%s*%((%d+)%)');
   stonecount = stonecount and tonumber(stonecount) or -1;
   oreMatchPattern = matchPatterns[ore:lower()] or matchPatterns.default;
+  usrChatCmd = dropdown_cmd_values[cmdKey];
 end
 
 function getMineLoc()
@@ -723,6 +734,9 @@ function checkAbort()
   end
 end
 
+
+---------------------------------------------------------------
+
 function waitForResult()
   startTime = lsGetTimer();
   local loopCount = 0;
@@ -758,7 +772,7 @@ function waitForResult()
       if oreFound and oreGathered ~= nil then
         oreGatheredTotal = oreGatheredTotal + oreGathered;
         oreGatheredLast = oreGatheredLast + oreGathered;
-        chatCmd('time');
+        chatCmd(usrChatCmd);
         logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";    
       elseif (curTime > chatReadTimeOut) then
         -- We really shouldn't get in here anymore except under the most exceptional circumstances
@@ -813,6 +827,9 @@ function parseChat()
 
   return oreFound;
 end
+
+---------------------------------------------------------------
+
 
 function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
