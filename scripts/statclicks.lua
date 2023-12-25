@@ -933,9 +933,10 @@ function excavateBlocks()
 end
 
 function churnButter()
-  local t = srFindImage("statclicks/churn.png");
-  if t then
-    srClickMouseNoMove(t[0]+10, t[1]+15);
+  local churn = findText("^Churn", nil, REGEX); -- ^ at the start of a pattern anchors it to the start of the string. This forces Churn to be the first word found on the line.
+  if (churn) then    
+    srClickMouseNoMove(churn[0]+5, churn[1]+5);
+    lsSleep(click_delay);
   end
   srReadScreen();
   local take = findText("Take...")
