@@ -935,7 +935,7 @@ end
 function churnButter()
   local churn = findText("^Churn", nil, REGEX); -- ^ at the start of a pattern anchors it to the start of the string. This forces Churn to be the first word found on the line.
   if (churn) then    
-    srClickMouseNoMove(churn[0]+5, churn[1]+5);
+    srClickMouseNoMove(churn[0]+10, churn[1]+2);
     lsSleep(click_delay);
   end
   srReadScreen();

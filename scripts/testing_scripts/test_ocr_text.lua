@@ -93,7 +93,7 @@ function findStuff()
   y = y + 25;
 
 
-  findBlah = findAllText(text);
+  findBlah = findAllText(text, nil, REGEX);
   findCount = #findBlah;
 
   lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Searching for \"" .. text .. "\"");
