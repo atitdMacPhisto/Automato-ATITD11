@@ -62,7 +62,7 @@ end
 
 local searchText = '';
 local findBlah = {};
-local errInfo = '';
+local errorInfo = '';
 local x = 5;
 local w = 0;
 local bg = {};
@@ -78,10 +78,10 @@ function findStuff()
   x = 5;
 
   w = lsPrint(x, y, z, scale, scale, 0xFFFFFFff, "Search Text (case sensitive):");  
-  if (errInfo and errInfo ~= '') then
+  if (errorInfo and errorInfo ~= '') then
    -- Draw the error message with a red background
     x = x+w+5;
-    w = lsPrint(x, y, z, scale, scale, 0xFFFFB0ff, errInfo .. ' for selection');
+    w = lsPrint(x, y, z, scale, scale, 0xFFFFB0ff, errorInfo);
     bg.x = x+1;
     bg.x1 = x+w+1;
     bg.y = y;
@@ -122,11 +122,11 @@ function findStuff()
   local status, result = pcall(function () return findAllText(searchText, nil, REGEX); end)
   if (status) then
     print('Status: '..tostring(status).. "; Results: "..#result);
-    errInfo = '';
+    errorInfo = '';
     findBlah = result or {};
   else 
     print('Status: '..tostring(status).. "; Result: "..result);
-    errInfo = result:match(": ([A-Za-z ]+)");    
+    errorInfo = result:match(": ([A-Za-z ]+)");    
     findBlah = {};
   end
 
