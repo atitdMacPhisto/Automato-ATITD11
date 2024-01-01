@@ -420,10 +420,15 @@ function queryRoute()
             silt = lsCheckBox(5, y, z, 0xFFFFFFff, " Silt", silt);
             writeSetting("silt",silt);
 
+            clay = readSetting("clay", clay);
+            clay = lsCheckBox(5, y-25, z, 0xFFFFFFff, " Clay (Flint)", clay);
+            writeSetting("clay", clay);
+
             stones = readSetting("stones", stones);
             stones = lsCheckBox(155, y, z, 0xFFFFFFff, " Stones", stones);
             writeSetting("stones", stones);
         else
+            clay = false;
             silt = false;
             stones = false;
         end
@@ -433,10 +438,6 @@ function queryRoute()
             slate = readSetting("slate", slate);
             slate = lsCheckBox(5, y-75, z, 0xFFFFFFff, " Slate", slate);
             writeSetting("slate", slate);
-
-            clay = readSetting("clay", clay);
-            clay = lsCheckBox(5, y-50, z, 0xFFFFFFff, " Clay (Flint)", clay);
-            writeSetting("clay", clay);
 
             papy = readSetting("papy", papy);
             papy = lsCheckBox(5, y, z, 0xFFFFFFff, " Papy", papy);
