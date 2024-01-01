@@ -509,7 +509,7 @@ end
 function finish()
   local close = srFindImage("acro/close.png", 500);
   if close then
-    safeClick(close[0], close[1]);
+    safeClick(close[0]+5, close[1]+5);
   end
 
   if bye ~= "" then
