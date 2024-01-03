@@ -714,7 +714,7 @@ function plantHere(xyPlantFlax)
   checkWindowSize()
 
   -- Move window into corner
-  stashWindow(bed[0] + 5, bed[1], BOTTOM_RIGHT, nil, offset)
+  stashWindow(bed[0] + 5, bed[1] + 3, BOTTOM_RIGHT, nil, offset)
   return true
 end
 
