@@ -509,3 +509,18 @@ function waitForKeyrelease(timeout)
   end
   return true;
 end
+
+-------------------------------------------------------------------------------
+-- setWaitSpot(timeout)
+--
+-- Initialize position and pixel value for waitForChange() or waitForStasis()
+-- x -- Position in pixels on x-axis
+-- y -- Position in pixels on y-axis
+--
+-------------------------------------------------------------------------------
+
+function setWaitSpot(x0, y0)
+	setWaitSpot_x = x0;
+	setWaitSpot_y = y0;
+	setWaitSpot_px = srReadPixel(x0, y0);
+end
