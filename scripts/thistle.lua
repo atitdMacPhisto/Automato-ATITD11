@@ -100,9 +100,9 @@ function clickAllComplex(image_names, message)
 		srReadScreen()
 		batchSize = findText("Batch Size...")
 			if batchSize then
-				cascade_offset = 295
+				cascade_offset = 305
 			else
-				cascade_offset = 275
+				cascade_offset = 285
 			end
 		setWaitSpot(window_locs[i][0], window_locs[i][1]);
 		srClickMouseNoMove(window_locs[i][0], window_locs[i][1] + cascade_offset);
@@ -136,8 +136,8 @@ function waitForMonChange(message)
 			mon_x = first_nit[0] - 15;
 			mon_y = first_nit[1] + 33;
 		else
-			mon_x = first_nit[0] - 25;
-			mon_y = first_nit[1] + 13;
+			mon_x = first_nit[0] - 21;
+			mon_y = first_nit[1] + 36;
 		end
 
 	local different = nil;
