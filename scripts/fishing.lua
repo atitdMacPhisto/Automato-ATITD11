@@ -363,11 +363,6 @@ end
 function gui_refresh()
     checkBreak();
 
-    if GrandTotalCasts == 0 or GrandTotalCasts == 1 then
-        dateBegin = date;
-        timeBegin = time;
-    end
-
     if GrandTotalCaught < 10 then
         last10 = GrandTotalCaught .. "/10";
     elseif GrandTotalCaught > 10 then
@@ -567,17 +562,17 @@ function gui_refresh()
     end
 
     if writeStats then
+        findClockInfo()
         WriteFishStats(
             "Note this report is overwritten every time the macro runs. The stats are for last fishing session only!\n"
-            .. "You can safely delete this file, but it will be created the next time macro runs!\n\n\nStart Time: " ..
-            dateBegin .. " @ " .. timeBegin .. "\nEnd Time: " .. date .. " @ " .. time .. "\nLast coordinates: " ..
-            coordinates .. "\n----------------------------------\nOdd Fish Seen: " .. GrandTotalOdd ..
-            "\nUnusual Fish Seen: " .. GrandTotalUnusual .. "\nStrange Fish Seen: " .. GrandTotalStrange ..
-            "\n----------------------------------\nLures Clicked: " .. GrandTotalLuresUsed .. "\nLures Lost: " ..
-            GrandTotalLostLures .. " \n----------------------------------\nCasts: " .. GrandTotalCasts ..
-            "\nFailed Catches: " .. GrandTotalFailed .. "\nFish Caught: " .. GrandTotalCaught .. " (" ..
-            math.floor(GrandTotaldb) .. "db)\n----------------------------------\n\nAll lures lost this Session:\n\n" ..
-            lostlures .. "\n\n\nAll fish caught this Session:\n\n" .. allcaught);
+            .."You can safely delete this file, but it will be created the next time macro runs!"
+            .."\n\n\nLast coordinates: " ..coordinates.. "\n----------------------------------\nOdd Fish Seen: "
+            ..GrandTotalOdd.."\nUnusual Fish Seen: "..GrandTotalUnusual.."\nStrange Fish Seen: "..GrandTotalStrange
+            .."\n----------------------------------\nLures Clicked: "..GrandTotalLuresUsed.."\nLures Lost: "
+            ..GrandTotalLostLures.."\n----------------------------------\nCasts: "..GrandTotalCasts
+            .."\nFailed Catches: "..GrandTotalFailed.."\nFish Caught: "..GrandTotalCaught.." ("
+            ..math.floor(GrandTotaldb).."db)\n----------------------------------\n\nAll lures lost this Session:\n\n"
+            ..lostlures.. "\n\n\nAll fish caught this Session:\n\n"..allcaught);
     end
 
     lsDoFrame();
