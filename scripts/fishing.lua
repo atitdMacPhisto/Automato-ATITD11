@@ -397,7 +397,7 @@ function gui_refresh()
     local y = 2;
     CurrentLure = PlayersLures[CurrentLureIndex];
     QCurrentLure = PlayersLures[QCurrentLureIndex];
-    lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, date .. " | " .. time .. " | " .. coordinates);
+    --lsPrintWrapped(10, y, 0, lsScreenX - 20, 0.5, 0.5, 0xc0c0ffff, date .. " | " .. time .. " | " .. coordinates);
     nextLureChange = TotalCasts + 1 - castcount
     nextLureChangeMessageColor = 0xc0ffffff;
 
@@ -594,16 +594,7 @@ function doit()
     PlayersLures = SetupLureGroup(); -- Fetch the list of lures from pinned lures window
     lsSleep(1000); -- Just a delay to let the sound effect finishing playing, not needed...
 
-    findClockInfo();
-    while not coordinates do
-        checkBreak();
-        findClockInfo();
-        sleepWithStatus(1000,
-            "Can not find Clock!\n\nMove your clock slightly.\n\nMacro will resume once found ...\n\nIf you do not see a clock, type /clockloc in chat bar.");
-    end
-
     while 1 do
-
         checkBreak();
         srReadScreen();
         cast = srFindImage("Fishing/fishicon.png", 100);
@@ -843,17 +834,20 @@ function doit()
                 -- Do nothing
             elseif overweight then
                 if LogFails then
+                    findClockInfo()
                     WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                     LureType .. ")] " .. lastLineParse2 .. "\n");
                 end
             elseif writeLastTwoLines then
                 if LogFails then
+                    findClockInfo()
                     WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                     LureType .. ")] " .. lastLineParse2 .. "\n");
                     WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                     LureType .. ")] " .. lastLineParse .. "\n");
                 end
             elseif LogFails then
+                findClockInfo()
                 WriteFishLog("[" .. date .. ", " .. time .. "] [" .. coordinates .. "] [" .. CurrentLure .. " (" ..
                                  LureType .. ")] " .. lastLineParse .. "\n");
             end
