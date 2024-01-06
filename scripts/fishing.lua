@@ -363,13 +363,6 @@ end
 function gui_refresh()
     checkBreak();
 
-    findClockInfo()
-
-    if GrandTotalCasts == 0 or GrandTotalCasts == 1 then
-        dateBegin = date;
-        timeBegin = time;
-    end
-
     if GrandTotalCaught < 10 then
         last10 = GrandTotalCaught .. "/10";
     elseif GrandTotalCaught > 10 then
