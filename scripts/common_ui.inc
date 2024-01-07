@@ -67,7 +67,7 @@ function checkBreak()
     local done = false;
     while not done do
       local unpaused = lsButtonText(lsScreenX - 110, lsScreenY - 60,
-                                    z, 100, 0xFFFFFFff, "Unpause");
+                                    z, 100, 0xff0Bffff, "Unpause");
       statusScreen("Hold Alt+Shift to resume", 0xFFFFFFff, false);
       done = (unpaused or (lsAltHeld() and lsShiftHeld()));
     end
@@ -206,7 +206,7 @@ function statusScreen(message, color, allow_break, scale)
   lsPrintWrapped(10, lsScreenY-100, 0, lsScreenX - 20, scale, scale, 0xffd0d0ff,
                  error_status);
   if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100,
-                  0xFFFFFFff, "End script") then
+                  0xFF0000ff, "End script") then
     error(quit_message);
   end
   if allow_break then

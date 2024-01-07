@@ -8,7 +8,7 @@ dropdown_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 kilnList = {"True Kiln","Reinforced Kiln"};
 productNames = { "Wet Clay Bricks", "Wet Clay Mortars", "Wet Firebricks", "Wet Jugs", "Wet Claypots", "Faience" };
 dropdown_cur_value = 1;
-total_delay_time = 155000;
+total_delay_time = 110000;
 
 window_h = 200;
 window_w = 481;
@@ -335,12 +335,12 @@ clickList = {};
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "Click Start to begin checking Kilns.")
 
     if #clickList >= 1 then -- Only show start button if one or more Kiln was selected.
-      if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Start") then
+      if lsButtonText(10, lsScreenY - 30, z, 100, 0x00ff00ff, "Start") then
         is_done = 1;
       end
     end
 
-    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff,
+    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff,
                     "End script") then
       error "Clicked End Script button";
     end
@@ -353,29 +353,31 @@ end
 function clickSequence()
   sleepWithStatus(1500, "Starting... Don\'t move mouse!");
 	startTime = lsGetTimer();
-  kilnCounter = 1;
-  takeCounter = 1;
-		for l=1, kilnPasses do
-      for i=1,#clickList do
-        statusScreen("Filling the Kilns\n\n" .. kilnCounter .. " / " .. #clickList .. " Remaining",nil, nil, 0.7);
-        srSetMousePos(clickList[i][1], clickList[i][2]);
-        lsSleep(150); -- ~65+ delay needed before the mouse can actually move.
-        kilnAction();
-        kilnCounter = kilnCounter + 1
-      end
-		local time_left = total_delay_time - #clickList
-		lsSleep(100);
-		closePopUp(); -- Screen clean up
-		sleepWithStatus(time_left,"Pass " .. l .. " of " .. kilnPasses .. "\nWaiting for products to finish\n\n"
+  for l=1, kilnPasses do
+    kilnCounter = 1;
+    takeCounter = 1;
+    for i=1,#clickList do
+      statusScreen("Filling the Kilns\n\n" .. kilnCounter .. " / " .. #clickList .. " Remaining",nil, nil, 0.7);
+      srSetMousePos(clickList[i][1], clickList[i][2]);
+      lsSleep(150); -- ~65+ delay needed before the mouse can actually move.
+      kilnAction();
+      kilnCounter = kilnCounter + 1
+    end
+
+    local time_left = total_delay_time - #clickList
+    lsSleep(100);
+    closePopUp(); -- Screen clean up
+    sleepWithStatus(time_left,"Pass " .. l .. " of " .. kilnPasses .. "\nWaiting for products to finish\n\n"
     .. "BE CAREFUL:\nThe macro will resume control of your mouse after the timer has finished!");
-      for i=1,#clickList do
-        statusScreen("Taking items from the Kilns\n\n" .. takeCounter .. " / " .. #clickList
-        .. " Remaining",nil, nil, 0.7);
-        srSetMousePos(clickList[i][1], clickList[i][2]);
-        lsSleep(150); -- ~65+ delay needed before the mouse can actually move.
-        kilnTake();
-        takeCounter = takeCounter + 1
-      end
+
+    for i=1,#clickList do
+      statusScreen("Taking items from the Kilns\n\n" .. takeCounter .. " / " .. #clickList
+      .. " Remaining",nil, nil, 0.7);
+      srSetMousePos(clickList[i][1], clickList[i][2]);
+      lsSleep(150); -- ~65+ delay needed before the mouse can actually move.
+      kilnTake();
+      takeCounter = takeCounter + 1
+    end
 	end
   lsPlaySound("Complete.wav");
   lsMessageBox("Elapsed Time:", getElapsedTime(startTime), 1);
@@ -404,20 +406,20 @@ function kilnAction()
 
   checkBreak();
   closePopUp(); -- Screen clean up
-  srKeyEvent('w');
-  lsSleep(150);
-  srReadScreen();
-  closePopUp(); -- Screen clean up
-  lsSleep(150);
-  srKeyEvent(inputkey);
-  lsSleep(150);
-  srReadScreen();
-  closePopUp(); -- Screen clean up
-  lsSleep(150);
-  srKeyEvent('f');
-  closePopUp(); -- Screen clean up
-  lsSleep(150);
   srKeyEvent(repairHotkey);
+  lsSleep(100);
+  srKeyEvent('w');
+  lsSleep(60);
+  srReadScreen();
+  closePopUp(); -- Screen clean up
+  lsSleep(60);
+  srKeyEvent(inputkey);
+  lsSleep(60);
+  srReadScreen();
+  closePopUp(); -- Screen clean up
+  lsSleep(60);
+  srKeyEvent('f');
+  lsSleep(60);
   closePopUp(); -- Screen clean up
 end
 
