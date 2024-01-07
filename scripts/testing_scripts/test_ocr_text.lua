@@ -60,6 +60,13 @@ function showDebugInRange(name, screenx, screeny, imgw, imgh, x, y, z, w, h)
   lsDrawRect(x - border, y - border, x + imgw * scale + border, y + imgh * scale + border, 1, 0xFF0000ff);
 end
 
+local searchText = '';
+local findBlah = {};
+local errorInfo = '';
+local x = 5;
+local w = 0;
+local bg = {};
+local z = 10;
 function findStuff()
   local scale = 0.7;
   local y = 5;
@@ -68,10 +75,29 @@ function findStuff()
   local result = "";
   srReadScreen();
   local pos = getMousePos();
+  x = 5;
 
-  lsPrint(5, y, z, scale, scale, 0xFFFFFFff, "Search Text (case sensitive):");
+  w = lsPrint(x, y, z, scale, scale, 0xFFFFFFff, "Search Text (case sensitive):");  
+  if (errorInfo and errorInfo ~= '') then
+   -- Draw the error message with a red background
+    x = x+w+5;
+    w = lsPrint(x, y, z, scale, scale, 0xFFFFB0ff, errorInfo);
+    bg.x = x+1;
+    bg.x1 = x+w+1;
+    bg.y = y;
+    bg.y1 = (y+14);
+    lsDrawRect(bg.x, bg.y, bg.x1, bg.y1, z-1, 0xB00000ff);
+
+   -- Put a red border around the editbox below
+    lsDrawRect(8, y+16, 212, y+42, z-1, 0xFF0000ff);
+  end
   y = y + 18;
-  foo, text = lsEditBox("text", 10, y, z, 200, 25, scale, scale, 0x000000ff);
+  foo, text = lsEditBox("text", 10, y, z, 200, 25, scale, scale, 0x000000ff);  
+  -- foo is set to 1 if the user presses enter while in the editbox
+  if (foo==1 or lsButtonText(220, y, z, 100, 0xff0Bffff, "Search")) then    
+    searchText = text;
+  end
+
 
   y = y + 25;
   lsPrint(5, y, z, scale, scale, 0xFFFFFFff, "X offset:    +/-");
@@ -93,10 +119,20 @@ function findStuff()
   y = y + 25;
 
 
-  findBlah = findAllText(text, nil, REGEX);
+  local status, result = pcall(function () return findAllText(searchText, nil, REGEX); end)
+  if (status) then
+    print('Status: '..tostring(status).. "; Results: "..#result);
+    errorInfo = '';
+    findBlah = result or {};
+  else 
+    print('Status: '..tostring(status).. "; Result: "..result);
+    errorInfo = result:match(": ([A-Za-z ]+)");    
+    findBlah = {};
+  end
+
   findCount = #findBlah;
 
-  lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Searching for \"" .. text .. "\"");
+  lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Searching for \"" .. searchText .. "\"");
   y = y + 18;
   if findCount == 0 then
     result = " Not Found";
