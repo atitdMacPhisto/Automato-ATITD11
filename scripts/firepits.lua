@@ -105,11 +105,11 @@ function askForPitCounts()
       is_count = true;
     end
 
-    if (lsButtonText(10, lsScreenY - 30, 0, 100, 0xFFFFFFff, "Continue")) then
+    if (lsButtonText(10, lsScreenY - 30, 0, 100, 0x00FF00ff, "Continue")) then
       is_done = true;
     end
 
-    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff, "End script") then
+    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
       error "Clicked End Script button";
     end
 
@@ -133,15 +133,17 @@ function printPitLocs(gotpits)
   local x = 5;
   local y = 5;
 
-  lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "Press CTRL over each firepit near");
+  lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "Press CTRL over each firepit near the green");
   y = y + 20;
-  lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "the center. The script will sample");
+  lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "dot shown below. The script will sample");
   y = y + 20;
   lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "pixels within +/- 20 x/y of point.");
   y = y + 40;
 
+  srShowImageDebug('firepits/location.png', lsScreenX-200, y, 0, 1.0);
+
   for ii=0,gotpits-1 do
-    lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "Pit #" .. ii+1 .. ": (" .. pitlocs[ii][0] .. ", " .. pitlocs[ii][1] .. ")");
+    lsPrint(x, y, 1, 0.7, 0.7, 0xffffffff, ii+1 .. ": (" .. pitlocs[ii][0] .. ", " .. pitlocs[ii][1] .. ")");
     y = y + 20;
   end
 
@@ -151,7 +153,11 @@ function printPitLocs(gotpits)
       lsSleep(100);
     end
     y = y + 20;
-    lsPrint(x, y, 0, 0.7, 0.7, 0xffffffff, "Done. Start your firepits when ready!");
+    lsPrint(x, lsScreenY-50, 0, 0.7, 0.7, 0xffffffff, "Done. Start your firepits when ready!");
+  end
+
+  if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End Script") then
+    error "Clicked End Script button";
   end
 
   lsDoFrame();
@@ -244,7 +250,7 @@ function updateStatus()
 
   y = y + 20;
 
-  if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFFFFFFff, "End script") then
+  if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
     error "Clicked End Script button";
   end
 
