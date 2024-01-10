@@ -96,7 +96,7 @@ function safeScroll(x, y, steps)
     error("Incorrect number of arguments for safeScroll()");
   end
   safeBegin();
-  return srMouseWheel(x, y, steps);
+  srMouseWheel(x, y, steps);
 end
 
 -------------------------------------------------------------------------------

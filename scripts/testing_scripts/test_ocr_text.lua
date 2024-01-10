@@ -119,7 +119,7 @@ function findStuff()
   y = y + 25;
 
 
-  local status, result = pcall(function () return findAllText(searchText, nil, REGEX); end)
+  local status, result = pcall(function () return findAllText(searchText, nil, REGEX); end);
   if (status) then
     print('Status: '..tostring(status).. "; Results: "..#result);
     errorInfo = '';
