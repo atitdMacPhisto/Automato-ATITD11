@@ -31,7 +31,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.27-MacDreamy';
+local version = '0.28-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -40,26 +40,29 @@ local WARNING = {
   [[ 1. You MUST pull a fresh workload every time you start the macro!!]],
   [[   * YES, even if you just started working the mine and closed and reopend the macro!]],
   [[   * "Worked the {something} Mine" MUST be the most recent message in main chat before picking stone locations]],
-  [[ 2. In Options -> Interface Options]],
+  [[ 2. MAIN chat must be showing!!]],
+  [[   * The entrire chat window must be visible inside the game window to be found!!]],
+  [[   * ALL 4 BORDERS OF IT!]],
+  [[ 3. In Options -> Interface Options]],
   [[   * SET: UI Size to Normal]],
   [[   * SET: Transparencies to 0% (double-check this!!)]],
   [[   * ENABLE : Use the chat area instead of popups for many messages]],
   [[   * DISABLE: Use Flyaway Messages for some things]],
   [[   * ENABLE : Suppress the flyaway messages, only use console]],
-  [[ 3. You probably want to disable chat bubbles in Options -> Chat-Related]],
-  [[ 4. Press F8 F8 to set the camera in top down mode]],
-  [[ 5. Zoom out enough to see all the stones in the ore field!']],
-  [[ 6. Press ALT-L to lock the camera so it doesn't move accidentally]],
-  [[ 7. MAIN chat must be showing!!]],
+  [[ 4. You probably want to disable chat bubbles in Options -> Chat-Related]],
+  [[ 5. Press F8 F8 to set the camera in top down mode]],
+  [[ 6. Zoom out enough to see all the stones in the ore field!']],
+  [[ 7. Press ALT-L to lock the camera so it doesn't move accidentally]],
   [[ 8. ALT*SHIFT will quickly pause the macro]],
   [[ 9. Moving off of MAIN chat will also pause the macro]],
   [[   * Press F9 or F10 to move over a tab (Game window must be active)]],
   [[   * While macro is paused you may chat in other tabs.]],
   [[   * You will have 5 seconds to reset once you select MAIN again.]],
-  [[10. Do not move once the macro is running]],
-  [[11. Do not use the mouse whilst the macro is running]],
-  [[   * Unless in DualMonitorMode]],
-  [[12. (Optional) Pin the mine's Take...Ore... menu]],
+  [[10. ONCE THE MACRO IS RUNNING:]],
+  [[   * DO NOT USE THE MOUSE]],
+  [[       * Unless in DualMonitorMode]],
+  [[   * DO NOT MOVE]],
+  [[11. (Optional) Pin the mine's Take...Ore... menu]],
   [[   * It will refresh every round]],
   [[   * "All Ore" will appear in the pinned window]],
   '',
@@ -81,6 +84,7 @@ local WARNING = {
   [[With a rebel yell, "Ore, ore, ore]],
   [[Ore, ore, ore"]]
 };
+
 
 -- Start don't alter these ...
 local oreGathered = 0;
