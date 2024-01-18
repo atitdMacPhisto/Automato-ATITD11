@@ -516,27 +516,27 @@ end
 
 function plantHere(xyPlantFlax)
   -- Plant
-  lsPrintln('planting ' .. xyPlantFlax[0] .. ',' .. xyPlantFlax[1]);
-  local bed = clickPlant(xyPlantFlax);
+  -- lsPrintln("planting " .. xyPlantFlax[0] .. "," .. xyPlantFlax[1])
+  local bed = clickPlant(xyPlantFlax)
   if not bed then
-    return false;
+    return false
   end
 
   -- Bring up menu
-  lsPrintln('menu ' .. bed[0] .. ',' .. bed[1]);
-    if not openAndPin(bed[0], bed[1], 3500) then
-      error_status = "No window came up after planting.";
-      return false;
-    end
-  goodPlantings = goodPlantings + 1;
+  -- lsPrintln("menu " .. bed[0] .. "," .. bed[1])
+  if not openAndPin(bed[0], bed[1], 3500) then
+    error_status = "No window came up after planting."
+    return false
+  end
 
   -- Check for window size
-  checkWindowSize();
+  checkWindowSize()
 
   -- Move window into corner
-  stashWindow(bed[0] + 5, bed[1], BOTTOM_RIGHT);
-  return true;
+  stashWindow(bed[0] + 5, bed[1] + 3, BOTTOM_RIGHT, nil, offset)
+  return true
 end
+
 
 function clickPlant(xyPlantFlax)
   local result = xyFlaxMenu;
