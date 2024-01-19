@@ -147,6 +147,7 @@ stds.common = {
     "serializeInternal",
     "setCameraView",
     "setCleanupCallback",
+    "setWaitSpot",
     "singleLine",
     "sleepWithBreak",
     "sleepWithStatus",

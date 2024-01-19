@@ -1,7 +1,20 @@
 dofile("common.inc");
+dofile("settings.inc")
+
+----------------------------------------
+--          Global Variables          --
+----------------------------------------
+
+askText = singleLine([[
+  Automatically gathers wood from pinned tree windows.
+]]);
+
+----------------------------------------
 
 function doit()
-  askForWindow("Pin 5-10 tree windows, will click them VERTICALLY (left to right if there is a tie - multiple columns are fine). \n\nOptionally, pin a Bonfire window for stashing wood. \n\nIf the trees are part of an oasis, you only need to pin 1 of the trees.");
+  askForWindow(askText);
+  promptParameters();
+  askForFocus();
   while 1 do
     checkBreak();
     refreshWindows();
@@ -13,18 +26,54 @@ function doit()
   end
 end
 
-function refreshWindows()
-  srReadScreen();
-  this = findAllImages("wood/This.png");
-  Bonfire = findAllText("Bonfire");
-    for i=1,#this do
-      safeClick(this[i][0], this[i][1])
+function promptParameters()
+  scale = 1.0;
+  local z = 0;
+  local is_done = nil;
+  -- Edit box and text display
+  while not is_done do
+    checkBreak();
+    y = 5;
+
+    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+	  "Pin 5-10 tree windows, will click them VERTICALLY"
+    .. " (left to right if there is a tie - multiple columns are fine)."
+    .. "\n\nOptionally, pin a Bonfire window for stashing wood."
+    .. "\n\nIf the trees are part of an oasis, you only need to pin 1 of the trees.");
+    y = y + 140
+
+    lsPrint(10, y, 10, scale, scale, 0xffff40ff,
+    "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    y = y + 25
+
+    autoCarrot = readSetting("autoCarrot",autoCarrot);
+    autoCarrot = lsCheckBox(10, y, z, 0xFFFFFFff, " Automatically Eat Carrots", autoCarrot);
+    writeSetting("autoCarrot",autoCarrot);
+
+    lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
+      "(Pin the 'Grilled Carrot' window)\nAutomatically eat an onion, everytime the endurance buff is not visible.");
+
+    if lsButtonText(10, (lsScreenY - 30) * scale, z, 100, 0x00ff00ff, "OK") then
+      is_done = 1;
     end
-  lsSleep(500);
+
+    if lsButtonText((lsScreenX - 110) * scale, (lsScreenY - 30) * scale, z, 100, 0xFF0000ff,
+      "End script") then
+      error "Clicked End Script button";
+    end
+
+    lsDoFrame();
+    lsSleep(100);
+  end
 end
 
 function findWood()
   srReadScreen();
+
+  if autoCarrot then
+    eatCarrot()
+  end
+
   local clickWood = findAllImages("wood/gather_wood.png");
   nowood = findAllImages("wood/no_wood.png")
   for i=1,#clickWood do
@@ -47,3 +96,34 @@ function bonfire()
       end
   end
 end
+
+----------------------------------------
+--         Utility Functions          --
+----------------------------------------
+
+function refreshWindows()
+  srReadScreen();
+  this = findAllImages("wood/This.png");
+  Bonfire = findAllText("Bonfire");
+    for i=1,#this do
+      safeClick(this[i][0], this[i][1])
+    end
+  lsSleep(500);
+end
+
+function eatCarrot()
+  srReadScreen();
+  buffed = srFindImage("stats/perceptionBuff.png")
+    if not buffed then
+      srReadScreen();
+      local consumeCarrot = srFindImage("consume.png")
+      if consumeCarrot ~= nil then
+        safeClick(consumeCarrot[0],consumeCarrot[1]);
+        waitForImage("stats/perceptionBuff.png", 5000, "Waiting for Endurance Buff icon")
+        srClickMouseNoMove(consumeCarrot[0]-5,consumeCarrot[1]-10);
+        lsSleep(click_delay);
+      end
+    end
+end
+
+----------------------------------------

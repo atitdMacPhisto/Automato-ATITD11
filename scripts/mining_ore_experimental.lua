@@ -31,7 +31,7 @@ RED = 0xFF2020ff;
 GREEN = 0x66CD00ff;
 YELLOW = 0xffff00ff;
 
-local version = '0.24-MacDreamy';
+local version = '0.28-MacDreamy';
 info = "Macro brute force tries every possible 3 stone combination (and optionally 4 stone, too)."..
   "\nTime consuming but it works! (DualMonitorMode is slower)"..
   "\n\nMAIN chat will be selected and minimized";
@@ -40,26 +40,29 @@ local WARNING = {
   [[ 1. You MUST pull a fresh workload every time you start the macro!!]],
   [[   * YES, even if you just started working the mine and closed and reopend the macro!]],
   [[   * "Worked the {something} Mine" MUST be the most recent message in main chat before picking stone locations]],
-  [[ 2. In Options -> Interface Options]],
+  [[ 2. MAIN chat must be showing!!]],
+  [[   * The entrire chat window must be visible inside the game window to be found!!]],
+  [[   * ALL 4 BORDERS OF IT!]],
+  [[ 3. In Options -> Interface Options]],
   [[   * SET: UI Size to Normal]],
   [[   * SET: Transparencies to 0% (double-check this!!)]],
   [[   * ENABLE : Use the chat area instead of popups for many messages]],
   [[   * DISABLE: Use Flyaway Messages for some things]],
   [[   * ENABLE : Suppress the flyaway messages, only use console]],
-  [[ 3. You probably want to disable chat bubbles in Options -> Chat-Related]],
-  [[ 4. Press F8 F8 to set the camera in top down mode]],
-  [[ 5. Zoom out enough to see all the stones in the ore field!']],
-  [[ 6. Press ALT-L to lock the camera so it doesn't move accidentally]],
-  [[ 7. MAIN chat must be showing!!]],
+  [[ 4. You probably want to disable chat bubbles in Options -> Chat-Related]],
+  [[ 5. Press F8 F8 to set the camera in top down mode]],
+  [[ 6. Zoom out enough to see all the stones in the ore field!']],
+  [[ 7. Press ALT-L to lock the camera so it doesn't move accidentally]],
   [[ 8. ALT*SHIFT will quickly pause the macro]],
   [[ 9. Moving off of MAIN chat will also pause the macro]],
   [[   * Press F9 or F10 to move over a tab (Game window must be active)]],
   [[   * While macro is paused you may chat in other tabs.]],
   [[   * You will have 5 seconds to reset once you select MAIN again.]],
-  [[10. Do not move once the macro is running]],
-  [[11. Do not use the mouse whilst the macro is running]],
-  [[   * Unless in DualMonitorMode]],
-  [[12. (Optional) Pin the mine's Take...Ore... menu]],
+  [[10. ONCE THE MACRO IS RUNNING:]],
+  [[   * DO NOT USE THE MOUSE]],
+  [[       * Unless in DualMonitorMode]],
+  [[   * DO NOT MOVE]],
+  [[11. (Optional) Pin the mine's Take...Ore... menu]],
   [[   * It will refresh every round]],
   [[   * "All Ore" will appear in the pinned window]],
   '',
@@ -82,6 +85,7 @@ local WARNING = {
   [[Ore, ore, ore"]]
 };
 
+
 -- Start don't alter these ...
 local oreGathered = 0;
 local oreGatheredTotal = 0;
@@ -93,6 +97,7 @@ local dropdown_key_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Cl
 local key_strings = {"tap SHIFT", "tap CTRL", "tap ALT", "click MWHEEL"};
 local key_functions = {lsShiftHeld, lsControlHeld, lsAltHeld, function() return lsMouseIsDown(2); end}
 local dropdown_ore_values = {"Aluminum (9)", "Antimony (14)", "Coal (10)", "Cobalt (10)", "Copper (8)", "Gold (12)", "Iron (7)", "Lead (9)", "Magnesium (9)", "Nickel (13)", "Platinum (12)", "Silver (10)", "Tin (9)", "Zinc (10)"};
+local dropdown_cmd_values = {'qc', 'time'};
 local cancelButton = 0;
 
 local userKeyFn = key_functions[1];
@@ -118,6 +123,7 @@ local extraStones = readSetting("extraStones",1);
 local noMouseMove = readSetting("noMouseMove",0); 
 local muteSoundEffects = readSetting("noMouseMove",1);
 local clickDelay = readSetting("clickDelay",125);
+local cmdKey = readSetting("cmdKey", 2);
 
 -- Useful for debugging. If true, will write log file to mining_ore.txt
  local writeLogFile = readSetting("writeLogFile",0);
@@ -136,11 +142,12 @@ local matchPatterns = {
 }
 local oreMatchPattern = matchPatterns.default;
 local chatReadTimeOut = 2500; -- Maximum Time(ms) to wait before moving on to the next workload.
-local chatParseTargets = {"Worked", "Year"}
+local chatParseTargets = {"Worked", "Year"};
+local usrChatCmd = 'time';
 local cmdKeyMap = {
   time = {VK_DIVIDE, VK_T, VK_I, VK_M, VK_E, VK_RETURN},
   qc = {VK_DIVIDE, VK_Q, VK_C, VK_RETURN}
-}
+};
 --End Customizable
 
 ----------------------------------------
@@ -297,6 +304,13 @@ function promptDelays()
     end
     writeSetting("clickDelay",clickDelay);
     
+    y = y + 35;
+    lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Chat cmd on successful workload:");
+
+    y = y + 22;
+    cmdKey = lsDropdown("cmdKey", 15, y, 0, 320, cmdKey, dropdown_cmd_values);
+    writeSetting("cmdKey",cmdKey);
+    
     y = y + 40;
     lsPrint(15, y, 0, 0.8, 0.8, 0xffffffff, "Total Ore Found Starting Value:");
     
@@ -352,6 +366,7 @@ function processInput()
   ore, stonecount = dropdown_ore_values[dropdown_ore_cur_value]:match('(%a+)%s*%((%d+)%)');
   stonecount = stonecount and tonumber(stonecount) or -1;
   oreMatchPattern = matchPatterns[ore:lower()] or matchPatterns.default;
+  usrChatCmd = dropdown_cmd_values[cmdKey];
 end
 
 function getMineLoc()
@@ -723,6 +738,9 @@ function checkAbort()
   end
 end
 
+
+---------------------------------------------------------------
+
 function waitForResult()
   startTime = lsGetTimer();
   local loopCount = 0;
@@ -735,9 +753,9 @@ function waitForResult()
     checkBreak();
     -- Find chat messages
     --print('['..loopCount..'] Checking main chat...');
-    parseChat();
-      
-    if (not oreFound) then
+    if parseChat() then
+      startTime = lsGetTimer();
+    else
       -- Find and Close Popup
       --print('['..loopCount..'] Looking for Popup...');
       OK = srFindImage("OK.png");
@@ -754,18 +772,17 @@ function waitForResult()
     local curTime = lsGetTimer() - startTime;
     if (oreFound) or (curTime > chatReadTimeOut)  then
       logResult = logResult .. ((curTime > chatReadTimeOut) and 'Timed Out' or 'Normal Break');
-
-      if (curTime > chatReadTimeOut) then
-        -- We really shouldn't get in here anymore except under the most exceptional circumstances
-        -- If we actually timeout we're going to assume some misclicks occurred and force no ore found
-        oreFound = nil;
-        oreGathered = nil;
-      end
-
+      
       if oreFound and oreGathered ~= nil then
         oreGatheredTotal = oreGatheredTotal + oreGathered;
         oreGatheredLast = oreGatheredLast + oreGathered;
-        logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";
+        chatCmd(usrChatCmd);
+        logResult = logResult .. "\n[Ore Gathered: " .. oreGathered .. "]  [oreGatheredLast: " .. math.floor(oreGatheredLast) .. "]  [oreGatheredTotal: " .. math.floor(oreGatheredTotal) .. "]";    
+      elseif (curTime > chatReadTimeOut) then
+        -- We really shouldn't get in here anymore except under the most exceptional circumstances
+        -- If we actually timeout we're going to assume some misclicks occurred and force no ore found
+        oreFound = nil;
+        oreGathered = 0;     
       end
 
       --print(logResult);
@@ -802,7 +819,6 @@ function parseChat()
     if (oreGathered) then -- We found ore!
       oreFound = true;
       --print("Ore gathered: "..oreGathered);
-      chatCmd('time');
       break;
     else
       oreFound = nil;
@@ -812,7 +828,12 @@ function parseChat()
     currentLine = chatText[idx][2];
     lsSleep(1); -- Yes this is too fast to do anything. It just gives me the warm/fuzzies
   until (currentLine:findAny(chatParseTargets)); 
+
+  return oreFound;
 end
+
+---------------------------------------------------------------
+
 
 function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)

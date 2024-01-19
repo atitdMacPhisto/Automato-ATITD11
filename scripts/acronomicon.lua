@@ -183,8 +183,6 @@ function doit()
 end
 
 function findMoves()
-  greeted = false;
-
   lsDoFrame();
   statusScreen("Scanning Acro Buttons ...", nil, 0.7);
   foundMovesName = {};
@@ -196,7 +194,7 @@ function findMoves()
   local defaultSize = srFindImage("acro/default_size.png", 500);
   if defaultSize then
     local resize = srFindImage("acro/resize.png", 500);
-    safeDrag(resize[0], resize[1], resize[0], resize[1] + 240);
+    safeDrag(resize[0], resize[1], resize[0], resize[1] + 215);
   end
 
   srReadScreen();
@@ -215,7 +213,7 @@ function findMoves()
   if not acrobatics then
     return;
   end
-  safeDrag(acrobatics[0], acrobatics[1], 300, acrobatics[1]);
+  safeDrag(acrobatics[0], acrobatics[1], 250, 75);
 
   for i=1,#moveNames do
     checkBreak();
@@ -322,7 +320,7 @@ function uncheck(i)
     return;
   end
 
-  sleepWithStatus(7000, "Unchecking " .. foundMovesName[i] .. " from Move List.\n\nMove was followed or learnt", nil, 0.7);
+  sleepWithStatus(1500, "Unchecking " .. foundMovesName[i] .. " from Move List.\n\nMove was followed or learnt", nil, 0.7);
   foundMovesShortName[i] = false;
 
   countChecked();
@@ -507,9 +505,12 @@ function getNextLocation()
 end
 
 function finish()
+  foundMovesName = {};
+  greeted = false;
   local close = srFindImage("acro/close.png", 500);
   if close then
-    safeClick(close[0], close[1]);
+    safeClick(close[0]+5, close[1]+5);
+    lsSleep(200);
   end
 
   if bye ~= "" then
@@ -536,9 +537,14 @@ end
 
 function refresh()
   findMoves();
+  if #foundMovesName == 0 then
+    sleepWithStatus(900, "No acro window found !", nil, 0.8, "Refreshing");
+    return;
+  end
+
   checkAllBoxes();
   if auto then
-    sleepWithStatus(3000, "Waiting a few seconds before starting moves...");
+    sleepWithStatus(500, "Starting Acro...", nil, 0.8);
     start();
   end
 end
@@ -566,7 +572,12 @@ function displayMoves()
     lsPrint(5, y, 0, 1, 1, 0xFFFFFFff, "End Msg:");
     foo, bye = lsEditBox("bye", 105, y, z, windowSize[0] - 120, 0, 1, 1, 0x000000ff, bye);
     writeSetting("bye", bye);
-    y = y + 30;
+    y = y + 35;
+
+    lsPrint(5, y, 0, 0.9, 0.9, 0x7fe1ffff, "Punctuation ignored in above Start/End Msg.");
+    y = y + 25;
+    lsPrint(5, y, 0, 0.9, 0.9, 0x7fe1ffff, "Msg will be sent in lower case to main chat.");
+    y = y + 40;
 
     auto = readSetting("auto", auto);
     lsPrint(5, y, 0, 1, 1, 0xFFFFFFff, "Auto Start:");
@@ -589,7 +600,7 @@ function displayMoves()
       switch = lsCheckBox(105, y, z, 0xFFFFFFff, "", switch);
       lsPrint(135, y, 0, 1, 1, 0xFFFFFFff, "Call Switch (Only in Acro Courts)");
     end
-    y = y + 30;
+    y = y + 40;
 
     if #foundMovesName > 0 then
       lsPrint(5, y, 0,1, 1, 0x40ff40ff, "Check moves you want to perform:");
@@ -658,7 +669,6 @@ function displayMoves()
 
     lsSetCamera(0,0, lsScreenX,lsScreenY);
     lsDoFrame();
-    lsSleep(10);
   end
 end
 

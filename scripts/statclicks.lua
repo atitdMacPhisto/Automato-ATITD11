@@ -311,7 +311,7 @@ function doTasks()
   if didTask == false then
     lsPrint(10, 10, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting for task to be ready.");
     if autoOnion and not buffed then
-      if alertNoOnions then 
+      if alertNoOnions then
         lsPlaySound("siren.wav");
       end
       lsPrint(10, 30, 0, 0.7, 0.7, 0xB0B0B0ff, "Auto eat: No pinned Onions found!");
@@ -845,7 +845,7 @@ function stirCement()
             if fuelType == "Coal" or fuelType == "Charcoal" then
               srCharEvent("800\n");
             elseif fuelType == "Petroleum" then
-              srCharEvent("40\n");
+              srCharEvent("150\n");
             end
           waitForNoImage("max.png");
         end
@@ -933,9 +933,10 @@ function excavateBlocks()
 end
 
 function churnButter()
-  local t = srFindImage("statclicks/churn.png");
-  if t then
-    srClickMouseNoMove(t[0]+5, t[1]+60);
+  local churn = findText("^Churn", nil, REGEX); -- ^ at the start of a pattern anchors it to the start of the string. This forces Churn to be the first word found on the line.
+  if (churn) then    
+    srClickMouseNoMove(churn[0]+10, churn[1]+2);
+    lsSleep(click_delay);
   end
   srReadScreen();
   local take = findText("Take...")
