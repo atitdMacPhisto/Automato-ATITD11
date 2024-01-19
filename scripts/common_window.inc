@@ -690,3 +690,31 @@ function unpinWindow(window)
     safeClick(window.x + window.width - 15, window.y + 15, 0);
   end
 end
+
+-------------------------------------------------------------------------------
+-- refreshWindow(window)
+--
+-- Refreshes a window by clicking x+5, y+5 of window region.
+--
+-- window - window object to refresh
+-------------------------------------------------------------------------------
+
+function refreshWindow(window)
+    srClickMouseNoMove(window.x + 5, window.y + 5);
+    lsSleep(click_delay);
+    srReadScreen();
+end
+
+-------------------------------------------------------------------------------
+-- refreshAllWindows
+--
+-- Refreshes all opened windows
+--
+-------------------------------------------------------------------------------
+
+function refreshAllWindows()
+    local windows = findAllWindows();
+    for i = 1, #windows do
+        refreshWindow(windows[i]);
+    end
+end
