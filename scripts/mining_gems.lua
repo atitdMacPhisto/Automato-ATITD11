@@ -14,18 +14,18 @@ smallGemMode = false;
 colorBlind = false;
 dropdown_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 dropdown_cur_value = 1;
-dropdown_pattern_values = {"6 color (1 Pair) (*)", "5 color (2 Pair) (*)", "4 color (3 Pair) (*)", "5 color (Triple) (5)", "4 color (Triple+Pair) (4)", "4 color (Quadruple) (6)", "3 Color (Quad+Pair) (1)", "3 color (Quintuple) (5)", "7 Color (All Different) (*)"};
 
-gui = {
+dropdown_pattern_values = {
   [1] = "6 color (1 Pair) (*)",
   [2] = "5 color (2 Pair) (*)",
   [3] = "4 color (3 Pair) (*)",
   [4] = "5 color (Triple) (5)",
   [5] = "4 color (Triple+Pair) (4)",
-  [6] = "4 color (Quadruple) (6)",
-  [7] = "3 Color (Quad+Pair) (1)",
-  [8] = "3 color (Quintuple) (5)",
-  [9] = "7 Color (All Different) (*)"
+  [6] = "3 Color (Triple+Triple) (1)",
+  [7] = "4 color (Quadruple) (6)",
+  [8] = "3 Color (Quad+Pair) (1)",
+  [9] = "3 color (Quintuple) (5)",
+  [10] = "7 Color (All Different) (*)"
 };
 
 dropdown_pattern_cur_value = 1;
@@ -118,6 +118,16 @@ allSets = {
     {1,4,6,7}
   },
 
+  {  --3 color (Triple+Triple)
+    {1,4,7},
+    {2,4,7},
+    {3,4,7},
+    {1,5,7},
+    {2,5,7},
+    {3,5,7},
+    {1,6,7}
+  },
+
   {  --4 color (Quadruple)
     {1,5,6},
     {1,5,7},
@@ -145,7 +155,7 @@ allSets = {
     {3,6,7},
     {4,5,7}
   },
-
+  
   {  --3 color (Quintuple)
     {1,2,3},
     {1,2,4},
@@ -257,6 +267,16 @@ allSetsSmall = {
     {3,4,6},
     {3,4,7},
     {2,6,7}
+  },
+
+  {  --3 color (Triple+Triple)
+    {1,4,7},
+    {2,4,7},
+    {3,4,7},
+    {1,5,7},
+    {2,5,7},
+    {3,5,7},
+    {1,6,7}
   },
 
   {  --4 color (Quadruple)
@@ -735,7 +755,7 @@ function clickSequence()
   end
   local pattern = "Unknown";
 
-  for k, v in pairs(gui) do
+  for k, v in pairs(dropdown_pattern_values) do
     if k == dropdown_pattern_cur_value then
       pattern = v;
       break;
