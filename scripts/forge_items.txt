@@ -550,6 +550,14 @@ return
 			["time"] = 2,
 		}
 		,
+		["Hatchet Blade"] =
+		{
+			["metal"] = "Iron",
+			["prod"] = 1,
+			["q"] = 3,
+			["time"] = 5,
+		}
+		,
 	}
 	,
 	["Wire"] =

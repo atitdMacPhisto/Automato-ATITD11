@@ -485,20 +485,25 @@ function openCharacterMenu()
 end
 
 function getName()
-  openCharacterMenu();
+  name = readSetting("name", "");
+  
+  if string.len(name)==0 then
+    openCharacterMenu();
 
-  local utility = waitForText("Utility...", 1000, nil, nil, REGION);
-  if utility then
-    local parse = findText("%w+", utility, REGEX);
+    local utility = waitForText("Utility...", 1000, nil, nil, REGION);
+    if utility then
+      local parse = findText("%w+", utility, REGEX);
 
-    --Names are usually "Name, title" except for "Citizen Name"
-    --commas are being parsed as periods though in the new fo
-    local commaSplit = explode(".", parse[2]);
-    local spaceSplit = explode(" ", commaSplit[1]);
-    name = spaceSplit[#spaceSplit];
+      --Names are usually "Name, title" except for "Citizen Name"
+      --commas are being parsed as periods though in the new fo
+      local commaSplit = explode(".", parse[2]);
+      local spaceSplit = explode(" ", commaSplit[1]);
+      name = spaceSplit[#spaceSplit];
+    end
+
+    writeSetting("name", name);
+    srKeyEvent("\27"); --Esc
   end
-
-  srKeyEvent("\27"); --Esc
 end
 
 function loadReports()
@@ -715,6 +720,8 @@ function reportToShroomdar(mushroom)
       lsPrint(5, 260, 5, 0.7, 0.7, 0xff0000ff, "Count must be between 1 and 999.");
       error = true;
     end
+
+    writeSetting("name", reportName);
 
     if not error and lsButtonText(5, lsScreenY - 30, 5, 80, 0x00ff00ff, "Report") then
       local body, status, auth = http.request("https://catitd.com/mushrooms/submit_report.asp", table.concat({

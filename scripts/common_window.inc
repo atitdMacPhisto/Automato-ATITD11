@@ -537,7 +537,7 @@ function windowManager(title, message, allowCascade, allowUIGap, varWidth, varHe
     lsPrintWrapped(10, y, 0, lsScreenY - 20, 0.7, 0.7, 0xd0d0d0ff,
                    message);
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100,
-                    0xffffffff, "End Script") then
+                    0xFF0000ff, "End Script") then
       error(quit_message);
     end
     while lsControlHeld() do

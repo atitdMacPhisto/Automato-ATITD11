@@ -1,427 +1,180 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-
-dropdown_values_canopy = {"Night - Canopy Ignored (0)", "Day - Canopy Closed (33)", "Day - Canopy Open (99)"};
-per_click_delay = 0;
-grid_mode = false; -- Expects windows to be pinned in a Grid
-screenshot_test_mode = false; -- Take a screenshot of game at Ticks 9,19,29,39. Useful when Testing Voids. Saves .png's to c:\games\Automato folder
-window_locs = {};
-button_names = {"ThistleNit.png", "ThistlePot.png", "ThistleH2O.png", "ThistleOxy.png", "ThistleSun.png"};
-
-function setWaitSpot(x0, y0)
-	setWaitSpot_x = x0;
-	setWaitSpot_y = y0;
-	setWaitSpot_px = srReadPixel(x0, y0);
-end
-
-function waitForChange()
-	local c=0;
-	while srReadPixel(setWaitSpot_x, setWaitSpot_y) == setWaitSpot_px do
-		lsSleep(1);
-		c = c+1;
-		if (lsShiftHeld() and lsControlHeld()) then
-			error 'broke out of loop from Shift+Ctrl';
-		end
-	end
-	lsPrintln('Waited ' .. c .. 'ms for pixel to change.');
-end
-
-function clickAll(image_name, message, up)
-	if not message then
-		message = "";
-	end
-	-- Find buttons and click them!
-	srReadScreen();
-	local buttons = findAllImages(image_name);
-
-	if #buttons == 0 then
-		statusScreen("Could not find specified buttons...", nil, nil, 0.7);
-		lsSleep(1500);
-	else
-		statusScreen(message .. " Clicking " .. #buttons .. " button(s)...", nil, nil, 0.7);
-		if up then
-			for i=#buttons, 1, -1  do
-				srClickMouseNoMove(buttons[i][0]+5, buttons[i][1]+3);
-				lsSleep(per_click_delay);
-			end
-		else
-			for i=1, #buttons  do
-				srClickMouseNoMove(buttons[i][0]+5, buttons[i][1]+3);
-				lsSleep(per_click_delay);
-			end
-		end
-		lsSleep(100);
-	end
-end
-
-function clickAllComplex(image_names, message)
-	if not message then
-		message = "";
-	end
-	-- Find buttons and click them!
-	srReadScreen();
-	window_locs = findAllImages(thisImage);
-	if #window_locs == 0 then
-	  sleepWithStatus(1000, "No windows found");
-	  thistleConfig();
-	end
-	local dpos = {};
-	for i=1, #image_names do
-		local pos = srFindImageInRange(image_names[i],
-			window_locs[#window_locs][0]-125, window_locs[#window_locs][1],
-			410, 312);
-		if not pos then
-			error ('Failed to find ' .. image_names[i]);
-		end
-		dpos[i] = {};
-		dpos[i][0] = pos[0] - window_locs[#window_locs][0];
-		dpos[i][1] = pos[1] - window_locs[#window_locs][1];
-	end
-	statusScreen(message .. " Clicking " .. #window_locs .. " button(s)...", nil, nil, 0.7);
-	local first = 1;
-	for i=#window_locs, 1, -1 do
-		if not first then
-			-- focus
-			setWaitSpot(window_locs[i+1][0], window_locs[i+1][1]);
-			srClickMouseNoMove(window_locs[i][0], window_locs[i][1]);
-			waitForChange();
-		end
-		-- click all buttons
-		for j=1, #image_names do
-			srClickMouseNoMove(window_locs[i][0] + dpos[j][0] + 5, window_locs[i][1] + dpos[j][1] + 5);
-		end
-		first = nil;
-	end
-	lsSleep(100);
-	statusScreen(message .. " Refocusing...", nil, nil, 0.7);
-	-- refocus
-	for i=2, #window_locs do
-		srReadScreen()
-		batchSize = findText("Batch Size...")
-			if batchSize then
-				cascade_offset = 295
-			else
-				cascade_offset = 275
-			end
-		setWaitSpot(window_locs[i][0], window_locs[i][1]);
-		srClickMouseNoMove(window_locs[i][0], window_locs[i][1] + cascade_offset);
-		waitForChange();
-	end
-	lsSleep(100);
-end
-
+----------------------------------------
+--          Global Variables          --
+----------------------------------------
 local z = 2;
 
--- Initialize last_mon
-local mon_w = 10;
-local mon_h = 152;
-local last_mon = {};
-for x=1, mon_w do
-	last_mon[x] = {};
-	for y=1, mon_h do
-		last_mon[x][y] = 0;
-	end
-end
+aThistleGarden = "Thistle/ThisIsaThistleGarden.png"
+yourThistleGarden = "Thistle/ThisIsYourThistleGarden.png"
+thistleHarvestImage = "Thistle/Harvest.png"
 
-function waitForMonChange(message)
-	if not first_nit then
-		first_nit = srFindImage("thistle/ThistleNit.png");
-	end
-	if not first_nit then
-		error "Could not find first Nit";
-	end
-	srReadScreen();
-		if batchSize then
-			mon_x = first_nit[0] - 15;
-			mon_y = first_nit[1] + 33;
-		else
-			mon_x = first_nit[0] - 25;
-			mon_y = first_nit[1] + 13;
-		end
+setWaitSpot_x = nil;
+setWaitSpot_y = nil;
+setWaitSpot_px = nil;
 
-	local different = nil;
-	local skip_next = nil;
-	local first_loop = 1;
-	while not different do
-		srReadScreen();
-		for x=1, mon_w do
-			for y=1, mon_h do
-				newvalue = srReadPixelFromBuffer(mon_x + x, mon_y + y);
-				if (math.abs(math.floor(newvalue/(256*256*256)) - math.floor(last_mon[x][y]/(256*256*256))) > 10) then
-					different = 1;
-				end
-				last_mon[x][y] = newvalue;
-			end
-		end
-		if not different then
-			first_loop = nil;
-		end
+grid_mode = false; -- Expects windows to be pinned in a Grid
+screenshot_test_mode = false; -- Screenshot T=ticks 9,19,29,39 for testing voids.
 
-		if different then
-			-- Make sure the screen was done refreshing and update again
-			lsSleep(60);
-			srReadScreen();
-			for x=1, mon_w do
-				for y=1, mon_h do
-					last_mon[x][y] = srReadPixelFromBuffer(mon_x + x, mon_y + y);
-				end
-			end
-		end
+dropdown_values_canopy = {"Night - Canopy Ignored (0)", "Day - Canopy Closed (33)", "Day - Canopy Open (99)"};
+button_names = {"ThistleNit.png", "ThistlePot.png", "ThistleH2O.png", "ThistleOxy.png", "ThistleSun.png"};
 
-		if (different and skip_next) then
-			skip_next = nil;
-			different = nil;
-		end
-
-		lsPrintWrapped(10, 5, 0, lsScreenX - 20, 0.8, 0.8, 0xFFFFFFff, message);
-		lsPrintWrapped(10, 35, 0, lsScreenX - 20, 0.7, 0.7, 0xFFFFFFff, "Elapsed Time: " .. getElapsedTime(startTime));
-		lsPrintWrapped(10, 60, 0, lsScreenX - 20, 0.8, 0.8, 0xFFFFFFff, "Waiting for change...");
-		if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
-			error "Clicked End Script button";
-		end
-
-		if lsButtonText(40, lsScreenY - 60, z, 200, 0xFFFFFFff, "Force tick") then
-			different = 1;
-		end
-
-		if lsButtonText(40, lsScreenY - 90, z, 200, 0xFFFFFFff, "Skip tick") then
-			skip_next = 1;
-		end
-
-		if abort then
-			if lsButtonText(40, lsScreenY - 150, z, 200, 0xff4040ff, "Cancel Abort") then
-				abort = nil;
-			end
-
-		else
-
-			if lsButtonText(40, lsScreenY - 150, z, 200, 0xFFFFFFff, "Abort Crops") then
-				abort = 1;
-			end
-
-		end
-
-		if finish_up then
-			if lsButtonText(40, lsScreenY - 120, z, 200, 0x40ff40ff, "Cancel Finish Up") then
-				finish_up = nil;
-			end
-
-		else
-
-			if lsButtonText(40, lsScreenY - 120, z, 200, 0xFFFFFFff, "Finish up") then
-				finish_up = 1;
-			end
-
-		end
-
-		-- display mon pixels
-		for x=1, mon_w do
-			for y=1, mon_h do
-				local size = 2;
-				lsDisplaySystemSprite(1, 10+x*size, 90+y*size, 0, size, size, last_mon[x][y]);
-			end
-		end
-		lsDoFrame();
-		lsSleep(100);
-	end
-	statusScreen("Changed, waiting a moment for other beds to catch up...", nil, nil, 0.7);
-	if not first_loop then -- Don't wait, we might be behind already!
-		lsSleep(1500); -- Wait a moment after image changes before doing the next tick
-	end
-end
+window_locs = {};
+----------------------------------------
 
 function doit()
 	askForWindow("Pin any number of thistle gardens. Must be CASCADED (can be GRID if you use Grid Mode checkbox).\n\nUse Window Manager button and choose \'Form Cascade\' (or \'Form Grid\' if using Grid Mode) to arrange the windows correctly. Check \'Water Gap\' so that water icon isn\'t covered. Optionally, you can pin a rain barrel (water gap not required) to refill your jugs. Water is refilled after each tick, so you won\'t need many jugs (#gardens x 2 should be enough).\n\nCan handle up to about 32 gardens by using the cascade method (shuffles windows back and forth).");
 
   while 1 do
-	thistleConfig();
-	if dropdown_cur_value_canopy == 1 then
-	  last_sun = 0;
-	elseif dropdown_cur_value_canopy == 2 then
-	  last_sun = 33;
-	elseif dropdown_cur_value_canopy == 3 then
-	  last_sun = 99;
-	end
+    thistleConfig();
 
-	if not ( #instructions == 41*5) then
-		error("Invalid instruction length: " .. loadedFile .. "\nDid you add a valid recipe to the file?");
-	end
+    if dropdown_cur_value_canopy == 1 then
+      last_sun = 0;
+    elseif dropdown_cur_value_canopy == 2 then
+      last_sun = 33;
+    elseif dropdown_cur_value_canopy == 3 then
+      last_sun = 99;
+    end
 
-	-- We want to make sure a Rain Barrel or Aquaduct isn't pinned. Previously we used ThisIs.png. Rain Barrel has ThisIs.png so tries to process this window like a regular thistle window
-	-- Only check for windows showing 'This is Your Thistle Garden' or 'This is A Thistle Garden'
-	srReadScreen();
-	local your = findAllImages("Thistle/ThisIsYourThistleGarden.png");
-	local a = findAllImages("Thistle/ThisIsAThistleGarden.png");
+    if not ( #instructions == 41*5) then
+      error("Invalid instruction length: " .. loadedFile .. "\nDid you add a valid recipe to the file?");
+    end
 
-	if #your > 0 then
-	  thisImage = "Thistle/ThisIsYourThistleGarden.png"
-	elseif #a > 0 then
-	  thisImage = "Thistle/ThisIsAThistleGarden.png"
-	else
-	  thisImage = "ThisIs.png"
-	end
+    -- We want to make sure a Rain Barrel or Aquaduct isn't pinned. Previously we used ThisIs.png. Rain Barrel has ThisIs.png so tries to process this window like a regular thistle window
+    -- Only check for windows showing 'This is Your Thistle Garden' or 'This is A Thistle Garden'
+    srReadScreen();
+    local your = findAllImages(yourThistleGarden);
+    local a = findAllImages(aThistleGarden);
 
-	if grid_mode then
-	  mainCustomMode()
-	else
+    if #your > 0 then
+      windowImage = yourThistleGarden
+    elseif #a > 0 then
+      windowImage = aThistleGarden
+    else
+      windowImage = "ThisIs.png"
+    end
+
+    -- Execute Script
     main();
-	end
   end
 end
 
 function main()
-	finish_up = nil;
-	abort = nil;
-	srReadScreen();
-	window_locs = findAllImages(thisImage);
-	plant_buttons_found = findAllImages("thistle/ThistlePlantACrop.png");
-      startTime = lsGetTimer();
+  finish_up = nil;
+  abort = nil;
+  srReadScreen();
+  window_locs = findAllImages(windowImage);
+  plant_buttons_found = findAllImages("thistle/ThistlePlantACrop.png");
+  startTime = lsGetTimer();
 
-	if not (#window_locs == expected_gardens) then
-		error ("Did not find expected number of thistle gardens (found " .. #window_locs .. " expected " ..  expected_gardens .. ")");
-	end
+  if grid_mode then
+    -- Check to see if we pinned windows with Form Cascade, because we are in Grid Mode.
+    if not (#window_locs == #plant_buttons_found) then
+      error ("Are your windows Cascaded? Because you are in Grid Mode! Uncheck the 'Windows Arranged in Grid' checkbox or Pin your windows in a Grid.");
+    end
+  else
+    -- Check to see if we pinned windows with Form Grid, because we are in Cascade Mode.
+    if #plant_buttons_found > 1 then
+      error ("Are your windows in a Grid? Because you are in Cascade Mode! Check the 'Windows Arranged in Grid' checkbox or Pin your windows in a Cascade.");
+    end
+  end
 
-	-- Check to see if we pinned windows with Form Grid, because we are in Cascade Mode.
-	if #plant_buttons_found > 1 then
-		error ("Are your windows in a Grid? Because you are in Cascade Mode! Check the 'Windows Arranged in Grid' checkbox or Pin your windows in a Cascade.");
-	end
+  for loops=1, num_loops do
+    if finish_up then
+      break;
+    end
 
-	for loops=1, num_loops do
+      for i=0, 39 do
+        drawWater(1);
+        local to_click = {}; -- Used by cascade mode to build an array of click locations
 
-		if finish_up then
-		  break;
-		end
+        if grid_mode then
+          if (i == 0) then
+            clickAll(windowImage, 1); -- Refresh all windows
+            clickAll("thistle/ThistlePlantACrop.png", 1);
+          end
 
-		for i=0, 39 do
-			drawWater(1);
+          for j=0, 3 do
+            for k=1, instructions[i*5 + j + 1] do
+              clickAll("thistle/" .. button_names[j+1], 1);
+              end
+          end
 
-			local to_click = {};
-			if (i == 0) then
-				to_click[1] = "Thistle/ThistlePlantACrop.png";
-			end
-			for j=0, 3 do
-				for k=1, instructions[i*5 + j + 1] do
-					to_click[#to_click+1] = "thistle/" .. button_names[j+1];
-				end
-			end
-			if not (instructions[i*5 + 5] == last_sun) then
-				last_sun = instructions[i*5 + 5];
-				to_click[#to_click+1] = "thistle/" .. button_names[5];
-			end
-			if #to_click > 0 then
-				clickAllComplex(to_click, ("(" .. loops .. "/" .. num_loops .. ") " .. i .. ":"));
-			end
-			waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
-			if (i == 0) then -- first one immediately finds a change
-				waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
-			end
-			if abort then
-				to_click[1] = "Thistle/ThistleAbort.png";
-				clickAllComplex(to_click, ("Aborting Crops ..."));
-				closeAbortWindows();
-				break;
-			end
-		end
+          if not (instructions[i*5 + 5] == last_sun) then
+            last_sun = instructions[i*5 + 5];
+            clickAll("thistle/" .. button_names[5], 1);
+          end
 
-		if abort then
-		  clickAllComplex({thisImage});  -- Refresh windows after abort, so that 'Plant a Crop' appears
-		else
-		lsSleep(3000);
-		  clickAllComplex({"Thistle/Harvest.png"});
-		end
-		lsSleep(500);
+          if (screenshot_test_mode and grid_mode) and (i == 9 or i == 19 or i == 29 or i == 39) then
+            screenshot(i)
+          end
+        else
+          if (i == 0) then
+            to_click[1] = "Thistle/ThistlePlantACrop.png";
+          end
 
-		drawWater(1);
-		lsSleep(200);
+          for j=0, 3 do
+            for k=1, instructions[i*5 + j + 1] do
+            to_click[#to_click+1] = "thistle/" .. button_names[j+1];
+            end
+          end
 
-		if abort then
-			break;
-		end
-	end
-	lsPlaySound("Complete.wav");
-	lsMessageBox("Elapsed Time:", getElapsedTime(startTime), 1)
+          if not (instructions[i*5 + 5] == last_sun) then
+            last_sun = instructions[i*5 + 5];
+            to_click[#to_click+1] = "thistle/" .. button_names[5];
+          end
+
+          if #to_click > 0 then
+            clickAllComplex(to_click, ("(" .. loops .. "/" .. num_loops .. ") " .. i .. ":"));
+          end
+        end
+
+      waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
+      if (i == 0) then -- first one immediately finds a change
+        waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
+      end
+
+      if abort then
+        if grid_mode then
+          clickAll("Thistle/ThistleAbort.png", ("Aborting Crops ..."));
+        else
+          to_click[1] = "Thistle/ThistleAbort.png";
+          clickAllComplex(to_click, ("Aborting Crops ..."));
+        end
+      closeAbortWindows();
+      break;
+      end
+    end
+
+    if abort then
+      -- Refresh windows after abort, so that 'Plant a Crop' appears
+      if grid_mode then
+        clickAll(windowImage);
+      else
+        clickAllComplex({windowImage});
+      end
+    else
+      lsSleep(3000);
+      if grid_mode then
+        clickAll(thistleHarvestImage);
+      else
+        clickAllComplex({thistleHarvestImage});
+      end
+    end
+
+    lsSleep(500);
+    drawWater(1);
+    lsSleep(200);
+
+    if abort then
+      break;
+    end
+  end
+
+  lsPlaySound("Complete.wav");
+  lsMessageBox("Elapsed Time:", getElapsedTime(startTime), 1)
 end
-
-
-function mainCustomMode()
-	finish_up = nil;
-	abort = nil;
-	srReadScreen();
-	window_locs = findAllImages(thisImage);
-	plant_buttons_found = findAllImages("thistle/ThistlePlantACrop.png");
-      startTime = lsGetTimer();
-
-	if not (#window_locs == expected_gardens) then
-		error ("Did not find expected number of thistle gardens (found " .. #window_locs .. " expected " ..  expected_gardens .. ")");
-	end
-
-	-- Check to see if we pinned windows with Form Cascade, because we are in Grid Mode.
-	if not (#window_locs == #plant_buttons_found) then
-		error ("Are your windows Cascaded? Because you are in Grid Mode! Uncheck the 'Windows Arranged in Grid' checkbox or Pin your windows in a Grid.");
-	end
-
-	for loops=1, num_loops do
-
-		if finish_up then
-		  break;
-		end
-
-		for i=0, 39 do
-		drawWater(1);
-
-			if (i == 0) then
-				clickAll(thisImage, 1); -- Refresh all windows
-				clickAll("thistle/ThistlePlantACrop.png", 1);
-			end
-
-			for j=0, 3 do
-				for k=1, instructions[i*5 + j + 1] do
-					clickAll("thistle/" .. button_names[j+1], 1);
-				end
-			end
-
-			if not (instructions[i*5 + 5] == last_sun) then
-				last_sun = instructions[i*5 + 5];
-				clickAll("thistle/" .. button_names[5], 1);
-			end
-
-			if (screenshot_test_mode and grid_mode) and (i == 9 or i == 19 or i == 29 or i == 39) then
-			  screenshot(i)
-			end
-
-			waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
-			if (i == 0) then -- first one immediately finds a change
-				waitForMonChange("(" .. loops .. "/" .. num_loops .. ") Tick " .. i .. "/40 done");
-			end
-
-			if abort then
-				clickAll("Thistle/ThistleAbort.png", ("Aborting Crops ..."));
-				closeAbortWindows();
-				break;
-			end
-		end
-
-		if abort then
-		  clickAll(thisImage);  -- Refresh windows after abort, so that 'Plant a Crop' appears
-		else
-		lsSleep(3000);
-		  clickAll("Thistle/Harvest.png");
-		end
-		lsSleep(500);
-
-		drawWater(1);
-		lsSleep(200);
-
-		if abort then
-			break;
-		end
-
-	end
-	lsPlaySound("Complete.wav");
-	lsMessageBox("Elapsed Time:", getElapsedTime(startTime), 1)
-end
-
 
 function config()
   local is_done = false;
@@ -454,7 +207,6 @@ function config()
     grid_mode = readSetting("grid_mode",grid_mode);
     grid_mode = CheckBox(15, y, z+10, grid_color, " Windows Arranged in Grid", grid_mode, 0.65, 0.65);
     writeSetting("grid_mode",grid_mode);
-
     y = y + 20;
 
     if grid_mode then
@@ -509,6 +261,230 @@ function config()
   end
 end
 
+----------------------------------------
+--         Utility Functions          --
+----------------------------------------
+
+function waitForChange()
+	local c=0;
+	while srReadPixel(setWaitSpot_x, setWaitSpot_y) == setWaitSpot_px do
+		lsSleep(1);
+		c = c+1;
+		if (lsShiftHeld() and lsControlHeld()) then
+			error 'broke out of loop from Shift+Ctrl';
+		end
+	end
+	lsPrintln('Waited ' .. c .. 'ms for pixel to change.');
+end
+
+function clickAll(image_name, message, up)
+	if not message then
+		message = "";
+	end
+	-- Find buttons and click them!
+	srReadScreen();
+	local buttons = findAllImages(image_name);
+
+	if #buttons == 0 then
+		statusScreen("Could not find specified buttons...", nil, nil, 0.7);
+		lsSleep(1500);
+	else
+		statusScreen(message .. " Clicking " .. #buttons .. " button(s)...", nil, nil, 0.7);
+		if up then
+			for i=#buttons, 1, -1  do
+				srClickMouseNoMove(buttons[i][0]+5, buttons[i][1]+3);
+			end
+		else
+			for i=1, #buttons  do
+				srClickMouseNoMove(buttons[i][0]+5, buttons[i][1]+3);
+			end
+		end
+		lsSleep(100);
+	end
+end
+
+function clickAllComplex(image_names, message)
+	if not message then
+		message = "";
+	end
+	-- Find buttons and click them!
+	srReadScreen();
+	window_locs = findAllImages(windowImage);
+	if #window_locs == 0 then
+	  sleepWithStatus(1000, "No windows found");
+	  thistleConfig();
+	end
+	local dpos = {};
+	for i=1, #image_names do
+		local pos = srFindImageInRange(image_names[i],
+			window_locs[#window_locs][0]-125, window_locs[#window_locs][1],
+			410, 312);
+		if not pos then
+			error ('Failed to find ' .. image_names[i]);
+		end
+		dpos[i] = {};
+		dpos[i][0] = pos[0] - window_locs[#window_locs][0];
+		dpos[i][1] = pos[1] - window_locs[#window_locs][1];
+	end
+	statusScreen(message .. " Clicking " .. #window_locs .. " button(s)...", nil, nil, 0.7);
+	local first = 1;
+	for i=#window_locs, 1, -1 do
+		if not first then
+			-- focus
+			setWaitSpot(window_locs[i+1][0], window_locs[i+1][1]);
+			srClickMouseNoMove(window_locs[i][0], window_locs[i][1]);
+			waitForChange();
+		end
+		-- click all buttons
+		for j=1, #image_names do
+			srClickMouseNoMove(window_locs[i][0] + dpos[j][0] + 5, window_locs[i][1] + dpos[j][1] + 5);
+		end
+		first = nil;
+	end
+	lsSleep(100);
+	statusScreen(message .. " Refocusing...", nil, nil, 0.7);
+	-- refocus
+	for i=2, #window_locs do
+		srReadScreen()
+		batchSize = findText("Batch Size...")
+			if batchSize then
+				cascade_offset = 305
+			else
+				cascade_offset = 285
+			end
+		setWaitSpot(window_locs[i][0], window_locs[i][1]);
+		srClickMouseNoMove(window_locs[i][0], window_locs[i][1] + cascade_offset);
+		waitForChange();
+	end
+	lsSleep(100);
+end
+
+-- Initialize last_mon
+local mon_w = 10;
+local mon_h = 152;
+local last_mon = {};
+for x=1, mon_w do
+	last_mon[x] = {};
+	for y=1, mon_h do
+		last_mon[x][y] = 0;
+	end
+end
+
+function waitForMonChange(message)
+	if not first_nit then
+		first_nit = srFindImage("thistle/ThistleNit.png");
+	end
+	if not first_nit then
+		error "Could not find first Nit";
+	end
+	srReadScreen();
+  if batchSize then
+    mon_x = first_nit[0] - 15;
+    mon_y = first_nit[1] + 33;
+  else
+    if grid_mode then
+      -- Offset positions required to be able to monitor the tick number on the thistle garden
+      monitorOffsetX = 23
+      monitorOffseYX = 13
+    else
+      monitorOffsetX = 16
+      monitorOffseYX = 36
+    end
+    mon_x = first_nit[0] - monitorOffsetX;
+    mon_y = first_nit[1] + monitorOffseYX;
+  end
+
+	local different = nil;
+	local skip_next = nil;
+	local first_loop = 1;
+	while not different do
+		srReadScreen();
+		for x=1, mon_w do
+			for y=1, mon_h do
+				newvalue = srReadPixelFromBuffer(mon_x + x, mon_y + y);
+				if (math.abs(math.floor(newvalue/(256*256*256)) - math.floor(last_mon[x][y]/(256*256*256))) > 10) then
+					different = 1;
+				end
+				last_mon[x][y] = newvalue;
+			end
+		end
+		if not different then
+			first_loop = nil;
+		end
+
+		if different then
+			-- Make sure the screen was done refreshing and update again
+			lsSleep(60);
+			srReadScreen();
+			for x=1, mon_w do
+				for y=1, mon_h do
+					last_mon[x][y] = srReadPixelFromBuffer(mon_x + x, mon_y + y);
+				end
+			end
+		end
+
+		if (different and skip_next) then
+			skip_next = nil;
+			different = nil;
+		end
+
+		lsPrintWrapped(10, 5, 0, lsScreenX - 20, 0.8, 0.8, 0xFFFFFFff, message);
+		lsPrintWrapped(10, 35, 0, lsScreenX - 20, 0.7, 0.7, 0xFFFFFFff, "Elapsed Time: " .. getElapsedTime(startTime));
+		lsPrintWrapped(10, 60, 0, lsScreenX - 20, 0.8, 0.8, 0xFFFFFFff, "Waiting for change...");
+		if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
+			error "Clicked End Script button";
+		end
+
+		if lsButtonText(40, lsScreenY - 60, z, 200, 0xFFFFFFff, "Force tick") then
+			different = 1;
+		end
+
+    if skip_next then
+      if lsButtonText(40, lsScreenY - 90, z, 200, 0xffbb80ff, "Cancel Skip") then
+        skip_next = nil;
+      end
+    else
+      if lsButtonText(40, lsScreenY - 90, z, 200, 0xFFFFFFff, "Skip tick") then
+        skip_next = 1;
+      end
+    end
+
+		if abort then
+			if lsButtonText(40, lsScreenY - 150, z, 200, 0xff4040ff, "Cancel Abort") then
+				abort = nil;
+			end
+		else
+			if lsButtonText(40, lsScreenY - 150, z, 200, 0xFFFFFFff, "Abort Crops") then
+				abort = 1;
+			end
+    end
+
+		if finish_up then
+			if lsButtonText(40, lsScreenY - 120, z, 200, 0x40ff40ff, "Cancel Finish Up") then
+				finish_up = nil;
+			end
+		else
+			if lsButtonText(40, lsScreenY - 120, z, 200, 0xFFFFFFff, "Finish up") then
+				finish_up = 1;
+			end
+		end
+
+		-- display mon pixels
+		for x=1, mon_w do
+			for y=1, mon_h do
+				local size = 2;
+				lsDisplaySystemSprite(1, 10+x*size, 90+y*size, 0, size, size, last_mon[x][y]);
+			end
+		end
+		lsDoFrame();
+		lsSleep(100);
+	end
+	statusScreen("Changed, waiting a moment for other beds to catch up...", nil, nil, 0.7);
+	if not first_loop then -- Don't wait, we might be behind already!
+		lsSleep(1500); -- Wait a moment after image changes before doing the next tick
+	end
+end
+
 function thistleConfig()
   local add;
   local y = 0;
@@ -517,130 +493,122 @@ function thistleConfig()
   local foundRecipe;
   local is_done = false;
 
-
   while not is_done do
-  checkBreak();
+    checkBreak();
 
-  if start then
-    start = nil;
-    break;
-  end
+    if start then
+      start = nil;
+      break;
+    end
 
-	lsPrintWrapped(10, y+5, 0, lsScreenX, 0.6, 0.6, 0xFF0000ff,
-	"");
+    lsPrintWrapped(10, y+5, 0, lsScreenX, 0.6, 0.6, 0xFF0000ff,
+    "");
 
-	lsPrintWrapped(10, y+95, 0, lsScreenX - 20, 0.7, 0.7, 0xffff40ff,
-	"---------------------------------------------------------------");
+    lsPrintWrapped(10, y+95, 0, lsScreenX - 20, 0.7, 0.7, 0xffff40ff,
+    "---------------------------------------------------------------");
 
-  if not add then
-	if lsButtonText(15, y+180, 0, 125, 0xffbb80ff, "Add Farm") then
-	  add = 1;
-	end
-
-	if lsButtonText(10, lsScreenY - 60, 0, 120, 0x6666FFff, "Misc Stuff") then
-	  miscButtons();
-	end
-
-  else
-
-	if lsButtonText(10, y+65, 0, 100, 0xffffffff, "Cancel") then
-	  add = nil;
-	end
-
-	if string.len(farmName) > 0 then
-	  if lsButtonText(140, y+65, 0, 120, 0xffffffff, "Create/Save") then
-	    addSilkFarm(farmName);
-	    add = nil;
-	  end
-	end
-
-  end
-
-  if add then
-	lsPrint(10, y+10, 0, 0.8, 0.8, 0xffffffff, "Silk Farm Name:");
-	is_done, farmName = lsEditBox("farmName", 10, y+30, 0, 230, 0, 0.9, 0.9, 0x000000ff);
-  end
-
-  --lsPrintWrapped(10, y+200, z, lsScreenX - 20, 0.65, 0.65, 0xffff40ff, message);
-
-  parseSilkFarm();
-
-  if #farms > 0 then
-    lsSetCamera(0,0,lsScreenX/0.9, lsScreenY/0.9);
-    dropdown_cur_value_farm = readSetting("dropdown_cur_value_farm",dropdown_cur_value_farm);
-    dropdown_cur_value_farm = lsDropdown("thisFarm", 15, y+165, 0, lsScreenX - 20, dropdown_cur_value_farm, farms);
-    writeSetting("dropdown_cur_value_farm",dropdown_cur_value_farm);
-    lsSetCamera(0,0,lsScreenX,lsScreenY);
-
-    lsPrintWrapped(15, 115, z, lsScreenX - 20, 0.65, 0.65, 0x40ffffff, "Silk Farm " .. dropdown_cur_value_farm .. "/" .. #farms .. " selected");
-
-    if checkRecipeValid(farms[dropdown_cur_value_farm]) then
-		foundRecipe = false;
-    lsPrintWrapped(15, 130, z, lsScreenX - 20, 0.65, 0.65, 0xff4040ff, "Invalid Recipe - You need to Edit");
+    if not add then
+      if lsButtonText(15, y+180, 0, 125, 0xffbb80ff, "Add Farm") then
+        add = 1;
+      end
+      if lsButtonText(10, lsScreenY - 60, 0, 120, 0x6666FFff, "Misc Stuff") then
+        miscButtons();
+      end
     else
-      foundRecipe = true;
-			lsPrintWrapped(15, 130, z, lsScreenX - 20, 0.65, 0.65, 0x40ff40ff, "Recipe Found");
+      if lsButtonText(10, y+65, 0, 100, 0xffffffff, "Cancel") then
+        add = nil;
+      end
+
+      if string.len(farmName) > 0 then
+        if lsButtonText(140, y+65, 0, 120, 0xffffffff, "Create/Save") then
+          addSilkFarm(farmName);
+          add = nil;
+        end
+      end
     end
 
-    if lsButtonText(15, y+215, 0, 125, 0xFF0000ff, "Delete Farm") then
-      message = "";
-		if promptOkay("Are you sure want to Delete?\n\nSilk Farm: " .. farms[dropdown_cur_value_farm], 0xff8080ff, 0.7, true) then
-		  deleteSilkFarms(dropdown_cur_value_farm);
-		end
+    if add then
+      lsPrint(10, y+10, 0, 0.8, 0.8, 0xffffffff, "Silk Farm Name:");
+      is_done, farmName = lsEditBox("farmName", 10, y+30, 0, 230, 0, 0.9, 0.9, 0x000000ff);
     end
 
-	  if lsButtonText(lsScreenX - 145, y+180, 0, 110, 0x6666FFff, "Edit Recipe") then
-	    promptRecipe(farms[dropdown_cur_value_farm]);
-	  end
+    parseSilkFarm();
 
-		if foundRecipe then
-		  if lsButtonText(10, lsScreenY - 30, 0, 120, 0x40ff40ff, "Load Farm") then
-		    loadSilkFarms(farms[dropdown_cur_value_farm]);
-		    config();
-		  end
+    if #farms > 0 then
+      lsSetCamera(0,0,lsScreenX/0.9, lsScreenY/0.9);
+      dropdown_cur_value_farm = readSetting("dropdown_cur_value_farm",dropdown_cur_value_farm);
+      dropdown_cur_value_farm = lsDropdown("thisFarm", 15, y+165, 0, lsScreenX - 20, dropdown_cur_value_farm, farms);
+      writeSetting("dropdown_cur_value_farm",dropdown_cur_value_farm);
+      lsSetCamera(0,0,lsScreenX,lsScreenY);
+
+      lsPrintWrapped(15, 115, z, lsScreenX - 20, 0.65, 0.65, 0x40ffffff, "Silk Farm " .. dropdown_cur_value_farm .. "/" .. #farms .. " selected");
+
+      if checkRecipeValid(farms[dropdown_cur_value_farm]) then
+        foundRecipe = false;
+        lsPrintWrapped(15, 130, z, lsScreenX - 20, 0.65, 0.65, 0xff4040ff, "Invalid Recipe - You need to Edit");
+      else
+        foundRecipe = true;
+        lsPrintWrapped(15, 130, z, lsScreenX - 20, 0.65, 0.65, 0x40ff40ff, "Recipe Found");
+      end
+
+      if lsButtonText(15, y+215, 0, 125, 0xFF0000ff, "Delete Farm") then
+        message = "";
+        if promptOkay("Are you sure want to Delete?\n\nSilk Farm: " .. farms[dropdown_cur_value_farm], 0xff8080ff, 0.7, true) then
+          deleteSilkFarms(dropdown_cur_value_farm);
+        end
+      end
+
+      if lsButtonText(lsScreenX - 145, y+180, 0, 110, 0x6666FFff, "Edit Recipe") then
+        promptRecipe(farms[dropdown_cur_value_farm]);
+      end
+
+      if foundRecipe then
+        if lsButtonText(10, lsScreenY - 30, 0, 120, 0x40ff40ff, "Load Farm") then
+          loadSilkFarms(farms[dropdown_cur_value_farm]);
+          config();
+        end
+      end
     end
-  end
 
-  if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
-    error "Clicked End Script button";
-  end
-
-  if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xffff40ff, "Calendar") then
-    if socketHttpFirstRun then -- If we already fetched Voids once, then the "Allow Network Access' prompt won't appear again, so skip message
-      lsButtonText(lsScreenX - 110, lsScreenY - 60, 10, 100, 0xffffc0ff, "Querying!");
-      lsDoFrame();
-      fetchVoids();
-    else
-      fetchVoidsWarning();
+    if lsButtonText(lsScreenX - 110, lsScreenY - 30, z, 100, 0xFF0000ff, "End script") then
+      error "Clicked End Script button";
     end
-  end
 
-  lsDoFrame();
-  lsSleep(10);
+    if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xffff40ff, "Calendar") then
+      if socketHttpFirstRun then -- If we already fetched Voids once, then the "Allow Network Access' prompt won't appear again, so skip message
+        lsButtonText(lsScreenX - 110, lsScreenY - 60, 10, 100, 0xffffc0ff, "Querying!");
+        lsDoFrame();
+        fetchVoids();
+      else
+        fetchVoidsWarning();
+      end
+    end
+
+    lsDoFrame();
+    lsSleep(10);
   end -- end while
 end
 
 function closeAbortWindows()
   while 1 do
-      sleepWithStatus(50,"Closing Popup windows ...")
-	checkBreak();
-	srReadScreen();
-	local pos = srFindImage("yes.png");
-		if (pos) then
-		  safeClick(pos[0] + 1, pos[1] + 1);
-               lsSleep(10);
-		end
-	local pos2 = srFindImage("OK.png");
-		if (pos2) then
-		  safeClick(pos2[0] + 1, pos2[1] + 1);
-               lsSleep(10);
-		end
-	if not pos and not pos2 then
-        break;
-	end
+    sleepWithStatus(50,"Closing Popup windows ...")
+    checkBreak();
+    srReadScreen();
+    local pos = srFindImage("yes.png");
+    if (pos) then
+      safeClick(pos[0] + 1, pos[1] + 1);
+      lsSleep(10);
+    end
+    local pos2 = srFindImage("OK.png");
+    if (pos2) then
+      safeClick(pos2[0] + 1, pos2[1] + 1);
+      lsSleep(10);
+    end
+    if not pos and not pos2 then
+      break;
+    end
   end
 end
-
 
 function miscButtons()
   while 1 do
@@ -657,7 +625,7 @@ function miscButtons()
       closeAbortWindows();
 	clickAllComplex({"Thistle/ThistleAbort.png"}, "Aborting");
 	closeAbortWindows();
-	clickAllComplex({thisImage}, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
+	clickAllComplex({windowImage}, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
     end
   end
 
@@ -665,7 +633,7 @@ function miscButtons()
     if promptOkay("This is only used if you currently have crops planted and are ready for harvest. Likely something went wrong in macro.\n\nAre you sure you want to Harvest Crops?", 0xff8080ff, 0.7, true) then
       closeAbortWindows();
       clickAllComplex({"Thistle/Harvest.png"}, "Harvesting");
-      clickAllComplex({thisImage}, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
+      clickAllComplex({windowImage}, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
     end
   end
 
@@ -677,7 +645,7 @@ function miscButtons()
       closeAbortWindows();
 	clickAll("Thistle/ThistleAbort.png", "Aborting");
 	closeAbortWindows();
-	clickAll(thisImage, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
+	clickAll(windowImage, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
     end
   end
 
@@ -685,7 +653,7 @@ function miscButtons()
     if promptOkay("This is only used if you currently have crops planted and are ready for harvest. Likely something went wrong in macro.\n\nAre you sure you want to Harvest Crops?", 0xff8080ff, 0.7, true) then
       closeAbortWindows();
       clickAll("Thistle/Harvest.png", "Harvesting");
-      clickAll(thisImage, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
+      clickAll(windowImage, "Refreshing");  -- Refresh windows after abort, so that 'Plant a Crop' appears
     end
   end
 
@@ -758,12 +726,12 @@ function deleteSilkFarms(num)
   io.close(file);
   for line in io.lines("SilkFarms.txt") do
     lineNumber = lineNumber + 1;
-	if num ~= lineNumber then
-	  table.insert(farms, line);
-	else
-	  farmName = line;
-	  fileName = convertFarmName2FileName(farmName);
-	end
+    if num ~= lineNumber then
+      table.insert(farms, line);
+    else
+      farmName = line;
+      fileName = convertFarmName2FileName(farmName);
+    end
   end
   for i = 1, #farms,1 do
     output = output .. farms[i] .. "\n";
@@ -787,10 +755,10 @@ function parseRecipeLeft(recipe)
     if i >= 1 and i <= 21*5 then
       lineNumber = lineNumber + 1
       output = output .. recipes[i] .. ",";
-        if lineNumber == 5 then
-          output = output .. "\n";
-          lineNumber = 0;
-        end
+      if lineNumber == 5 then
+        output = output .. "\n";
+        lineNumber = 0;
+      end
     end
   end
 	if string.len(output) <= 2 then
@@ -805,15 +773,15 @@ function parseRecipeRight(recipe)
   local output = "";
   for i = 1, #recipes,1 do
     if i >= 106 then
-    lineNumber = lineNumber + 1
+      lineNumber = lineNumber + 1
       output = output .. recipes[i];
-        if i <= 205 then
-         output = output .. ",";
-        end
-          if lineNumber == 5 then
-            output = output .. "\n";
-            lineNumber = 0;
-          end
+      if i <= 205 then
+        output = output .. ",";
+      end
+      if lineNumber == 5 then
+        output = output .. "\n";
+        lineNumber = 0;
+      end
     end
   end
   return output;
@@ -1031,23 +999,23 @@ end
 --------------
 -- Added in an explode function (delimiter, string) to deal with broken csplit.
 function explode(d,p)
-   local t, ll
-   t={}
-   ll=0
-   if(#p == 1) then
-      return {p}
-   end
-   while true do
-      l = string.find(p, d, ll, true) -- find the next d in the string
-      if l ~= nil then -- if "not not" found then..
-         table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
-         ll = l + 1 -- save just after where we found it for searching next time.
-      else
-         table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
-         break -- Break at end, as it should be, according to the lua manual.
-      end
-   end
-   return t
+  local t, ll
+  t={}
+  ll=0
+  if(#p == 1) then
+    return {p}
+  end
+  while true do
+    l = string.find(p, d, ll, true) -- find the next d in the string
+    if l ~= nil then -- if "not not" found then..
+      table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
+      ll = l + 1 -- save just after where we found it for searching next time.
+    else
+      table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
+      break -- Break at end, as it should be, according to the lua manual.
+    end
+  end
+  return t
 end
 
 function convertTime(ms)
@@ -1055,9 +1023,10 @@ function convertTime(ms)
 	local hours = math.floor(duration / 60 / 60);
 	local minutes = math.floor((duration - hours * 60 * 60) / 60);
 	local seconds = duration - hours * 60 * 60 - minutes * 60;
-      if hours > 0 then
-	  return string.format("%02dh %02dm %02ds",hours,minutes,seconds);
-      else
-	  return string.format("%02dm %02ds",minutes,seconds);
-      end
+
+  if hours > 0 then
+    return string.format("%02dh %02dm %02ds",hours,minutes,seconds);
+  else
+    return string.format("%02dm %02ds",minutes,seconds);
+  end
 end

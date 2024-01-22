@@ -78,6 +78,28 @@ function safeDrag(sourceX, sourceY, destX, destY)
 end
 
 -------------------------------------------------------------------------------
+-- safeScroll(x, y, steps)
+--
+-- Move the mouse to x,y and scroll the wheel
+--
+-- x, y -- Point to click
+-- steps -- positive value rolls the wheel forward (away from the user)
+--       -- negative value rolls the wheel backward (toward the user)
+-- safeScroll(100,100,-12)
+-------------------------------------------------------------------------------
+
+function safeScroll(x, y, steps)
+  --This version includes required changes to the srMouseWheel
+  lsRequireVersion(2,73);
+
+  if not x or not y or not steps then
+    error("Incorrect number of arguments for safeScroll()");
+  end
+  safeBegin();
+  srMouseWheel(x, y, steps);
+end
+
+-------------------------------------------------------------------------------
 -- clickPoint(point, offsetX, offsetY, rightClick)
 --
 -- Click one point with an offset
@@ -232,7 +254,28 @@ function drawWater(skipTimer)
       end
   end
 
-  -- Second, check for aqueduct
+  -- Second, check for water well
+  srReadScreen();
+  if not result then
+    local waterWell = findText("Water Well")
+    if waterWell then
+      sleepWithStatus(200, "Refreshing Water Well...", nil, 0.7);
+      safeClick(waterWell[0], waterWell[1]);
+      srReadScreen();
+      local fill = findText("Fill Containers");
+        if fill then
+          sleepWithStatus(200, "Refilling water...", nil, 0.7);
+          safeClick(fill[0] + 5, fill[1]);
+          local max = waitForImage("max.png", 3000, "Waiting for Max button");
+            if max then
+              safeClick(max[0]+5, max[1]+5);
+              result = true;
+            end
+        end
+    end
+  end  
+
+  -- Third, check for aqueduct
   srReadScreen();
   if not result then
     local aqueduct = findText("an Aqueduct")
