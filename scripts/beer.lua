@@ -15,6 +15,17 @@ ingredients[3] = {2, 25, 12};
 ingredients[4] = {0, 0, 0};
 seal = 1250;
 
+askText = ([[
+Beer and Yeast Test starter.
+ 
+Starts Beer and Yeast tests. Must have Sand Timer(s) for seal time scheduling.
+Must also have candles, rope and ingredients in inventory to schedule ingredients.
+
+Move mouse over beer kettle and press CTRL to start beer, or ALT to start yeast test.
+ 
+Press shift over the ATITD window to begin.
+]]);
+
 function sendKey(key, qty)
 	for i = 1, qty do
 		srKeyDown(key);
@@ -182,7 +193,7 @@ function startYeast()
 end
 
 function doit()
-	askForWindow("Beer Brewing");
+	askForWindow(askText);
 	local client = srGetWindowSize();
 	centerX = math.floor(client[0] / 2);
 	centerY = math.floor(client[1] / 2);
