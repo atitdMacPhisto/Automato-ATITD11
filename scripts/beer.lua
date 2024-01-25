@@ -6,11 +6,12 @@ centerX = 0;
 centerY = 0;
 BEER_CHOOSE = {5, 10, -90, -50};
 TIMER_CHOOSE = {4, 10, -90, -50};
-ingredientNames = {"Honey", "Barley (Raw)", "Barley (Light Roasted)", "Barley (Medium Roasted)", "Barley (Dark Roasted)", "Barley (Burnt)", "Malt (Raw)", "Malt (Light Roasted)", "Malt (Medium Roasted)", "Malt (Dark Roasted)", "Malt (Burnt)", "Wheat (Dried, Raw)", "Wheat (Light Roasted)", "Wheat (Medium Roasted)", "Wheat (Dark Roasted)", "Wheat (Burnt)"};
+ingredientNames = {"Honey", "Malt (Raw)", "Malt (Light Roasted)", "Malt (Medium Roasted)", "Malt (Dark Roasted)", "Malt (Burnt)", "Wheat (Dried, Raw)", "Wheat (Light Roasted)", "Wheat (Medium Roasted)", "Wheat (Dark Roasted)", "Wheat (Burnt)"};
+imageNames = { "honey", "maltraw", "maltlight", "maltmedium", "maltdark", "maltburnt", "wheatraw", "wheatlight", "wheatmedium", "wheatdark", "wheatburnt" };
 ingredients = {};
-ingredients[1] = {9, 30, 1200};
+ingredients[1] = {4, 30, 1200};
 ingredients[2] = {1, 100, 1200};
-ingredients[3] = {7, 25, 12};
+ingredients[3] = {2, 25, 12};
 ingredients[4] = {0, 0, 0};
 seal = 1250;
 
@@ -26,9 +27,12 @@ end
 function chooseIngredient(idx)
 	srSetWindowBorderColorRange(minThickWindowBorderColorRange, maxThickWindowBorderColorRange);
 	local win = getWindowBorders(centerX, centerY);
-	local choose = findText(ingredientNames[ingredients[idx][1]], win, nil, BEER_CHOOSE);
+	local choose = findImage("beer/" .. imageNames[ingredients[idx][1]] .. ".png", win);
 	if not choose then
-		error("ingredient '" .. ingredientNames[ingredients[idx][1]] .. "' not found");
+		choose = findImage("beer/" .. imageNames[ingredients[idx][1]] .. "alt.png", win);
+		if not choose then
+			error("ingredient '" .. ingredientNames[ingredients[idx][1]] .. "' not found");
+		end
 	end
 	clickText(choose);
 	lsSleep(click_delay);
