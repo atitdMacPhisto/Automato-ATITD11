@@ -34,7 +34,7 @@ function chooseIngredient(idx)
 			error("ingredient '" .. ingredientNames[ingredients[idx][1]] .. "' not found");
 		end
 	end
-	clickText(choose);
+	safeClick(choose[0] + 3, choose[1] + 3);
 	lsSleep(click_delay);
 	local ok = findImage("ok.png");
 	if not ok then
