@@ -474,7 +474,9 @@ function promptAdd()
         name = vineName,
         image = vineCustom,
         tends = {1, 1, 1, 1, 1, 1, 1},
-        vigors = {1, 1, 1, 1, 1, 1, 1}
+        vigors = {1, 1, 1, 1, 1, 1, 1},
+        grapesign = {1, 1, 1, 1, 1, 1, 1},
+        grapes = {0, 0, 0, 0, 0, 0, 0}
       };
       vinesUsed[vineName] = vines[#vines];
       vineCustomsUsed[vineCustom] = vines[#vines];
