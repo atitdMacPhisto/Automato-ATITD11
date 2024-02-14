@@ -485,7 +485,7 @@ function fetchTotalCombos4()
   if writeLogFile then
     WriteLog("\n**** " .. TotalCombos .. "/" .. #oreNodes .. " of the Combos that produced Ore have valid 4 Stone Combos\n" .. text4);
   end
-  sleepWithStatus(1250, "Finished Verifying Four Stone Combos...\n\n" .. TotalCombos .. " Found -> " .. text4, nil, 0.7, "Parsing Complete");
+  sleepWithStatus(500, "Finished Verifying Four Stone Combos...\n\n" .. TotalCombos .. " Found -> " .. text4, nil, 0.7, "Parsing Complete");
 end
 
 function getPoints()
@@ -915,9 +915,11 @@ function updateGUI(i,j,k,l)
                 y = y + 35;
                 progressBar(y)
 
-                brokenStoneInfo = "Broken Nodes: " .. table.concat(brokenStones,", ");
-                y = y + 20
-                lsPrintWrapped(10, y, 0, lsScreenX-20, 0.7, 0.7, 0xFFFFFFff, brokenStoneInfo);
+		if #brokenStones > 0 then
+                  brokenStoneInfo = "Broken Nodes: " .. table.concat(brokenStones,", ");
+                  y = y + 20
+                  lsPrintWrapped(10, y, 0, lsScreenX-20, 0.7, 0.7, 0xFFFFFFff, brokenStoneInfo);
+		end
 
                 lsDoFrame();
 end
