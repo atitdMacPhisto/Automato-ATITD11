@@ -450,10 +450,10 @@ end
 -----------------------------------------------------------------------------
 -- coord2region(x, y)
 --
--- Returns a region name - Valid for T9
+-- Returns a region name - Valid for T11
 -----------------------------------------------------------------------------
 function coord2region(x,y)
-  if not x  or not y then
+  if not x or not y then
     x = 9999;
     y = 9999;
   end
