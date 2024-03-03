@@ -522,7 +522,9 @@ function getPoints()
     lsPrint(5, y, z, 0.5, 0.5, 0xf0f0f0ff, "Triples (3 same color), Pairs (2 same color)");
     y = y + 15;
     lsPrint(5, y, z, 0.5, 0.5, 0xf0f0f0ff, "Single colored nodes (1 color)");
-    y = y + 20;
+    y = y + 17;
+    lsDrawLine(5, y, lsScreenX - 5, y, 0, 1, 0, 0xFFFFFFff)
+    y = y + 3;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "Ingame Popup? Suggests you chose wrong pattern.");
     y = y + 15;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "Or you need to adjust the delays (previous menu).");
@@ -530,7 +532,11 @@ function getPoints()
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "(*) Denotes ALL stones should be broken!");
     y = y + 15;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "(#) Denotes # of stones NOT broken!");
-    y = y + 25;
+    y = y + 15;
+    lsPrintWrapped(5, y, z, lsScreenX - 20, 0.6, 0.6, 0xf0f0f0ff, "Tip: If Automato is in focus, you can use up/down arrow keys to cycle through pulldown menu.");
+    y = y + 32;
+    lsDrawLine(5, y, lsScreenX - 5, y, 0, 1, 0, 0xFFFFFFff)
+    y = y + 5;
 
     local start = math.max(1, #clickList - 20);
     local index = 0;
@@ -558,7 +564,7 @@ function getPoints()
     end
 
     if #clickList > 0 then
-      if lsButtonText(100, lsScreenY - 30, z, 75, 0xff8080ff, "Reset") then
+      if lsButtonText(10, lsScreenY - 30, z, 75, 0xff8080ff, "Reset") then
         lsDoFrame();
         reset();
       end
