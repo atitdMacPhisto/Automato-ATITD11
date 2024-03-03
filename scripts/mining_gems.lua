@@ -6,8 +6,9 @@ askText = chat_minimized .. "Press Shift over ATITD window to start.\n\nOptional
 
 bonusRegion = false;
 noMouseMove = false;
-minPopSleepDelay = 150;  -- The minimum delay time used during findClosePopUp() function
-clickDelay = 150;
+minPopSleepDelay = 150;  -- The minimum ms delay time used during findClosePopUp() function
+clickDelay = 100; -- ms
+maxWaitContinue = 3000; -- Max ms to wait after working a mine; especially when you work the same quantity sand twice in a row.
 muteSoundEffects = false;
 autoWorkMine = true;
 smallGemMode = false;
@@ -736,7 +737,7 @@ function findClosePopUp(noRead)
       break;
     end
 
-    if (lastLineFound2 ~= lastLineParse2 and not bonusRegion) or (lastLineFound ~= lastLineParse and not localSupportFound) or (skipRead == true) or ( (lsGetTimer() - startTime) > 6000 ) or (worked-1 == #sets)  then
+    if (lastLineFound2 ~= lastLineParse2 and not bonusRegion) or (lastLineFound ~= lastLineParse and not localSupportFound) or (skipRead == true) or ( (lsGetTimer() - startTime) > maxWaitContinue ) or (worked-1 == #sets)  then
       break;
     end
 
