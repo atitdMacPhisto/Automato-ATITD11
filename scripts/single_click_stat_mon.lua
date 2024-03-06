@@ -1,14 +1,17 @@
 dofile("common.inc");
+dofile("settings.inc");
 
 askText = singleLine([[
   This macro will watch your skills window and only click when you are not tired.
   Move mouse to a spot you want clicked and press shift to repeat clicks when not tired.
 ]]);
 
+clickQty = 0;
+
 function doit()
 
-  local mousePos = askForWindow(askText);
   askQty();
+  local mousePos = askForWindow(askText);
 
   local startTime = lsGetTimer();
   local clickCount = 0;
@@ -41,6 +44,7 @@ function doit()
       safeClick(mousePos[0], mousePos[1]);
       clickCount = clickCount + 1;
       message = message .. "Clicking. ";
+      lsSleep(500);
     end
 
     if clickQty > 0 then
@@ -61,6 +65,7 @@ function askQty()
       local y = 10;
       lsPrint(5, y, 0, 0.8, 0.8, 0xffffffff, "How many clicks?");
 	y = y + 22;
+      clickQty = readSetting("clickQty",clickQty);
       is_done, clickQty = lsEditBox("clickQty", 5, y, 0, 50, 30, 1.0, 1.0, 0x000000ff, 0);
       clickQty = tonumber(clickQty);
       if not clickQty then
@@ -68,6 +73,7 @@ function askQty()
         lsPrint(5, y+32, 10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
         clickQty = 0;
       end
+      writeSetting("clickQty",clickQty);
 	y = y + 50;
       lsPrint(5, y, 0, 0.6, 0.6, 0xffffffff, "Enter 0 to repeat clicks until manually stopped");
 	y = y + 22;
@@ -76,7 +82,7 @@ function askQty()
     end
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff,
                     "End script") then
-      error(quit_message);
+      error(quitMessage);
     end
   lsDoFrame();
   lsSleep(50);
