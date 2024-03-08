@@ -202,6 +202,14 @@ local items = {
     ["Wooden Pestle"] = {
       ["stat"] = "FOC",
       ["workFn"] = function () findAndClickText("Wooden Pestle") end
+    },
+
+  --speed
+    ["Litmus"] = {
+      ["stat"] = "SPD",
+      ["delay"] = 1000,
+      ['ignorePopup'] = true;
+      ["workFn"] = function() clickText(findText("Stir a batch of")) end
     }
 };
 local selectedTasks = {};
@@ -224,8 +232,10 @@ local dropdown_item_values = { -- This is filled with filterTasksForDropdowns()
   ["constitution"] = {""},
   --foc
   ["focus"] = {""},
+  --spd
+  ["speed"] = {""},
 };
-local statNames = {"strength", "endurance", "constitution", "focus"};
+local statNames = {"strength", "endurance", "constitution", "focus", "speed"};
 local statTimer = {};
 local askText = singleLine([[
    Repeatedly performs stat-dependent tasks. Can perform several tasks at once as long as they use different attributes.
@@ -252,6 +262,8 @@ function filterTasksForDropdowns()
   local endArr = dropdown_item_values.endurance;
   local conArr = dropdown_item_values.constitution;
   local focArr = dropdown_item_values.focus;
+  local spdArr = dropdown_item_values.speed;
+  
   for key, value in pairs(items) do
     items[key].id = key;
     if (value.stat == 'STR') then
@@ -262,17 +274,20 @@ function filterTasksForDropdowns()
       conArr[#conArr+1] = key;
     elseif (value.stat == 'FOC') then
       focArr[#focArr+1] = key;
+    elseif (value.stat == 'SPD') then
+      spdArr[#spdArr+1] = key;
     end
   end
   table.sort(strArr);
   table.sort(endArr);
   table.sort(conArr);
   table.sort(focArr);
+  table.sort(spdArr);
 end
 
 function doTasks()
   didTask = false;
-  for i = 1, 4 do
+  for i = 1, #statNames do
     task_key = selectedTasks[i]
     if task_key ~= "" then
       curTask = items[task_key];
@@ -329,7 +344,9 @@ function doTasks()
   else
       srReadScreen();
       --closeEmptyAndErrorWindows();
-      closePopUp();
+      if curTask.ignorePopup == nil then
+      	closePopUp();
+    	end
       lsSleep(per_tick);
   end
 end
