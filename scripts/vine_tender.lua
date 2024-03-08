@@ -87,6 +87,7 @@ local tendImages = {
 };
 
 local vigorNames = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
+local grapesNames = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
 
 ----------------------------------------
 function doit()
@@ -473,7 +474,9 @@ function promptAdd()
         name = vineName,
         image = vineCustom,
         tends = {1, 1, 1, 1, 1, 1, 1},
-        vigors = {1, 1, 1, 1, 1, 1, 1}
+        vigors = {1, 1, 1, 1, 1, 1, 1},
+        grapesign = {1, 1, 1, 1, 1, 1, 1},
+        grapes = {0, 0, 0, 0, 0, 0, 0}
       };
       vinesUsed[vineName] = vines[#vines];
       vineCustomsUsed[vineCustom] = vines[#vines];
@@ -490,7 +493,8 @@ function promptEdit(vine)
   while not done do
     lsPrint(10, 10, 0, 1.0, 1.0, 0xffffffff, "Editing " .. vine.name);
     lsPrint(74, 60, 0, 0.7, 0.7, 0xd0d0d0ff, "Action");
-    lsPrint(139, 60, 0, 0.7, 0.7, 0xd0d0d0ff, "Vigor");
+    lsPrint(135, 60, 0, 0.7, 0.7, 0xd0d0d0ff, "Vigor");
+    lsPrint(196, 60, 0, 0.7, 0.7, 0xd0d0d0ff, "Grapes");
     local y = 100;
     for i=1,#stateNames do
       lsSetCamera(0,0,lsScreenX*1.2,lsScreenY*1.2);
@@ -501,6 +505,17 @@ function promptEdit(vine)
       vine.tends[i] = tendActions[tend];
       vine.vigors[i] = lsDropdown(stateNames[i] .. "V" .. "-" .. vine.name,
         160, y, 0, 60, vine.vigors[i], vigorNames);
+	  if vine.grapesign[i] < 0 then
+          if lsButtonText(230, y, 0, 20, 0xff0000ff, "-") then
+		    vine.grapesign[i] = 1;
+          end
+	  else
+          if lsButtonText(230, y, 0, 20, 0x00ff00ff, "+") then
+		    vine.grapesign[i] = -1;
+          end
+	  end
+      vine.grapes[i] = lsDropdown(stateNames[i] .. "G" .. "-" .. vine.name,
+        255, y, 0, 60, vine.grapes[i] + 1, grapesNames) - 1;
       lsSetCamera(0,0,lsScreenX*1.0,lsScreenY*1.0);
       y = y + 30;
     end
@@ -542,6 +557,15 @@ function tendVineyard()
     return "Could not read Vigor";
   end
 
+  local grapesText = findText("Grapes:")
+  if grapesText == nil then
+    return "Did not find 'Grapes:' text";
+  end
+  local grapes = string.match(grapesText[2], "Grapes: ([0-9]+)");
+  if not grapes then
+    return "Could not read Grapes";
+  end
+
   srReadScreen();
   vineType = getVineName()
   if not vineType then
@@ -559,6 +583,11 @@ function tendVineyard()
       harvestFlag = 2;
     end
     return "This vine does not have enough vigor. Time to harvest.";
+  end
+
+  if (tonumber(grapes) + (vineType.grapesign[vineState] * vineType.grapes[vineState]) <= 0) then
+    sleepWithStatus(1500, "This vine does not have enough grapes for the preferred tend.");
+    return "This vine does not have enough grapes for the preferred tend.";
   end
 
   harvestFlag = 0
@@ -639,26 +668,45 @@ function parseVines()
         name = fields[1],
         image = fields[2],
         tends = {},
-        vigors = {}
+        vigors = {},
+		grapesign = {},
+		grapes = {}
       };
       vinesUsed[fields[1]] = vines[#vines];
       vineCustomsUsed[fields[2]] = vines[#vines];
 
       for i=3,#fields do
-        -- local sub = csplit(fields[i], "-");
-        local sub = explode("-", fields[i]);
-        if #sub ~= 2 then
+		local T,V,G = string.match(fields[i], "^([A-Z]+)-([0-9]+)([-+][0-9]+)$");
+
+		if G == nil then
+		  T,V = string.match(fields[i], "^([A-Z]+)-([0-9]+)$");
+		end
+
+		if T==nil or V==nil then
           error("Failed parsing line: " .. line);
         end
-        if not tendImages[sub[1]] then
+        if not tendImages[T] then
           error("Failed parsing line: " .. line);
         end
-        vines[#vines].tends[i-2] = sub[1];
-        local vigor = tonumber(sub[2])
+        vines[#vines].tends[i-2] = T;
+        local vigor = tonumber(V)
         if not vigor then
           error("Failed parsing line: " .. line);
         end
         vines[#vines].vigors[i-2] = vigor;
+		vines[#vines].grapesign[i-2] = 1;
+		vines[#vines].grapes[i-2] = 0;
+		if G ~= nil then
+			local grape = tonumber(G)
+			if not grape then
+			  error("Failed parsing line: " .. line);
+			end
+            vines[#vines].grapesign[i-2] = grape / math.abs(grape);
+            vines[#vines].grapes[i-2] = math.abs(grape);
+			if vines[#vines].grapes[i-2] == 0 then
+				vines[#vines].grapesign[i-2] = 1;
+			end
+		end
       end
     end
   end
@@ -670,6 +718,12 @@ function saveVines()
     file:write(vines[i].name .. "," .. vines[i].image);
     for j=1,#vines[i].tends do
       file:write("," .. vines[i].tends[j] .. "-" .. vines[i].vigors[j]);
+	  if (vines[i].grapesign[j] < 0) then
+	    file:write("-");
+	  else
+	    file:write("+");
+	  end
+      file:write(vines[i].grapes[j]);
     end
     file:write("\n");
   end
