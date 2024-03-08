@@ -213,7 +213,7 @@ function findMoves()
   if not acrobatics then
     return;
   end
-  safeDrag(acrobatics[0], acrobatics[1], 250, 75);
+  safeDrag(acrobatics[0], acrobatics[1], 250, acrobatics[1]);
 
   for i=1,#moveNames do
     checkBreak();
