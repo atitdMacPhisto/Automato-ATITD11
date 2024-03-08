@@ -196,6 +196,7 @@ function PlantLocation:move()
           lsSleep(tick_delay)
         end
       end
+      lsSleep(tick_delay)
       srReadScreen()
       build_arrows = findImage("veg_janitor/build_arrows.png", nil, 7000)
     end
