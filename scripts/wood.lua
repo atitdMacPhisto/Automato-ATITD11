@@ -76,9 +76,9 @@ function findWood()
 
   nowood = findAllImages("wood/no_wood.png")
   local clickWood = findAllImages("wood/gather_wood.png");
-  local mightyChop = findAllImages("wood/mighty_chop.png")
+  local mightyChop = findAllImages("wood/mighty_chop.png");
 
-  if mightyChop ~= nil then
+  if #mightyChop > 0 then
     for i=1,#mightyChop do
       safeClick(mightyChop[i][0], mightyChop[i][1])
     end
