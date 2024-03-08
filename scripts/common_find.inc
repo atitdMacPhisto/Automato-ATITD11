@@ -443,12 +443,6 @@ BLACK_SMALL_SET = 2;
 BLUE_BOLD_SET = 3;
 BLUE_SMALL_SET = 4;
 
-NORMAL_SET = 0;
-BLACK_BOLD_SET = 1;
-BLACK_SMALL_SET = 2;
-BLUE_BOLD_SET = 3;
-BLUE_SMALL_SET = 4;
-
 function ocrNumber(startX, startY, characterSet)
   if not startX or not startY then
     error("Incorrect number of arguments for ocrNumber()");
@@ -516,7 +510,7 @@ function getCharacterSet(characterSet)
   if characterSet == BLACK_BOLD_SET then
     return "ocr/bold/black/", 7, 9;
   elseif characterSet == BLACK_SMALL_SET then
-    return "ocr/small/black/", 6, 8;
+    return "ocr/small/black/", 7, 9;
   elseif characterSet == BLUE_BOLD_SET then
     return "ocr/bold/blue/", 7, 9;
   elseif characterSet == BLUE_SMALL_SET then

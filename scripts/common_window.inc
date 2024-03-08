@@ -79,6 +79,7 @@ function stashWindow(sourceX, sourceY, corner, bounds, offset)
   end
 
   safeDrag(sourceX, sourceY, dest[0], dest[1]);
+  lsSleep(click_delay);
   srSetMousePos(sourceX, sourceY);
   lsSleep(click_delay);
   return dest;
@@ -561,7 +562,7 @@ function windowManager(title, message, allowCascade, allowUIGap, varWidth, varHe
       local y = 0;
       x, y = srMousePos();
       openAndPin(x, y, 500);
-      stashWindow(x + 15, y + 30, BOTTOM_RIGHT);
+      stashWindow(x, y, BOTTOM_RIGHT);
     end
     if lsButtonText(10, lsScreenY - 30, 0, 100, 0xFFFFFFff, "Done") then
       done = true;
@@ -689,4 +690,32 @@ function unpinWindow(window)
   if window then
     safeClick(window.x + window.width - 15, window.y + 15, 0);
   end
+end
+
+-------------------------------------------------------------------------------
+-- refreshWindow(window)
+--
+-- Refreshes a window by clicking x+5, y+5 of window region.
+--
+-- window - window object to refresh
+-------------------------------------------------------------------------------
+
+function refreshWindow(window)
+    srClickMouseNoMove(window.x + 5, window.y + 5);
+    lsSleep(click_delay);
+    srReadScreen();
+end
+
+-------------------------------------------------------------------------------
+-- refreshAllWindows
+--
+-- Refreshes all opened windows
+--
+-------------------------------------------------------------------------------
+
+function refreshAllWindows()
+    local windows = findAllWindows();
+    for i = 1, #windows do
+        refreshWindow(windows[i]);
+    end
 end

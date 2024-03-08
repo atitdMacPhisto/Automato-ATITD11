@@ -4,7 +4,7 @@ windowIndex = 1;
 
 function doit()
   lsRequireVersion(2, 39);
-  askForWindow("Test to display regions such as Clock Window, Friends window and building windows. Press Shift over ATITD window.");
+  askForWindow("Test to display regions (pinned building windows/menus). Press Shift over ATITD window.");
   while true do
     checkBreak();
     findStuff();
@@ -90,11 +90,11 @@ function findStuff()
   end
   y = y + 20;
 
-  -- Test srFindInvRegion()
-  local invreg = srFindInvRegion();
-  lsPrint(10, y, 10, scale, scale, 0xFFFFFFff, "srFindInvRegion = " .. invreg[0] .. "," .. invreg[1] ..
-    " - " .. invreg[2] .. "," .. invreg[3]);
-  y = y + 20;
+  -- Test srFindInvRegion() -- DEPRECATED/BROKEN
+--  local invreg = srFindInvRegion();
+--  lsPrint(10, y, 10, scale, scale, 0xFFFFFFff, "srFindInvRegion = " .. invreg[0] .. "," .. invreg[1] ..
+--    " - " .. invreg[2] .. "," .. invreg[3]);
+--  y = y + 20;
 
   -- Test srGetWindowBorders
   local xyWindowSize = srGetWindowSize();
@@ -115,7 +115,7 @@ function findStuff()
     -- srStripRegion(borders[0], borders[1], borders[2] - borders[0] + 1, borders[3] - borders[1] + 1);
     showDebugInRange("current-window",
       borders[0], borders[1], borders[2] - borders[0] + 1, borders[3] - borders[1] + 1,
-      5, y, 2, lsScreenX - 10, lsScreenY - (y + 20) - 2, false);
+      5, y+10, 2, lsScreenX - 10, lsScreenY - (y + 20) - 2, false);
     y = y + 20;
   end
 

@@ -278,7 +278,7 @@ function drawWater(skipTimer)
   -- Third, check for aqueduct
   srReadScreen();
   if not result then
-    local aqueduct = findText("an Aqueduct")
+    local aqueduct = findText("This is [A-Za-z]+ Aqueduct", nil, REGEX)
     if aqueduct then
       sleepWithStatus(200, "Refreshing aqueduct...", nil, 0.7);
       safeClick(aqueduct[0], aqueduct[1]);

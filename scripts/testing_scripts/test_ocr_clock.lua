@@ -11,12 +11,10 @@ function doit()
   local zoomLevel = 1.0; -- Default Zoom Level
   local zoomeLevelStep = 0.5; -- If you want smaller/larger zoom levels, then change to 0.25, 0.50, 0.75, 1.0, or whatever
 
-  srReadScreen();
-  local clockRegion = findClockRegion();
-
   while 1 do
     checkBreak();
     srReadScreen();
+    local clockRegion = findClockRegion();
 
     srStripRegion(clockRegion.x, clockRegion.y, clockRegion.width, clockRegion.height);
     srMakeImage("clock-region", clockRegion.x, clockRegion.y, clockRegion.width, clockRegion.height, true);
@@ -25,7 +23,6 @@ function doit()
     if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFF0000ff, "Exit") then
       error "Clicked End Script button";
     end
-
 
     if ButtonText(60, lsScreenY - 30, 0, 20, 0xFF0000ff, "-") then
       zoomLevel = zoomLevel - zoomeLevelStep;

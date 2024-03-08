@@ -115,12 +115,11 @@ function runKettles(num_loops, action)
 
     waitForKettles(message, action.stoked, i, num_loops);
     clickAllImages("kettle/take.png");
-    if i < num_loops then
-      sleepWithStatus(5000,"Take all Kettles Completed!\n\nPausing before next Pass, in case you want to End Script", nil, 0.7);
-    end
     if finish_up then
       sleepWithStatus(5000,"Finish up initiated ...\n\nYou have completed " .. i .. "/" .. num_loops .. " passes.", nil, 0.7);
       break;
+    elseif i < num_loops then
+      sleepWithStatus(5000,"Take all Kettles Completed!\n\nPausing before next Pass, in case you want to End Script", nil, 0.7);
     end
   end
 end
@@ -133,6 +132,7 @@ end
 function waitForKettles(message, stoked, passes, num_loops)
   local done = false;
   while not done do
+    local finish_up_message = "";
     if stoked then
       igniteAll();
     end
@@ -144,14 +144,18 @@ function waitForKettles(message, stoked, passes, num_loops)
         done = false;
       end
     end
-    if finish_up and not finish_up_message then
-      message = message .. "\n\nFinishing up, this will be last pass!";
-      finish_up_message = 1;
+    if finish_up then
+      finish_up_message = "\n\nFinishing up; this will be last pass!";
+    end
+    if passes < num_loops then
+      finish_up_allowed = 1;
+    else
+      finish_up_allowed = nil;
     end
     if passes > 1 then
-      sleepWithStatus(5000, message .. "\n\nPass Elapsed Time: " .. getElapsedTime(startTimePass) .. "\n\nTotal Elapsed Time: " .. getElapsedTime(startTime), nil, 0.7);
+      sleepWithStatus(5000, message .. finish_up_message .. "\n\nPass Elapsed Time: " .. getElapsedTime(startTimePass) .. "\n\nTotal Elapsed Time: " .. getElapsedTime(startTime), nil, 0.7);
     else
-      sleepWithStatus(5000, message .. "\n\nPass Elapsed Time: " .. getElapsedTime(startTimePass), nil, 0.7);
+      sleepWithStatus(5000, message .. finish_up_message .. "\n\nPass Elapsed Time: " .. getElapsedTime(startTimePass), nil, 0.7);
     end
   end
 end
@@ -188,11 +192,11 @@ function stokeWindow(anchor, stoked)
       local water;
       local woodPos = findImageInWindow("kettle/wood.png", anchor[0], anchor[1], bounds);
       if woodPos then
-        wood = ocrNumber(woodPos[0] + 34, woodPos[1], BLACK_SMALL_SET);
+        wood = ocrNumber(woodPos[0] + 37, woodPos[1], BLACK_SMALL_SET);
       end
       local waterPos = findImageInWindow("kettle/water.png", anchor[0], anchor[1], bounds);
       if waterPos then
-        water = ocrNumber(waterPos[0] + 34, waterPos[1], BLACK_SMALL_SET);
+        water = ocrNumber(waterPos[0] + 39, waterPos[1], BLACK_SMALL_SET);
       end
       if wood and water
         and ((wood < 2 and water > 6)
@@ -242,12 +246,37 @@ function menuKettles()
     srReadScreen();
     local kettles = #(findAllImages("ThisIs.png"));
     local num_loops = promptNumber("How many passes ?", 10);
-    local message = "Making " .. selected.label .. " requires:\n";
+    local estimated_time = 0;
+    local message = "";
+    local message_multiple_pass = "";
     for i=1,#(selected.matLabels) do
-      message = message .. "  " .. selected.matCounts[i]*num_loops*kettles
-        .. " " .. selected.matLabels[i] .. "\n";
+    if num_loops > 1 then
+        if selected.matLabels[i] == "Water" then message = message .. "  *"; end
+          message = message .. "  " .. selected.matCounts[i]*num_loops*kettles .. " " .. selected.matLabels[i] .. " (" .. selected.matCounts[i]*kettles .. " per pass)\n";
+	else
+        if selected.matLabels[i] == "Water" then message = message .. "  *"; end
+          message = message .. "  " .. selected.matCounts[i]*num_loops*kettles .. " " .. selected.matLabels[i] .. "\n";
+	end
     end
-    message = message .. "\n\nNote: Jugs are refilled before each pass begins, if an available water source is available (water icon or pinned Water Barrel)\n\nTip: Did you know? If the macro breaks or you quit (before kettles are done), restarting macro will pick up where you left off at (even if kettles are idle)!";
+
+    -- ************************************************************
+    -- Optional Estimated Times for Kettle Projects. Add more with elseif statements
+    if selected.label == "Potash" then
+	estimated_time = 765; -- how many estimated seconds - 765s =  12m 45s
+    end
+    -- ************************************************************
+
+    if estimated_time > 0 then
+	estimated_time = estimated_time*1000; -- convert to ms
+	if num_loops > 1 then
+	  message = message .. "  About " .. convertTime(estimated_time*num_loops) .. "  (" .. convertTime(estimated_time) .. " per pass)\n";
+        message_multiple_pass = " You will only need enough jugs for ONE pass IF water source is available.";
+	else
+	  message = message .. "  About " .. convertTime(estimated_time) .. "\n";
+	end
+    end
+
+    message = message .. "\n* Jugs are refilled BEFORE each pass begins, if an available water source is available (water icon or pinned Water Barrel, Water Well, Aqueduct)." .. message_multiple_pass .. "\n\nPRO TIP:  If the macro breaks or you abort (before kettles are done); restarting macro will pick up where you left off at (regardless if kettles are still running or idle)!";
     askForWindow(message);
     runKettles(num_loops, selected);
   end
@@ -281,9 +310,15 @@ function statusScreen(message, color, allow_break, scale)
       lsPrint(10, 24, 0, 0.7, 0.7, 0xB0B0B0ff,
         "Hold Alt+Shift to pause this script.");
     end
-    if not finish_up then
-      if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xFFFFFFff, "Finish up") then
-        finish_up = 1;
+    if finish_up_allowed then
+      if finish_up then
+    	  if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0x40ff40ff, "Cancel Finish Up") then
+	    finish_up = nil;
+	  end
+      else
+	  if lsButtonText(lsScreenX - 110, lsScreenY - 60, z, 100, 0xFFFFFFff, "Finish up") then
+	    finish_up = 1;
+        end
       end
     end
     checkBreak();

@@ -6,26 +6,27 @@ askText = chat_minimized .. "Press Shift over ATITD window to start.\n\nOptional
 
 bonusRegion = false;
 noMouseMove = false;
-minPopSleepDelay = 150;  -- The minimum delay time used during findClosePopUp() function
-clickDelay = 150;
+minPopSleepDelay = 150;  -- The minimum ms delay time used during findClosePopUp() function
+clickDelay = 100; -- ms
+maxWaitContinue = 3000; -- Max ms to wait after working a mine; especially when you work the same quantity sand twice in a row.
 muteSoundEffects = false;
 autoWorkMine = true;
 smallGemMode = false;
 colorBlind = false;
 dropdown_values = {"Shift Key", "Ctrl Key", "Alt Key", "Mouse Wheel Click"};
 dropdown_cur_value = 1;
-dropdown_pattern_values = {"6 color (1 Pair) (*)", "5 color (2 Pair) (*)", "4 color (3 Pair) (*)", "5 color (Triple) (5)", "4 color (Triple+Pair) (4)", "4 color (Quadruple) (6)", "3 Color (Quad+Pair) (1)", "3 color (Quintuple) (5)", "7 Color (All Different) (*)"};
 
-gui = {
+dropdown_pattern_values = {
   [1] = "6 color (1 Pair) (*)",
   [2] = "5 color (2 Pair) (*)",
   [3] = "4 color (3 Pair) (*)",
   [4] = "5 color (Triple) (5)",
   [5] = "4 color (Triple+Pair) (4)",
-  [6] = "4 color (Quadruple) (6)",
-  [7] = "3 Color (Quad+Pair) (1)",
-  [8] = "3 color (Quintuple) (5)",
-  [9] = "7 Color (All Different) (*)"
+  [6] = "3 Color (Triple+Triple) (1)",
+  [7] = "4 color (Quadruple) (6)",
+  [8] = "3 Color (Quad+Pair) (1)",
+  [9] = "3 color (Quintuple) (5)",
+  [10] = "7 Color (All Different) (*)"
 };
 
 dropdown_pattern_cur_value = 1;
@@ -118,6 +119,16 @@ allSets = {
     {1,4,6,7}
   },
 
+  {  --3 color (Triple+Triple)
+    {1,4,7},
+    {2,4,7},
+    {3,4,7},
+    {1,5,7},
+    {2,5,7},
+    {3,5,7},
+    {1,6,7}
+  },
+
   {  --4 color (Quadruple)
     {1,5,6},
     {1,5,7},
@@ -145,7 +156,7 @@ allSets = {
     {3,6,7},
     {4,5,7}
   },
-
+  
   {  --3 color (Quintuple)
     {1,2,3},
     {1,2,4},
@@ -257,6 +268,16 @@ allSetsSmall = {
     {3,4,6},
     {3,4,7},
     {2,6,7}
+  },
+
+  {  --3 color (Triple+Triple)
+    {1,4,7},
+    {2,4,7},
+    {3,4,7},
+    {1,5,7},
+    {2,5,7},
+    {3,5,7},
+    {1,6,7}
   },
 
   {  --4 color (Quadruple)
@@ -502,7 +523,9 @@ function getPoints()
     lsPrint(5, y, z, 0.5, 0.5, 0xf0f0f0ff, "Triples (3 same color), Pairs (2 same color)");
     y = y + 15;
     lsPrint(5, y, z, 0.5, 0.5, 0xf0f0f0ff, "Single colored nodes (1 color)");
-    y = y + 20;
+    y = y + 17;
+    lsDrawLine(5, y, lsScreenX - 5, y, 0, 1, 0, 0xFFFFFFff)
+    y = y + 3;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "Ingame Popup? Suggests you chose wrong pattern.");
     y = y + 15;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "Or you need to adjust the delays (previous menu).");
@@ -510,7 +533,11 @@ function getPoints()
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "(*) Denotes ALL stones should be broken!");
     y = y + 15;
     lsPrint(5, y, z, 0.6, 0.6, 0xf0f0f0ff, "(#) Denotes # of stones NOT broken!");
-    y = y + 25;
+    y = y + 15;
+    lsPrintWrapped(5, y, z, lsScreenX - 20, 0.6, 0.6, 0xf0f0f0ff, "Tip: If Automato is in focus, you can use up/down arrow keys to cycle through pulldown menu.");
+    y = y + 32;
+    lsDrawLine(5, y, lsScreenX - 5, y, 0, 1, 0, 0xFFFFFFff)
+    y = y + 5;
 
     local start = math.max(1, #clickList - 20);
     local index = 0;
@@ -538,7 +565,7 @@ function getPoints()
     end
 
     if #clickList > 0 then
-      if lsButtonText(100, lsScreenY - 30, z, 75, 0xff8080ff, "Reset") then
+      if lsButtonText(10, lsScreenY - 30, z, 75, 0xff8080ff, "Reset") then
         lsDoFrame();
         reset();
       end
@@ -710,7 +737,7 @@ function findClosePopUp(noRead)
       break;
     end
 
-    if (lastLineFound2 ~= lastLineParse2 and not bonusRegion) or (lastLineFound ~= lastLineParse and not localSupportFound) or (skipRead == true) or ( (lsGetTimer() - startTime) > 6000 ) or (worked-1 == #sets)  then
+    if (lastLineFound2 ~= lastLineParse2 and not bonusRegion) or (lastLineFound ~= lastLineParse and not localSupportFound) or (skipRead == true) or ( (lsGetTimer() - startTime) > maxWaitContinue ) or (worked-1 == #sets)  then
       break;
     end
 
@@ -735,7 +762,7 @@ function clickSequence()
   end
   local pattern = "Unknown";
 
-  for k, v in pairs(gui) do
+  for k, v in pairs(dropdown_pattern_values) do
     if k == dropdown_pattern_cur_value then
       pattern = v;
       break;

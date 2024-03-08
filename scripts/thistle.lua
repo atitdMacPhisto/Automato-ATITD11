@@ -21,6 +21,14 @@ dropdown_values_canopy = {"Night - Canopy Ignored (0)", "Day - Canopy Closed (33
 button_names = {"ThistleNit.png", "ThistlePot.png", "ThistleH2O.png", "ThistleOxy.png", "ThistleSun.png"};
 
 window_locs = {};
+
+-- How many real seconds it takes to complete a cycle
+-- This is only to display estimated times. It doesn't affect how the macro runs
+-- Tale 11 is 6m 10s
+real_time_estimate = 370;
+game_time_ratio =  0.915;
+real_time_estimate = real_time_estimate * 1000;
+
 ----------------------------------------
 
 function doit()
@@ -239,7 +247,7 @@ function config()
        end
     writeSetting("expected_gardens",expected_gardens);
 
-    lsPrintWrapped(10, 160, z, lsScreenX - 20, 0.65, 0.65, 0xffff80FF, "Real Time Required:      " .. convertTime(436000*num_loops) .. "\nEgypt Time Required:    " .. convertTime(436000 / 1.068 * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
+    lsPrintWrapped(10, 160, z, lsScreenX - 20, 0.65, 0.65, 0xffff80FF, "Real Time Required:      " .. convertTime(real_time_estimate*num_loops) .. "\nEgypt Time Required:    " .. convertTime(real_time_estimate / game_time_ratio * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
     lsPrintWrapped(10, 210, z, lsScreenX - 20, 0.65, 0.65, 0x40ffffff, "Current Farm: " .. loadedFarm .. "\nRecipe File: " .. convertFarmName2FileName(loadedFarm) ..
     "\n\nWe are ready to start making thistles, with this farm\'s recipe! Click Start button to proceed ...");
 
@@ -1016,17 +1024,4 @@ function explode(d,p)
     end
   end
   return t
-end
-
-function convertTime(ms)
-	local duration = math.floor(ms / 1000);
-	local hours = math.floor(duration / 60 / 60);
-	local minutes = math.floor((duration - hours * 60 * 60) / 60);
-	local seconds = duration - hours * 60 * 60 - minutes * 60;
-
-  if hours > 0 then
-    return string.format("%02dh %02dm %02ds",hours,minutes,seconds);
-  else
-    return string.format("%02dm %02ds",minutes,seconds);
-  end
 end
