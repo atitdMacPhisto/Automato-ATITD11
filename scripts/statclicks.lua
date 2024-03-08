@@ -209,7 +209,7 @@ local items = {
       ["stat"] = "SPD",
       ["delay"] = 1000,
       ['ignorePopup'] = true;
-      ["workFn"] = function() clickText(findText("Stir a batch of")) end
+      ["workFn"] = function() findAndClickText("Stir a batch of") end
     }
 };
 local selectedTasks = {};
