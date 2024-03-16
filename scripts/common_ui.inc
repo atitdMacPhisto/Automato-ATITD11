@@ -490,9 +490,9 @@ function setCameraView(viewName)
 end
 
 -------------------------------------------------------------------------------
--- ButtonText(x, y, z, w, color, text, xsc, ysc)
+-- ButtonText(x, y, z, w, color, text, xsc)
 --
--- Allow scaling of lsButtonText()
+-- lsButtonText() now allows scaling directly. THis is just here to not break existing macros
 --
 -- x -- x coordinates to place button
 -- y -- y coordinates to place button
@@ -501,10 +501,10 @@ end
 -- color (optional) -- color of message (defaults to white)
 -- text -- string giving the user a message
 -- xsc (optional) -- x scaling -- x and y should typically be same
--- ysc (optional) -- y scaling -- x and y should typically be same
 -------------------------------------------------------------------------------
 
-function ButtonText(x, y, z, w, color, text, xsc, ysc)
+function ButtonText(x, y, z, w, color, text, xsc)
+  lsRequireVersion(2,73);
   if not text then
     error("Incorrect number of arguments for ButtonText()");
   end
@@ -517,22 +517,14 @@ function ButtonText(x, y, z, w, color, text, xsc, ysc)
   if not xsc then
     xsc = 0.8;
   end
-  if not ysc then
-    ysc = 0.8;
-  end
-  lsSetCamera(0,0, lsScreenX/xsc, lsScreenY/ysc);
-  if lsButtonText(x/xsc, y/ysc, z, w, color, text) then
-    lsSetCamera(0,0, lsScreenX, lsScreenY);
-    return true;
-  else
-    lsSetCamera(0,0, lsScreenX, lsScreenY);
-  end
+
+  return lsButtonText(x, y, z, w, xsc, color, text);
 end
 
 -------------------------------------------------------------------------------
--- CheckBox(x, y, z, color, text, value, xsc, ysc)
+-- CheckBox(x, y, z, color, text, value, xsc)
 --
--- Allow scaling of lsCheckBox()
+-- lsCheckBox() now allows scaling directly. This is just here to not break existing macros
 --
 -- x -- x coordinates to place check box
 -- y -- y coordinates to place check box
@@ -541,10 +533,10 @@ end
 -- text -- string giving the user a message
 -- value (optional) -- Current value of the check box (true/false)
 -- xsc (optional) -- x scaling -- x and y should typically be same
--- ysc (optional) -- y scaling -- x and y should typically be same
 -------------------------------------------------------------------------------
 
-function CheckBox(x, y, z, color, text, value, xsc, ysc)
+function CheckBox(x, y, z, color, text, value, xsc)
+  lsRequireVersion(2,73);  
   if not text then
     error("Incorrect number of arguments for CheckBox()");
   end
@@ -557,16 +549,8 @@ function CheckBox(x, y, z, color, text, value, xsc, ysc)
   if not xsc then
     xsc = 0.8;
   end
-  if not ysc then
-    ysc = 0.8;
-  end
-  lsSetCamera(0,0, lsScreenX/xsc, lsScreenY/ysc);
-  if lsCheckBox(x/xsc, y/ysc, z, color, text, value) then
-    lsSetCamera(0,0, lsScreenX, lsScreenY);
-    return true;
-  else
-    lsSetCamera(0,0, lsScreenX, lsScreenY);
-  end
+
+  return lsCheckBox(x, y, z, xsc, color, text, value);
 end
 
 
