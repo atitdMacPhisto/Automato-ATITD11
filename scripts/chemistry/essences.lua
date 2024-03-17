@@ -144,7 +144,7 @@ essences = {
 {"PowderedJade",20},
 {"PowderedLapis",49},
 {"PowderedSunstone",52},
-{"PowderedTuruoise",84},              -- need to fix map q
+{"PowderedTurquoise",84},
 {"PowderedAlmandine",48},
 {"PowderedAquamarine",88},
 {"PowderedKunzite",15},
@@ -205,7 +205,7 @@ essences = {
 {"Borage",30},
 --{"BrassyCaltrops",},
 {"BrownMuskerro",61},
-{"Buckleleaf",30},					-- r need to be mapped?
+{"Bucklerleaf",30},
 --{"BullsBlood",},
 {"BurntTarragon",68},
 --{"ButterflyDamia",},
@@ -671,7 +671,7 @@ function labTick(essWin, state)
 		clickText(waitForText(spiritsNeeded[i][1]));
 		lsSleep(per_click_delay);
 		waitForImage("max.png");
-		srKeyEvent(spiritsNeeded[i][2] .. "\n");
+		srCharEvent(spiritsNeeded[i][2] .. "\n");
 		lsSleep(per_click_delay + per_read_delay)
 		message = message .. " -- OK!"
 	end
