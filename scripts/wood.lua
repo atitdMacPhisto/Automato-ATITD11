@@ -51,7 +51,7 @@ function promptParameters()
     writeSetting("autoCarrot",autoCarrot);
 
     lsPrintWrapped(10, y+25, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff,
-      "(Pin the 'Grilled Carrot' window)\nAutomatically eat an onion, everytime the endurance buff is not visible.");
+      "(Pin the 'Grilled Carrot' window)\nAutomatically eat a carrot, everytime the perception buff is not visible.");
 
     if lsButtonText(10, (lsScreenY - 30) * scale, z, 100, 0x00ff00ff, "OK") then
       is_done = 1;
@@ -74,10 +74,18 @@ function findWood()
     eatCarrot()
   end
 
-  local clickWood = findAllImages("wood/gather_wood.png");
   nowood = findAllImages("wood/no_wood.png")
-  for i=1,#clickWood do
-    safeClick(clickWood[i][0], clickWood[i][1])
+  local clickWood = findAllImages("wood/gather_wood.png");
+  local mightyChop = findAllImages("wood/mighty_chop.png");
+
+  if #mightyChop > 0 then
+    for i=1,#mightyChop do
+      safeClick(mightyChop[i][0], mightyChop[i][1])
+    end
+  else
+    for i=1,#clickWood do
+      safeClick(clickWood[i][0], clickWood[i][1])
+    end
   end
 end
 
@@ -119,7 +127,7 @@ function eatCarrot()
       local consumeCarrot = srFindImage("consume.png")
       if consumeCarrot ~= nil then
         safeClick(consumeCarrot[0],consumeCarrot[1]);
-        waitForImage("stats/perceptionBuff.png", 5000, "Waiting for Endurance Buff icon")
+        waitForImage("stats/perceptionBuff.png", 5000, "Waiting for Perception Buff icon")
         srClickMouseNoMove(consumeCarrot[0]-5,consumeCarrot[1]-10);
         lsSleep(click_delay);
       end
