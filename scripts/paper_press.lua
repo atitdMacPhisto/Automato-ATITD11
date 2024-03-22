@@ -91,10 +91,10 @@ end
 function doPaper()
   if paperType == 1 then
     product = "Papyrus Paper"
-    productTimer = 75000
+    productTimer = convertTeppyTime(60);
   else
     product = "Wood Paper"
-    productTimer = 105000
+    productTimer = convertTeppyTime(90);
   end
 
 	for i=1, paper_passes do
@@ -163,7 +163,7 @@ function dryPressLining(product, lining)
       clickMax();
       lsSleep(100);
     end
-  sleepWithStatus(200000,"Waiting for " .. lining .. " to dry...", nil, 0.7);
+  sleepWithStatus(convertTeppyTime(180),"Waiting for " .. lining .. " to dry...", nil, 0.7);
   refreshWindows();
   clickAllText("Take");
   lsSleep(100);
