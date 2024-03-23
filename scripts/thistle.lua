@@ -24,10 +24,8 @@ window_locs = {};
 
 -- How many real seconds it takes to complete a cycle
 -- This is only to display estimated times. It doesn't affect how the macro runs
--- Tale 11 is 6m 10s
-real_time_estimate = 370;
-game_time_ratio =  0.915;
-real_time_estimate = real_time_estimate * 1000;
+-- Tale 11 is ~6m 10s (370s)
+real_time_estimate = 370 * 1000; -- convert to ms
 
 ----------------------------------------
 
@@ -184,6 +182,18 @@ function main()
   lsMessageBox("Elapsed Time:", getElapsedTime(startTime), 1)
 end
 
+function getRecipeTotals()
+  local dung = 0;
+  local sp = 0;
+  local w = 0;
+  for i=0, 39 do
+	dung = dung + instructions[i*5 + 1];
+	sp = sp + instructions[i*5 + 2];
+	w = w + instructions[i*5 + 3];
+  end
+  return expected_gardens * dung, expected_gardens * sp, expected_gardens * w;
+end
+
 function config()
   local is_done = false;
   local count = 1;
@@ -192,13 +202,13 @@ function config()
     local y = 10;
     lsPrint(12, y, 0, 0.7, 0.7, 0xffffffff,
             "Last Sun (Current Canopy Postion):");
-    y = y + 35;
+    y = y + 30;
     lsSetCamera(0,0,lsScreenX*1.3,lsScreenY*1.3);
     dropdown_cur_value_canopy = readSetting("dropdown_cur_value_canopy",dropdown_cur_value_canopy);
     dropdown_cur_value_canopy = lsDropdown("thisCanopy", 15, y, 0, 320, dropdown_cur_value_canopy, dropdown_values_canopy);
     writeSetting("dropdown_cur_value_canopy",dropdown_cur_value_canopy);
     lsSetCamera(0,0,lsScreenX*1.0,lsScreenY*1.0);
-    y = y + 20;
+    y = y + 15;
 
     if grid_mode then
       grid_color = 0xff8080ff
@@ -215,7 +225,7 @@ function config()
     grid_mode = readSetting("grid_mode",grid_mode);
     grid_mode = CheckBox(15, y, z+10, grid_color, " Windows Arranged in Grid", grid_mode, 0.65, 0.65);
     writeSetting("grid_mode",grid_mode);
-    y = y + 20;
+    y = y + 15;
 
     if grid_mode then
       screenshot_test_mode = readSetting("screenshot_test_mode",screenshot_test_mode);
@@ -223,7 +233,7 @@ function config()
       writeSetting("screenshot_test_mode",screenshot_test_mode);
     end
 
-    y = y + 20;
+    y = y + 15;
 
     lsPrint(15, y+5, 0, 0.8, 0.8, 0xffffffff, "How many passes?");
     is_done, num_loops = lsEditBox("num_loops", 175, y+5, 0, 50, 0, 0.9, 0.9,
@@ -247,9 +257,20 @@ function config()
        end
     writeSetting("expected_gardens",expected_gardens);
 
-    lsPrintWrapped(10, 160, z, lsScreenX - 20, 0.65, 0.65, 0xffff80FF, "Real Time Required:      " .. convertTime(real_time_estimate*num_loops) .. "\nEgypt Time Required:    " .. convertTime(real_time_estimate / game_time_ratio * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
-    lsPrintWrapped(10, 210, z, lsScreenX - 20, 0.65, 0.65, 0x40ffffff, "Current Farm: " .. loadedFarm .. "\nRecipe File: " .. convertFarmName2FileName(loadedFarm) ..
-    "\n\nWe are ready to start making thistles, with this farm\'s recipe! Click Start button to proceed ...");
+    tot_dung, tot_sp, tot_w = getRecipeTotals();
+    y = y + 35;
+    -- teppy_multiper is defined in common_time.inc
+    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffecc7FF, "Real Time Required:      " .. convertTime(real_time_estimate*num_loops) .. "\nEgypt Time Required:    " .. convertTime(real_time_estimate / teppy_multiplier * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
+    y = y + 50;
+    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffaa00FF, "Uses:  " .. tot_dung .. " Dung, " .. tot_sp .. " Saltpeter and " .. tot_w .. " Water.");
+    y = y + 22;
+    lsPrint(10, y, 0, 0.65, 0.65, 0xffffffff, "Current Farm :");
+    lsPrint(97, y, 0, 0.65, 0.65, 0x40ffffff, loadedFarm);
+    y = y + 15;
+    lsPrint(24, y, 0, 0.65, 0.65, 0xffffffff, "Recipe File :");
+    lsPrint(97, y, 0, 0.65, 0.65, 0x40ffffff, convertFarmName2FileName(loadedFarm));
+    y = y + 23;
+    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffffffff, "We are ready to start making thistles, with this farm\'s recipe! Click Start button to proceed ...");
 
     if lsButtonText(lsScreenX - 110, lsScreenY - 60, 0, 100, 0xffff40ff, "Back") then
         break;
