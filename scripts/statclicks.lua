@@ -996,7 +996,7 @@ function sporePaper()
   for i = 1, #parse do
     parse[i][2] = stripCharacters(parse[i][2]);
     if foundPaper == false then
-      if string.find(parse[i][2], "SpoePape") then
+      if string.find(parse[i][2], "SporePaper") then
         foundPaper = true;
         clickText(parse[i]);
       else
