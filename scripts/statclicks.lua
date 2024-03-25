@@ -945,10 +945,10 @@ function churnButter()
     clickText(waitForText("Everything"));
     lsSleep(75);
     srReadScreen();
-    local drain = findText("Drain")
-    if drain then
-      srClickMouseNoMove(drain[0], drain[1]-25, 1);
-    end
+  end
+  local drain = findText("Drain")
+  if drain then
+    srClickMouseNoMove(drain[0]+10, drain[1]+2);
   end
 end
 
