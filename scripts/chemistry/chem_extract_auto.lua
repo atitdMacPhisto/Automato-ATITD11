@@ -3,10 +3,11 @@ dofile("chemistry/chem_notepad.lua");
 cheapRecipes = nil;
 allRecipes = nil;
 
-local types = {"Ra", "Thoth", "Osiris", "Set", "Maat", "Geb"};
-local typePlus = {"+++++", "++++", "++++", "+++", "+++", "++"};
-local typeMinus = {"-----", "----", "----", "---", "---", "--"};
-local typeEnabled = {true, true, true, true, true, true};
+local types = {"Ra Brilliant", "Ra", "Thoth", "Osiris", "Set", "Maat", "Geb"};
+local menutypes = {"Ra's Brilliant", "Ra's Compound", "Thoth", "Osiris", "Set", "Maat", "Geb"};
+local typePlus = {"+++", "+++++", "++++", "++++", "+++", "+++", "++"};
+local typeMinus = {"---", "-----", "----", "----", "---", "---", "--"};
+local typeEnabled = {true, true, true, true, true, true, true};
 
 local properties = {"Aromatic", "Astringent", "Bitter", "Salty",
 		    "Sour", "Spicy", "Sweet", "Toxic"};
@@ -29,7 +30,7 @@ checkBreak();
     if typeEnabled[i] then
       statusScreen("Trying type " .. types[i]);
       srReadScreen();
-      clickAllText(types[i] .. "'s Compound");
+      clickAllText(menutypes[i]);
       sleepWithStatus(2750, "Waiting out requirement mutation...");  -- This line added per SomeBob's recommendation on February 23, 2019
       local anchor = waitForImage(
 		    "extract/required.png",
@@ -107,7 +108,7 @@ function makeRecipe(recipe, window)
 --    statusScreen("Adding Essence of " .. recipe[i]);
     safeClick(ingredients[i][0]+10, ingredients[i][1]+5);
 		waitForImage("max.png", 5000, status);
-    srKeyEvent("7\n");
+    srCharEvent("7\n");
 		waitForNoImage("max.png");
     local ingredientWindow = getWindowBorders(ingredients[i][0]+10,
 					      ingredients[i][1]+5);
@@ -132,7 +133,7 @@ function makeRecipe(recipe, window)
   t = waitForText("Mix Comp", nil, status);
   safeClick(t[0]+10, t[1]+5);
 	waitForImage("extract/succeeded.png", 60000, status);
-  srKeyEvent("autocompound\n");
+  srCharEvent("autocompound\n");
   sleepWithStatus(2000, "Refreshing Lab Window: Allowing compound creation latency to settle");
   clickAllText("Chemistry Lab");
   sleepWithStatus(500, status);
@@ -145,8 +146,8 @@ function makeRecipe(recipe, window)
   srReadScreen();
   statusScreen("Creating extract", nil, status);
   requiredWindow = findText("Required:", nil, REGION);
-  t = findText("Required:", requiredWindow);
-  safeClick(t[0]+20, t[1]+135);
+  t = findText("autocompound", requiredWindow);
+  clickText(t);
   sleepWithStatus(200, status);
   clickAllImages("Ok.png");
   sleepWithStatus(200, status);
@@ -206,22 +207,23 @@ function findWithoutParen(text)
 end
 
 -- Added in an explode function (delimiter, string) to deal with broken csplit.
-function explode(d,p)
-   local t, ll
-   t={}
-   ll=0
-   if(#p == 1) then
-      return {p}
-   end
-   while true do
-      l = string.find(p, d, ll, true) -- find the next d in the string
-      if l ~= nil then -- if "not not" found then..
-         table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
-         ll = l + 1 -- save just after where we found it for searching next time.
-      else
-         table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
-         break -- Break at end, as it should be, according to the lua manual.
-      end
-   end
-   return t
-end
+--function explode(d,p)
+--   local t, ll
+--   t={}
+--   ll=0
+--   if(#p == 1) then
+--      return {p}
+--   end
+--   while true do
+--      l = string.find(p, d, ll, true) -- find the next d in the string
+--      if l ~= nil then -- if "not not" found then..
+--         table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
+--         ll = l + 1 -- save just after where we found it for searching next time.
+--      else
+--         table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
+--         break -- Break at end, as it should be, according to the lua manual.
+--      end
+--   end
+--   return t
+--	return string.gmatch(p,d);
+--end

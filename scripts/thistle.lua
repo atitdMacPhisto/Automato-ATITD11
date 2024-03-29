@@ -24,10 +24,8 @@ window_locs = {};
 
 -- How many real seconds it takes to complete a cycle
 -- This is only to display estimated times. It doesn't affect how the macro runs
--- Tale 11 is 6m 10s
-real_time_estimate = 370;
-game_time_ratio =  0.915;
-real_time_estimate = real_time_estimate * 1000;
+-- Tale 11 is ~6m 10s (370s)
+real_time_estimate = 370 * 1000; -- convert to ms
 
 ----------------------------------------
 
@@ -261,7 +259,8 @@ function config()
 
     tot_dung, tot_sp, tot_w = getRecipeTotals();
     y = y + 35;
-    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffecc7FF, "Real Time Required:      " .. convertTime(real_time_estimate*num_loops) .. "\nEgypt Time Required:    " .. convertTime(real_time_estimate / game_time_ratio * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
+    -- teppy_multiper is defined in common_time.inc
+    lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffecc7FF, "Real Time Required:      " .. convertTime(real_time_estimate*num_loops) .. "\nEgypt Time Required:    " .. convertTime(real_time_estimate / teppy_multiplier * 3 * num_loops) .. "\nThistle Yield Expected:  " .. (5*num_loops*expected_gardens));
     y = y + 50;
     lsPrintWrapped(10, y, z, lsScreenX - 20, 0.65, 0.65, 0xffaa00FF, "Uses:  " .. tot_dung .. " Dung, " .. tot_sp .. " Saltpeter and " .. tot_w .. " Water.");
     y = y + 22;
