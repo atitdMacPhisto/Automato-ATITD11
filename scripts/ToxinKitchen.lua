@@ -1,7 +1,6 @@
 -- Ashen's improved Toxin Kitchen macro
 -- Make All The Toxins
 -- TODO: Support making EoG Serum with alternative ingredients
--- TODO: Support multiple kitchens
 
 dofile("common.inc");
 
@@ -202,9 +201,6 @@ STAGEADD = {
 	{ "Spider", "Sand", "Sun" },
 };
 
-
-window_pos = nil;
-
 per_click_delay = 20;
 tick_time = 1000;
 readDelay = 110;
@@ -212,110 +208,133 @@ window_w = 260;
 window_h = 256;
 tol = 6000;
 
-cooking = false;
 stop_cooking = false;
+conready = true;
 
-tempchanged = false;
-volchanged = false;
-statechanged = false;
-curstage = 0;
-curtemp = 0;
-curacidity = 0.0;
-curvolume = 0.0;
-curprecip = 0.0;
+tempchanged = {};
+volchanged = {};
+ticked = {};
+stagechanged = {};
+curstage = {};
+curtemp = {};
+curacidity = {};
+curvolume = {};
+curprecip = {};
+bounds = {};
 
 cabbageqty	= 0;
 waterqty	= 0;
 cactusqty	= 0;
 ccqty		= 0;
 
+qtydone = 0;
+qtystarted = 0;
 qtyrequested = 1;
+
+MAXWINDOWS = 10;
+
 ----------------------------------------
 
-function findWinText(text, window_pos, flag)
-	if (window_pos) then
-		local win = getWindowBorders(window_pos[0]+5, window_pos[1]+5);
-		return findText(text, win, flag);
-	end
+function resetstate(num)
+	curstage[num] = 0;
+	curtemp[num] = 0;
+	curacidity[num] = 0.0;
+	curvolume[num] = 0.0;
+	curprecip[num] = 0.0;
+	ticked[num] = false;
+	stagechanged[num] = false;
+	tempchanged[num] = false;
+	volchanged[num] = false;
 end
 
-function resetstate()
-	cooking = false;
-	statechanged = false;
-	curstage = 0;
-	curtemp = 0;
-	curacidity = 0.0;
-	curvolume = 0.0;
-	curprecip = 0.0;
-end
-
-function resetqty()
+function resetall()
 	cabbageqty = 0;
 	waterqty = 0;
 	cactusqty = 0;
 	ccqty = 0;
+
+	for num=1,MAXWINDOWS do
+		curstage[num] = 0;
+		curtemp[num] = 0;
+		curacidity[num] = 0.0;
+		curvolume[num] = 0.0;
+		curprecip[num] = 0.0;
+		ticked[num] = false;
+		stagechanged[num] = false;
+		tempchanged[num] = false;
+		volchanged[num] = false;
+	end
 end
 
-function updateStatus(window_pos)
-	local newstage = curstage;
-	local newtemp = curtemp;
-	local newvolume = curvolume;
-	local newacidity = curacidity;
-	local newprecip = curprecip;
-
+function updateStatus(windows)
+	-- Update CON Ready status
 	srReadScreen();
+	conready = not srFindImage("stats/constitution.png");
 
-	--search for which stage we're in
-	image = srFindImageInRange("toxinKitchen/ToxinStage.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
+	-- Update per-window status
+	for num = 1,#windows do
+		local newstage = curstage[num];
+		local newtemp = curtemp[num];
+		local newvolume = curvolume[num];
+		local newacidity = curacidity[num];
+		local newprecip = curprecip[num];
+
+		--search for which stage we're in
+		image = findImageInWindow("toxinKitchen/ToxinStage.png", windows[num].x+5, windows[num].y+5, tol);
 		if image then
 			newstage = ocrNumber(image[0] + 34, image[1], BLUE_SMALL_SET);
 		end
 
-	--check volume
-	image = srFindImageInRange("toxinKitchen/ToxinVolume.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
+		--check volume
+		image = findImageInWindow("toxinKitchen/ToxinVolume.png", windows[num].x+5, windows[num].y+5, tol);
 		if image then
 			newvolume = ocrNumber(image[0] + 48, image[1], BLUE_SMALL_SET);
 		end
 
-	--check temp
-	image = srFindImageInRange("toxinKitchen/ToxinTemperature.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
+		--check temp
+		image = findImageInWindow("toxinKitchen/ToxinTemperature.png", windows[num].x+5, windows[num].y+5, tol);
 		if image then
 			newtemp = ocrNumber(image[0] + 66, image[1], BLUE_SMALL_SET);
 		end
 
-	--check acidity
-	image = srFindImageInRange("toxinKitchen/ToxinAcidity.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
+		--check acidity
+		image = findImageInWindow("toxinKitchen/ToxinAcidity.png", windows[num].x+5, windows[num].y+5, tol);
 		if image then
 			newacidity = ocrNumber(image[0] + 41, image[1], BLUE_SMALL_SET);
 		end
 
-	--precipitate
-	image = srFindImageInRange("toxinKitchen/ToxinPrecipitate.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
+		--precipitate
+		image = findImageInWindow("toxinKitchen/ToxinPrecipitate.png", windows[num].x+5, windows[num].y+5, tol);
 		if image then
 			newprecip = ocrNumber(image[0] + 59, image[1], BLUE_SMALL_SET);
 		end
 
-		if (newtemp ~= curtemp) then
-			tempchanged = true;
+		if (newtemp ~= curtemp[num]) then
+			tempchanged[num] = true;
 		end
 
-		if (newvolume ~= curvolume) then
-			volchanged = true;
+		if (newvolume ~= curvolume[num]) then
+			volchanged[num] = true;
 		end
 
-		if ((newstage ~= curstage) or (newvolume ~= curvolume) or (newtemp ~= curtemp) or (newacidity ~= curacidity)) then
-			curstage = newstage;
-			curtemp = newtemp;
-			curvolume = newvolume;
-			curacidity = newacidity;
-			statechanged = true;
+		if (newstage ~= curstage[num]) then
+			stagechanged[num] = true;
+		end
+		
+		if (stagechanged[num] or volchanged[num] or tempchanged[num] or (newacidity ~= curacidity[num])) then
+			curstage[num] = newstage;
+			curtemp[num] = newtemp;
+			curvolume[num] = newvolume;
+			curacidity[num] = newacidity;
+			ticked[num] = true;
 		end
 
-	curprecip = newprecip;
+		curprecip[num] = newprecip;
+	end
 end
 
 -- Display status and sleep
-function displayStatus(tid, passno)
+function displayStatus(tid, windows)
 	local start_time = lsGetTimer();
 
 	while tick_time - (lsGetTimer() - start_time) > 0 do
@@ -328,29 +347,38 @@ function displayStatus(tid, passno)
 		lsPrint(x, 18, 0, 0.7, 0.7, 0xB0B0B0ff, "Hold Alt+Shift to pause this script.");
 		y = y + 40;
 
-		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Making " .. AUTOMENU[tid] .. " " .. passno .. "/" .. qtyrequested);
+		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Making " .. AUTOMENU[tid] .. " " .. qtydone .. "/" .. qtyrequested);
 		y = y + 40;
 
+		y = 90;
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Stage:");
-		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curstage);
 		y = y + 12;
-
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Temperature:");
-		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curtemp);
 		y = y + 12;
-
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Volume:");
-		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curvolume);
 		y = y + 12;
-
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Acidity:");
-		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curacidity);
 		y = y + 12;
-
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Precipitate:");
-		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curprecip);
 		y = y + 12;
 
+		x = 10;
+		for num=1,#windows do
+			y = 90;
+			lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curstage[num]);
+			y = y + 12;
+			lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curtemp[num]);
+			y = y + 12;
+			lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curvolume[num]);
+			y = y + 12;
+			lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curacidity[num]);
+			y = y + 12;
+			lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, curprecip[num]);
+			y = y + 12;
+			x = x + 40;
+		end
+
+		x = 10;
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Waiting:");
 		lsPrint(x+100, y, 0, 0.7, 0.7, 0xB0B0B0ff, time_left);
 		y = y + 40;
@@ -369,17 +397,22 @@ function displayStatus(tid, passno)
 
 		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Water Used:");
 		lsPrint(x+120, y, 0, 0.7, 0.7, 0xB0B0B0ff, waterqty);
+		y = y + 40;
+		if not conready then
+			lsPrint(x, y, 0, 0.7, 0.7, 0xFF0000ff, "CON Not Ready");
+		end
 
 		c = 0xFFFFFFff;
 		if (stop_cooking) then
 			c = 0x00FF00ff;
 		end
-			if lsButtonText(lsScreenX - 110, lsScreenY - 60, 0, 100, c, "Finish up") then
-				stop_cooking = true;
-			end
-			if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
-				error "Clicked End Script button";
-			end
+
+		if lsButtonText(lsScreenX - 110, lsScreenY - 60, 0, 100, c, "Finish up") then
+			stop_cooking = true;
+		end
+		if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
+			error "Clicked End Script button";
+		end
 
 		lsDoFrame();
 		lsSleep(25);
@@ -387,53 +420,71 @@ function displayStatus(tid, passno)
 	end
 end
 
-function checkAddWater(window_pos)
-	if (curvolume < MINVOLUME) then
-		srReadScreen();
-		image = srFindImageInRange("toxinKitchen/DiluteWater.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
-		srClickMouseNoMove(image[0] + 10, image[1] + 2);
-		lsSleep(per_click_delay);
-		waterqty = waterqty + 1;
+function checkAddWater(windows, num)
+	srReadScreen();
+	if (curvolume[num] < MINVOLUME) then
+		image = findImageInWindow("toxinKitchen/DiluteWater.png", windows[num].x+5, windows[num].y+5, tol);
+		if image then
+			srClickMouseNoMove(image[0] + 10, image[1] + 2);
+			lsSleep(per_click_delay);
+			waterqty = waterqty + 1;
+		else
+			lsPlaySound("error.wav");
+			sleepWithStatus(2000, "Dilute button not found");
+		end
 	end
 end
 
-function addCharcoal(window_pos)
+function addCharcoal(windows, num)
 	srReadScreen();
-	image = srFindImageInRange("toxinKitchen/HeatCharcoal.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
-	srClickMouseNoMove(image[0] + 10, image[1] + 2);
-	lsSleep(per_click_delay);
-	ccqty = ccqty + 1;
+	image = findImageInWindow("toxinKitchen/HeatCharcoal.png", windows[num].x+5, windows[num].y+5, tol);
+	if (image) then
+		srClickMouseNoMove(image[0] + 10, image[1] + 2);
+		lsSleep(per_click_delay);
+		ccqty = ccqty + 1;
+	else
+		lsPlaySound("error.wav");
+		sleepWithStatus(2000, "Heat button not found");
+	end
 end
 
-function addSap(qty, window_pos)
+function addSap(windows, num, qty)
 	srReadScreen();
-	image = srFindImageInRange("toxinKitchen/CatalyzeSap.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
-		if (image) then
-			for i = 1, qty, 1 do
-				srClickMouseNoMove(image[0] + 10, image[1] + 2);
-				lsSleep(per_click_delay);
-				cactusqty = cactusqty + 1;
-			end
+	image = findImageInWindow("toxinKitchen/CatalyzeSap.png", windows[num].x+5, windows[num].y+5, tol);
+	if (image) then
+		for num = 1, qty, 1 do
+			srClickMouseNoMove(image[0] + 10, image[1] + 2);
+			lsSleep(per_click_delay);
+			cactusqty = cactusqty + 1;
 		end
+	else
+		lsPlaySound("error.wav");
+		sleepWithStatus(2000, "Catalyze button not found");
+	end
 end
 
-function addCabbage(window_pos)
+function addCabbage(windows, num)
 	srReadScreen();
-	image = srFindImageInRange("toxinKitchen/CheckAcidity.png", window_pos[0]+5, window_pos[1]+5, window_w, window_h, tol);
-	srClickMouseNoMove(image[0] + 10, image[1] + 2);
-	lsSleep(per_click_delay);
-	cabbageqty = cabbageqty + 1;
+	image = findImageInWindow("toxinKitchen/CheckAcidity.png", windows[num].x+5, windows[num].y+5, tol);
+	if (image) then
+		srClickMouseNoMove(image[0] + 10, image[1] + 2);
+		lsSleep(per_click_delay);
+		cabbageqty = cabbageqty + 1;
+	else
+		lsPlaySound("error.wav");
+		sleepWithStatus(2000, "Check Acidity button not found");
+	end
 end
 
-function checkTakeProduct(tid, window_pos)
-	if (curstage == 4) then
+function checkTakeProduct(tid, windows, num)
+	if (curstage[num] == 4) then
 		srReadScreen();
-		clickloc = findWinText("Take the " .. PRODUCTS[tid], window_pos);
+		clickloc = findText("Take the " .. PRODUCTS[tid], windows[num]);
 
 		-- Kludge to work around misspelled Cloudy solvent
 		if (not clickloc and string.find(PRODUCTS[tid], "Cloudy")) then
 			local alt = string.gsub(PRODUCTS[tid], "Revelation", "Revealation");
-			clickloc = findWinText("Take the " .. alt, window_pos);
+			clickloc = findText("Take the " .. alt, windows[num]);
 		end
 
 		if (clickloc) then
@@ -446,170 +497,164 @@ function checkTakeProduct(tid, window_pos)
 	return false;
 end
 
-function addIngredient(tid, window_pos)
-	if ((curstage >= 1) and (curstage <= 3)) then
+function addIngredient(tid, windows, num)
+	srReadScreen();
+	if ((curstage[num] >= 1) and (curstage[num] <= 3)) then
 		ingredients = STAGEADD[tid];
-		addtext = "Ingredient: " .. ingredients[curstage];
+		addtext = "Ingredient: " .. ingredients[curstage[num]];
 		srReadScreen();
-		clickloc = findWinText(addtext, window_pos);
-			if not clickloc then
-				error("Could not find '" .. addtext .. "'");
-			end
-		srClickMouseNoMove(clickloc[0] + 10, clickloc[1] + 2);
-		lsSleep(per_click_delay);
+		clickloc = findText(addtext, windows[num]);
+		if clickloc then
+			srClickMouseNoMove(clickloc[0] + 10, clickloc[1] + 2);
+			lsSleep(per_click_delay);
+		else
+			lsPlaySound("error.wav");
+			sleepWithStatus(2000, "Could not find '" .. addtext .. "'");
+		end
 	end
 end
 
-function doTick(tid, window_pos)
+function doTick(tid, windows, num)
 	local acidok = false;
 	local tempok = false;
 	local docabbage = false;
 	local cabbageok = false;
-		if (not statechanged) then
-			return;
+
+	-- If nothing cooking, start a batch if we can
+	if (curstage[num] == 0) then
+		if conready and not stop_cooking and (qtydone + qtystarted < qtyrequested) then
+			srReadScreen();
+			clickloc = findText("Start a batch of " .. PRODUCTS[tid], windows[num]);
+			
+			if clickloc then
+				clickText(clickloc);
+				lsSleep(per_click_delay);
+				qtystarted = qtystarted + 1;
+			end
 		end
-		if ((curstage < 0) or (curstage > 4)) then
-			return;
-		end
-		if (checkTakeProduct(tid, window_pos)) then
-			resetstate();
-			return;
-		end
-	checkAddWater(window_pos);
-		if (curstage == 4) then
-			return;
-		end
-	acidrange = STAGEACID[tid][curstage];
-	temprange = STAGETEMP[tid][curstage];
-	cabbagerange = CABBAGETEMP[tid][curstage];
+
+		closePopUp();
+		return;
+	end
+	
+	-- Otherwise, nothing to do if no tick has passed
+	if (not ticked[num]) then
+		return;
+	end
+	
+	-- Refresh of window required for new buttons to appear
+	srClickMouseNoMove(windows[num].x+5, windows[num].y+5);
+
+	-- Take product from this window if it's done
+	if (checkTakeProduct(tid, windows, num)) then
+		qtydone = qtydone + 1;
+		qtystarted = qtystarted - 1;
+		resetstate(num);
+		return;
+	end
+
+	-- Always ensure there's plenty of water volume remaining
+	checkAddWater(windows, num);
+	closePopUp();
+
+	-- Nothing else to do for stage 4 except wait for precipitate
+	if (curstage[num] == 4) then
+		return;
+	end
+
+	initsap = STAGESAP[tid][curstage[num]];
+	acidrange = STAGEACID[tid][curstage[num]];
+	temprange = STAGETEMP[tid][curstage[num]];
+	cabbagerange = CABBAGETEMP[tid][curstage[num]];
 
 	-- Check current acidity vs. required, if it matters for this stage
-	if (((acidrange[1] == DONTCARE) or (curacidity >= acidrange[1])) and
-		((acidrange[2] == DONTCARE) or (curacidity <= acidrange[2]))) then
+	if (((acidrange[1] == DONTCARE) or (curacidity[num] >= acidrange[1])) and
+		((acidrange[2] == DONTCARE) or (curacidity[num] <= acidrange[2]))) then
 		acidok = true;
 	end
 
 	-- Check current temperature vs. required, if it matters for this stage
-	if (((temprange[1] == DONTCARE) or (curtemp >= temprange[1])) and
-		((temprange[2] == DONTCARE) or (curtemp <= temprange[2]))) then
+	if (((temprange[1] == DONTCARE) or (curtemp[num] >= temprange[1])) and
+		((temprange[2] == DONTCARE) or (curtemp[num] <= temprange[2]))) then
 		tempok = true;
 	else
-		if ((temprange[1] ~= DONTCARE) and (curtemp < temprange[1])) then
-			addCharcoal(window_pos);
+		if ((temprange[1] ~= DONTCARE) and (curtemp[num] < temprange[1])) then
+			addCharcoal(windows, num);
+			closePopUp();
 		end
 	end
 
 	-- Check current temperature vs. range where we should be checking acidity.
 	-- This is mainly to avoid wasting cabbage while waiting for a large drop
 	-- that coincides with an allowed large temperature drop.
-	if (((cabbagerange[1] == DONTCARE) or (curtemp >= cabbagerange[1])) and
-		((cabbagerange[2] == DONTCARE) or (curtemp <= cabbagerange[2])) and
+	if (((cabbagerange[1] == DONTCARE) or (curtemp[num] >= cabbagerange[1])) and
+		((cabbagerange[2] == DONTCARE) or (curtemp[num] <= cabbagerange[2])) and
 		((acidrange[1] ~= DONTCARE) or (acidrange[2] ~= DONTCARE))) then
 		cabbageok = true;
 	end
 
-	if ((acidrange[1] ~= DONTCARE) and (curacidity < acidrange[1])) then
-		addSap(1, window_pos);
+	if (stagechanged[num] and (initsap > 0)) then
+		addSap(windows, num, initsap);
+		closePopUp();
 		docabbage = true;
-	elseif ((acidrange[2] ~= DONTCARE) and (tempchanged or volchanged)) then
+	end
+
+	if (not stagechanged[num] and (acidrange[1] ~= DONTCARE) and (curacidity[num] < acidrange[1])) then
+		addSap(windows, num, 1);
+		closePopUp();
+		docabbage = true;
+	elseif ((acidrange[2] ~= DONTCARE) and (tempchanged[num] or volchanged[num])) then
 		docabbage = true;
 	end
 
 	if (docabbage and cabbageok) then
-		addCabbage(window_pos);
+		addCabbage(windows, num);
+		closePopUp();
 	end
 
 	-- Add ingredient if both acidity and temperature are in range
 	if (acidok and tempok) then
-		addIngredient(tid, window_pos);
+		addIngredient(tid, windows, num);
+		closePopUp();
 	end
 
-	statechanged = false;
-	tempchanged = false;
-	volchanged = false;
-end
-
-function waitForCon()
-	local ready = false;
-
-	while not ready do
-		--Search for black con timer
-		srReadScreen();
-		local stat_con = srFindImage("stats/constitution.png");
-
-		if stat_con then
-			local x = 10;
-			local y = 6;
-
-			lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Hold Ctrl+Shift to end this script.");
-			y = y + 12;
-			lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Hold Alt+Shift to pause this script.");
-			y = y + 40;
-			lsPrint(x, y, 0, 0.7, 0.7, 0xFF0000ff, "CON Not Ready");
-
-				if lsButtonText(lsScreenX - 110, lsScreenY - 60, 0, 100, 0xFFFFFFff, "Finish up") then
-					stop_cooking = true;
-					ready = true;
-				end
-				if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
-					stop_cooking = true;
-					ready = true;
-				end
-
-			lsDoFrame();
-			lsSleep(tick_delay);
-			checkBreak();
-		else
-			ready = true;
-		end
-	end
+	ticked[num] = false;
+	stagechanged[num] = false;
+	tempchanged[num] = false;
+	volchanged[num] = false;
 end
 
 function makeToxin(tid)
-	resetqty();
-	srReadScreen();
-	window_pos = findText("This is [a-z]+ Toxin Kitchen", nil, REGEX);
-	bounds = srGetWindowBorders(window_pos[0], window_pos[1]);
-		if (not window_pos) then
-			error "Did not find any Toxin Kitchen window";
+	resetall();
+	
+	while qtydone < qtyrequested do
+		if (stop_cooking) then
+			return;
 		end
-			for passno=1,qtyrequested do
-				waitForCon();
-					if (stop_cooking) then
-						return;
-					end
-				srReadScreen();
-				toxinKitchenWindow = findAllText("Toxin Kitchen");
 
-					for i=1,#toxinKitchenWindow do
-						local x = toxinKitchenWindow[i][0];
-						local y = toxinKitchenWindow[i][1];
-						local width = 441;
-						local height = 291;
-					end
-				sleepWithStatus(2500, "Allowing the server to settle down,"
-        .. " to avoid 'Could not find " ..  PRODUCTS[tid] .. "'", nil, 0.7);
-				srReadScreen();
-				clickloc = findWinText("Start a batch of " .. PRODUCTS[tid], window_pos);
-					if not clickloc then
-						error("Could not find '" .. PRODUCTS[tid] .. "'");
-					end
-				clickText(clickloc);
-				lsSleep(per_click_delay);
-				cooking = true;
-					while cooking do
-						closePopUp();
-						displayStatus(tid, passno);
-						srReadScreen();
-							if (bounds) then
-								srClickMouseNoMove(window_pos[0] + 10, window_pos[1] + 2);
-								lsSleep(readDelay);
-								updateStatus(bounds);
-								doTick(tid, bounds);
-							end
-						checkBreak();
-					end
+		closePopUp();
+
+		windows = {}
+		while #windows < 1 do
+			srReadScreen();
+			windows = findAllText("This is [a-z]+ Toxin Kitchen", nil, REGEX+REGION);
+
+			if #windows < 1 then
+				sleepWithStatus(500, "No Toxin Kitchen windows found");
 			end
+
+			checkBreak();
+		end
+		
+		updateStatus(windows);
+		displayStatus(tid, windows);
+		
+		for num=1,#windows do
+			doTick(tid, windows, num);
+		end
+
+		checkBreak();
+	end
 end
 
 function getQuantity(tid)
@@ -725,17 +770,21 @@ function displayMenu()
 end
 
 function doit()
-	askForWindow("Pin Toxin Kitchen window and press SHIFT over the ATITD window.");
+	askForWindow("Pin Toxin Kitchen window(s) and press SHIFT over the ATITD window.");
+
+	refreshWindows();
+	lsSleep(readDelay);
 
 	srReadScreen();
-	window_pos = findText("This is [a-z]+ Toxin Kitchen", nil, REGEX);
+	windows = findAllText("This is [a-z]+ Toxin Kitchen", nil, REGEX+REGION);
 
-	if window_pos == nil then
-		error "Did not find any Toxin Kitchen window";
+	if #windows < 1 then
+		error "Did not find any Toxin Kitchen windows";
 	end
 
-	srClickMouseNoMove(window_pos[0] + 10, window_pos[1] + 2);
-	lsSleep(readDelay);
+	if #windows > MAXWINDOWS then
+		error "Too many Toxin Kitchen windows!";
+	end
 
 	while not stop_cooking do
 		displayMenu();
