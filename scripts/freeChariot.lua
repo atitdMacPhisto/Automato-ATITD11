@@ -3,9 +3,9 @@ dofile("common.inc");
 -- 7 Aug 2021: Quality of life improvement, prompt to continue journey
 
 function doit()
-  while 1 do
-	  askForWindow("Click on Chariot, then click on Destination: <Location> you want to travel to. Pin that window.");
+  askForWindow("Click on Chariot, then click on Destination: <Location> you want to travel to. Pin that window.");
 
+  while 1 do
 	  startTime = lsGetTimer();
 	  while 1 do
 			srReadScreen();
