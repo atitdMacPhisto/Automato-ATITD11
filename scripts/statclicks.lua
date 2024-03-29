@@ -945,10 +945,10 @@ function churnButter()
     clickText(waitForText("Everything"));
     lsSleep(75);
     srReadScreen();
-    local drain = findText("Drain")
-    if drain then
-      srClickMouseNoMove(drain[0], drain[1]-25, 1);
-    end
+  end
+  local drain = findText("Drain")
+  if drain then
+    srClickMouseNoMove(drain[0]+10, drain[1]+2);
   end
 end
 
@@ -996,7 +996,7 @@ function sporePaper()
   for i = 1, #parse do
     parse[i][2] = stripCharacters(parse[i][2]);
     if foundPaper == false then
-      if string.find(parse[i][2], "SpoePape") then
+      if string.find(parse[i][2], "SporePaper") then
         foundPaper = true;
         clickText(parse[i]);
       else
