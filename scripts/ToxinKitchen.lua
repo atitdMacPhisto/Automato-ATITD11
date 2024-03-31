@@ -268,10 +268,14 @@ function resetall()
 	end
 end
 
-function updateStatus(windows)
-	-- Update CON Ready status
+function checkConReady()
 	srReadScreen();
 	conready = not srFindImage("stats/constitution.png");
+end
+
+function updateStatus(windows)
+	-- Update CON Ready status
+	checkConReady();
 
 	-- Update per-window status
 	for num = 1,#windows do
@@ -345,6 +349,9 @@ function displayStatus(tid, windows)
 	local start_time = lsGetTimer();
 
 	while tick_time - (lsGetTimer() - start_time) > 0 do
+		-- Update CON Ready status
+		checkConReady();
+
 		time_left = tick_time - (lsGetTimer() - start_time);
 
 		local y = 10;
@@ -528,6 +535,9 @@ function doTick(tid, windows, num)
 	local tempok = false;
 	local docabbage = false;
 	local cabbageok = false;
+
+	-- Update CON Ready status
+	checkConReady();
 
 	-- If nothing cooking, start a batch if we can
 	if (curstage[num] == 0) then
