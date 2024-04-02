@@ -153,6 +153,7 @@ end
 
 function doRapidFire()
 	while true do
+		srReadScreen();
 		refreshAllWindows();
 		local count = getPasses("Rapid Fire", "firings", 200);
 		
@@ -178,7 +179,7 @@ function doRapidFire()
 			local ok = waitForImage("ok2.png", 250, "Waiting for OK button");
 			if ok then
 			  srKeyEvent("1");
-			  lsSleep(60);
+			  lsSleep(50);
 			  safeClick(ok[0], ok[1]);
 			  waitForNoImage("ok2.png", 250, "Waiting for OK button to hide");
 			end
@@ -193,7 +194,7 @@ function doRapidFire()
 			local ok = waitForImage("ok2.png", 250, "Waiting for OK button");
 			if ok then
 			  srKeyEvent("1");
-			  lsSleep(60);
+			  lsSleep(50);
 			  safeClick(ok[0], ok[1]);
 			  waitForNoImage("ok2.png", 250, "Waiting for OK button to hide");
 			end
@@ -269,6 +270,7 @@ end
 
 function doEmptyJugs()
 	while true do
+		srReadScreen();
 		refreshAllWindows();
 		local count = getPasses("Empty Jugs", "jugs", 1000);
 		
@@ -295,9 +297,8 @@ function doEmptyJugs()
 			local ok = waitForImage("ok2.png", 250, "Waiting for OK button");
 			if ok then
 			  srKeyEvent("1");
-			  lsSleep(60);
+			  lsSleep(10);
 			  safeClick(ok[0], ok[1]);
-			  waitForNoImage("ok2.png", 250, "Waiting for OK button to hide");
 			end
 		end
 	end
@@ -305,6 +306,7 @@ end
 
 function doKillVeggies()
 	while true do
+		srReadScreen();
 		refreshAllWindows();
 		local count = getPasses("Kill Veggies", "seeds", 100);
 		
@@ -316,12 +318,16 @@ function doKillVeggies()
 		refreshAllWindows();
 		
 		for i=1,count do
+			srReadScreen();
+			if findImage("veg_janitor/build_arrows.png") then
+				errormsg = "Kill Veggies aborted: turn on Plant all crops where you stand!";
+				return;
+			end
 			if not printIters("Plant Veggies", i, count) then
 				errormsg = "Kill Veggies aborted";
 				count = i;
 				break;
 			end
-			srReadScreen();
 			if not waitForTextWithAbort("Kill Veggies", "Plant") then
 				return;
 			end
