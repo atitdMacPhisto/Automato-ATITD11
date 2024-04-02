@@ -442,6 +442,7 @@ BLACK_BOLD_SET = 1;
 BLACK_SMALL_SET = 2;
 BLUE_BOLD_SET = 3;
 BLUE_SMALL_SET = 4;
+BLUE_TINY_SET = 5;
 
 function ocrNumber(startX, startY, characterSet)
   if not startX or not startY then
@@ -485,7 +486,12 @@ function ocrNumber(startX, startY, characterSet)
     if digit == "." then
       decimal = true;
       afterDecimal = 1;
-      x = x + 4
+        -- KLUDGE: ought to use actual image size if possble
+      if (characterSet == BLUE_TINY_SET) then
+        x = x + 3;
+      else
+        x = x + 4;
+      end
       digit = findDigit(x, y, sizeX, sizeY, prefix);
     end
   end
@@ -504,6 +510,12 @@ function findDigit(x, y, sizeX, sizeY, prefix)
       return ".";
     end
   end
+
+  if prefix == "ocr/tiny/blue/" then
+    if srFindImageInRange("ocr/tiny/blue/decimals.png", x, y, sizeX, sizeY, 500) then
+      return ".";
+    end
+  end
 end
 
 function getCharacterSet(characterSet)
@@ -515,6 +527,8 @@ function getCharacterSet(characterSet)
     return "ocr/bold/blue/", 7, 9;
   elseif characterSet == BLUE_SMALL_SET then
     return "ocr/small/blue/", 6, 9;
+  elseif characterSet == BLUE_TINY_SET then
+    return "ocr/tiny/blue/", 5, 7;
   end
 end
 

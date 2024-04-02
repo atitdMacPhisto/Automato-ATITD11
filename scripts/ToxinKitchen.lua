@@ -252,6 +252,8 @@ function resetall()
 	waterqty = 0;
 	cactusqty = 0;
 	ccqty = 0;
+	qtydone = 0;
+	qtystarted = 0;
 
 	for num=1,MAXWINDOWS do
 		curstage[num] = 0;
@@ -266,10 +268,14 @@ function resetall()
 	end
 end
 
-function updateStatus(windows)
-	-- Update CON Ready status
+function checkConReady()
 	srReadScreen();
 	conready = not srFindImage("stats/constitution.png");
+end
+
+function updateStatus(windows)
+	-- Update CON Ready status
+	checkConReady();
 
 	-- Update per-window status
 	for num = 1,#windows do
@@ -320,7 +326,12 @@ function updateStatus(windows)
 		if (newstage ~= curstage[num]) then
 			stagechanged[num] = true;
 		end
-		
+
+		-- Update cooking count if kitchen was not previously known to be cooking
+		if (stagechanged[num] and (curstage[num] == 0)) then
+			qtystarted = qtystarted + 1;
+		end
+
 		if (stagechanged[num] or volchanged[num] or tempchanged[num] or (newacidity ~= curacidity[num])) then
 			curstage[num] = newstage;
 			curtemp[num] = newtemp;
@@ -338,6 +349,9 @@ function displayStatus(tid, windows)
 	local start_time = lsGetTimer();
 
 	while tick_time - (lsGetTimer() - start_time) > 0 do
+		-- Update CON Ready status
+		checkConReady();
+
 		time_left = tick_time - (lsGetTimer() - start_time);
 
 		local y = 10;
@@ -347,7 +361,8 @@ function displayStatus(tid, windows)
 		lsPrint(x, 18, 0, 0.7, 0.7, 0xB0B0B0ff, "Hold Alt+Shift to pause this script.");
 		y = y + 40;
 
-		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Making " .. AUTOMENU[tid] .. " " .. qtydone .. "/" .. qtyrequested);
+		lsPrint(x, y, 0, 0.7, 0.7, 0xB0B0B0ff, "Making " .. AUTOMENU[tid] .. " " .. qtydone
+			.. "/" .. qtyrequested .. " (" .. qtystarted .. " cooking)");
 		y = y + 40;
 
 		y = 90;
@@ -408,6 +423,7 @@ function displayStatus(tid, windows)
 		end
 
 		if lsButtonText(lsScreenX - 110, lsScreenY - 60, 0, 100, c, "Finish up") then
+			qtyrequested = qtydone + qtystarted;
 			stop_cooking = true;
 		end
 		if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
@@ -520,27 +536,31 @@ function doTick(tid, windows, num)
 	local docabbage = false;
 	local cabbageok = false;
 
+	-- Update CON Ready status
+	checkConReady();
+
 	-- If nothing cooking, start a batch if we can
 	if (curstage[num] == 0) then
-		if conready and not stop_cooking and (qtydone + qtystarted < qtyrequested) then
+		if conready and (qtydone + qtystarted < qtyrequested) then
 			srReadScreen();
 			clickloc = findText("Start a batch of " .. PRODUCTS[tid], windows[num]);
 			
 			if clickloc then
 				clickText(clickloc);
 				lsSleep(per_click_delay);
-				qtystarted = qtystarted + 1;
 			end
 		end
 
 		closePopUp();
 		return;
 	end
-	
+
 	-- Otherwise, nothing to do if no tick has passed
 	if (not ticked[num]) then
 		return;
 	end
+	
+	closePopUp();
 	
 	-- Refresh of window required for new buttons to appear
 	srClickMouseNoMove(windows[num].x+5, windows[num].y+5);
@@ -556,6 +576,21 @@ function doTick(tid, windows, num)
 	-- Always ensure there's plenty of water volume remaining
 	checkAddWater(windows, num);
 	closePopUp();
+	
+	-- Always make sure temp > 0 and acidity > 0 else cooking (and ticking) stops
+	if ((curtemp[num] == 0) or (curacidity[num] == 0)) then
+		if (curtemp[num] == 0) then
+			addCharcoal(windows, num);
+			closePopUp();
+		end
+		if (curacidity[num] == 0) then
+			addSap(windows, num, 1);
+			closePopUp();
+		end
+		addCabbage(windows, num);
+		closePopUp();
+		return;
+	end
 
 	-- Nothing else to do for stage 4 except wait for precipitate
 	if (curstage[num] == 4) then
@@ -628,10 +663,6 @@ function makeToxin(tid)
 	resetall();
 	
 	while qtydone < qtyrequested do
-		if (stop_cooking) then
-			return;
-		end
-
 		closePopUp();
 
 		windows = {}
@@ -723,8 +754,7 @@ function getQuantity(tid)
 		end
 
 		if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End Script") then
-			stop_cooking = true;
-			return 0;
+			error "Clicked End Script button";
 		end
 
 		lsDoFrame();
@@ -748,9 +778,7 @@ function displayMenu()
 		end
 
 		if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
-			selected = nil;
-			stop_cooking = true;
-			break;
+			error "Clicked End Script button";
 		end
 
 		lsDoFrame();
