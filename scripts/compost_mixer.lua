@@ -37,33 +37,49 @@ mix_salinity = "";
 mix_water = "";
 mix_nitrogen = "";
 mix_phosphorus = "";
-mix_metal = "";
 mix_potassium = "";
 mix_soot = "";
 mix_eco = "";
+mix_soil = 0;
 
-function getSoilValue(win)
+ECO_OFFSET_X = 410;
+ECO_OFFSET_Y = 18;
+ECO_OFFSET_LINE = 12;
+
+function resetMixerData()
+	mix_soil = 0;
+	mix_metal = "";
+	mix_ph = "";
+	mix_salinity = "";
+	mix_water = "";
+	mix_nitrogen = "";
+	mix_phosphorus = "";
+	mix_potassium = "";
+	mix_soot = "";
+	mix_eco = "";
+end
+
+function readMixerData(win)
 	srReadScreen();
-	local pos = srFindImage("soiltype.png");
+	local base = srFindImage("soiltype.png");
 
-	while not pos do
+	while not base do
 		checkBreak();
 		srReadScreen();
 		sleepWithStatus(1000, "Soil Type not found/obscured");
-		pos = srFindImage("soiltype.png");
+		base = srFindImage("soiltype.png");
+		resetMixerData();
 	end
-	
-	srSetMousePos(pos[0], pos[1]);
 
-	pos[0] = pos[0] + 75;
-	pos[1] = pos[1] - 3;
-
-	local base = pos[0];
+	pos = {};
+	pos[0] = base[0] + 75;
+	pos[1] = base[1] - 3;
 
 	local ofs = makePoint(0, 0);
-	local val = 0;
 	local left = nil;
 	local right = nil;
+
+	mix_soil = 0;
 	
 	srReadScreen();
 	for i=1,SOILWIDTH+10 do
@@ -77,18 +93,40 @@ function getSoilValue(win)
 	end
 
 	if (left ~= nil) and (right ~= nil) then
-		val = right - left;
+		mix_soil = right - left;
 
-		val = math.ceil(100.0 * val / (SOILWIDTH / 2.0));
+		mix_soil = math.ceil(100.0 * mix_soil / (SOILWIDTH / 2.0));
 
-		if (val >= 98) then
-			val = 100;
+		if (mix_soil >= 98) then
+			mix_soil = 100;
 		end
 
 		if (left < SOILWIDTH/2) then
-			val = val * -1;
+			mix_soil = mix_soil * -1;
 		end
 	end
+
+	local x = base[0] + ECO_OFFSET_X;
+	local y = base[1] + ECO_OFFSET_Y;
+
+	mix_metal = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_ph = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_salinity = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_water = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_nitrogen = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_phosphorus = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_potassium = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_soot = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
+	mix_eco = ocrNumber(x, y, BLUE_TINY_SET);
+	y = y + ECO_OFFSET_LINE;
 
 	return val;
 end
@@ -98,6 +136,7 @@ function getMixerWin()
 	local mixerWin = findAllText("Compost Mixer");
 
 	while #mixerWin ~= 1 do
+		resetMixerData();
 		checkBreak();
 
 		srReadScreen();
@@ -114,6 +153,43 @@ function getMixerWin()
 	return getWindowBorders(mixerWin[1][0], mixerWin[1][1]);
 end
 
+function displayEcoValues()
+	local y = 100;
+	
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Metal:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_metal);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "pH:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_ph);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Salinity:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_salinity);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Water:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_water);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Nit(N):");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_nitrogen);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Phos(P):");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_phosphorus);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Pot(K):");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_potassium);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Soot:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_soot);
+	y = y + 14;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Eco:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_eco);
+	y = y + 24;
+	lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Soil:");
+	lsPrint(80, y, 10, 0.7, 0.7, 0xFFFFFFff, mix_soil);
+	y = y + 14;
+
+	return y;
+end
+
 function doAdd(what, count)
 	win = getMixerWin();
 	plusses = findAllImages("plus.png", win);
@@ -122,7 +198,10 @@ function doAdd(what, count)
 		error("Unexpected # of plusses found (" .. #plusses .. ")");
 	end
 
+	local y = 10;
+
 	for i = 1,count do
+		y = 10;
 		checkBreak();
 		safeClick(plusses[what][0] + 2, plusses[what][1] + 2);
 		
@@ -146,11 +225,14 @@ function doAdd(what, count)
 		if lsButtonText(lsScreenX - 110, lsScreenY - 30, 0, 100, 0xFFFFFFff, "End script") then
 			error "Clicked End Script button";
 		end
-		
+
+		readMixerData();
+		displayEcoValues();
+
 		lsDoFrame();
 		lsSleep(50);
 	end
-
+	
 	return count;
 end
 
@@ -168,7 +250,7 @@ function doit()
 		checkBreak();
 
 		win = getMixerWin();
-		soil = getSoilValue(win);
+		readMixerData(win);
 		
 		y = 10;
 		lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "Qty");
@@ -189,9 +271,8 @@ function doit()
 			count = tonumber(count)
 		end
 
-		y = y + 30;
-		lsPrint(10, y, 10, 0.7, 0.7, 0xFFFFFFff, "SOIL: " .. soil);
-
+		displayEcoValues();
+	
 		if lsButtonText(10, lsScreenY - 30, 0, 100, 0x00FF00ff, "ADD IT") and count > 0 then
 			writeSetting("count", count);
 			writeSetting("what", what);
