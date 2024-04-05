@@ -170,7 +170,7 @@ function getTime(fmt)
     which require much more accurate stripping, so the ability to train all characters individually
     is no longer possible without stripping away part of the comma. - T11
   --]]
-  local year, season, month, day, hour, minute, ampm = string.match(str, "Year ?(%d+). (%a+) (%a+)-(%d+). ?(%d+):(%d+)(%a+)");
+  local year, season, month, day, hour, minute, ampm = string.match(str, "Year ?(%d+). (%a+) (%a+)-(%d+). ?(%d+):%s*(%d+)(%a+)");
   if year and season and month and day and hour and minute then
     datetime = "Year " .. year .. ", " .. season .. " " .. month .. "-" .. day .. ", " .. hour .. ":" .. minute .. ampm
     date = season .. " " .. month .. "-" .. day
