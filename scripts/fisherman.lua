@@ -72,7 +72,7 @@ function chooseLure()
 			unpinWindow(win);
 			lsSleep(click_delay);
 			unpinWindow(win);
-			return;
+			return true;
 		end
 		errmsg = "Select Lure Fail";
 		return false;
