@@ -1,7 +1,7 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-askText = "Fisherman\nPin your lure menu like in fishing.lua. Also like fishing.lua, if you have whole fish in inventory and pin your fillet menu (so that Fillet all fish is visible) and if auto-fillet is enabled, will automatically fillet fish as it goes.\n\nThis macro is still a bit experimental."
+askText = "Fisherman\nPin your lure menu like in fishing.lua. Also like fishing.lua, if you have whole fish in inventory and pin your fillet menu (so that Fillet all fish is visible) and if auto-fillet is enabled, will automatically fillet fish as it goes.\n\nThis macro is still a bit experimental.\n\nFly rod selection on menu screen is for logging purposes only. Fishing will use your default fly rod."
 
 rods = { "Simple Fly Rod", "Whisperer's Fly Rod", "Beachcomber's Fly Rod", "Spiderfang Fly Rod", "Whiptail Fly Rod", "Openheart Fly Rod", "Snakespine Fly Rod"};
 commonfish = {"Abdju", "Carp", "Catfish", "Chromis", "Oxyrynchus", "Perch", "Phagrus", "Tilapia"};
@@ -22,6 +22,7 @@ lastChat = {};
 lastFish = nil;
 isfishing = false;
 errmsg = nil;
+doreturn = false;
 
 local waitChars = {"-", "\\", "|", "/"};
 local waitFrame = 1;
@@ -287,12 +288,14 @@ function waitForFishStatus()
 			lsPrint(10, y, z, 0.8, 0.81, 0xffffffff, caughtFish[i]);		
 			y = y + 20;
 		end
-
-		if lsButtonText(10 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
-	    "Menu") then
-	    return "menu";
-	  end
-
+		
+		if not doreturn then
+			if lsButtonText(10 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
+		    "Menu") then
+		    return "menu";
+		  end
+		end
+		
     if lsButtonText((lsScreenX - 100) * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
       "End script") then
       error "Clicked End Script button";
@@ -307,7 +310,7 @@ function waitForFishStatus()
 end
 
 function doFishing()
-	local doreturn = false;
+	doreturn = false;
 	
 	getChatLines();
 
