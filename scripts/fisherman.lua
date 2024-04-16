@@ -277,7 +277,14 @@ function waitForFishStatus()
 	while not chatChanged() do
 		checkBreak();
 
-		local luremsg = "Current lure: " .. currentlure;
+		local luremsg;
+		
+		if maxcasts > 0 then
+			luremsg = "Current lure: " .. currentlure .. " [" .. castsmade .. "/" .. maxcasts .. " casts]";	
+		else
+			luremsg = "Current lure: " .. currentlure .. " [" .. castsmade .. " casts]";
+		end
+		
     local frame = math.floor(waitFrame/5) % #waitChars + 1;
 		local waitmsg = "Waiting for fishing result  " .. waitChars[frame];
 		local y = 20
@@ -351,13 +358,10 @@ function doFishing()
 					isfishing = false
 					return;
 				end
-				logLure();
-				srClickMouseNoMove(fishIcon[0], fishIcon[1]);
-				castsmade = castsmade + 1;
-			else
-				logLure();
-				srClickMouseNoMove(fishIcon[0], fishIcon[1]);
 			end
+			logLure();
+			srClickMouseNoMove(fishIcon[0], fishIcon[1]);
+			castsmade = castsmade + 1;
 			isfishing = true
 		end
 		
