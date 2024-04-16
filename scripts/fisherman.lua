@@ -14,6 +14,8 @@ logfish = true;
 loglure = false;
 logfillet = false;
 debuglog = false;
+maxcasts = 0;
+castsmade = 0;
 
 currentlure = nil;
 lures = {};
@@ -51,6 +53,7 @@ function findLures()
 end
 
 function chooseLure()
+	castsmade = 0;
 	local l = lures[1];
 	srReadScreen();
 	refreshAllWindows();
@@ -156,7 +159,7 @@ function checkCaughtFish(fishtext)
 	db, f = fishtext:match("a (%d+) deben ([%a%s]+).");
 	lastFish = f;
 	local	newCaught = {};
-	newCaught[1] = f .. " (" .. db .. "db) [" .. currentlure .. "]" ;
+	newCaught[1] = db .. "db " .. f .. " [" .. currentlure .. "]" ;
 	
 	if #caughtFish > 0 then
 		local m = math.min(9, #caughtFish);
@@ -202,6 +205,8 @@ function filletFish()
 	
 	srReadScreen();
 	refreshAllWindows();
+	lsSleep(click_delay);
+	srReadScreen();
 	local p;
 	p = findText("Fillet all fish");
 	if p then
@@ -341,8 +346,18 @@ function doFishing()
 				isfishing = false
 				return
 			end
-			logLure();
-			srClickMouseNoMove(fishIcon[0], fishIcon[1]);
+			if maxcasts > 0 then
+				if castsmade >= maxcasts then
+					isfishing = false
+					return;
+				end
+				logLure();
+				srClickMouseNoMove(fishIcon[0], fishIcon[1]);
+				castsmade = castsmade + 1;
+			else
+				logLure();
+				srClickMouseNoMove(fishIcon[0], fishIcon[1]);
+			end
 			isfishing = true
 		end
 		
@@ -386,6 +401,8 @@ function doit()
 	local ll = loglure;
 	local lfi = logfillet;
 	local dl = debuglog;
+	local mc = maxcasts;
+	local allowstart = true;
 	
   while not is_done do
 		checkBreak();
@@ -408,6 +425,27 @@ function doit()
 			writeSetting("flyrod",flyrod);
 		end
 		y = y + 40;
+
+		lsPrint(10, y, z, 1, 1, 0xffffffff, "Max Casts per lure: ");
+		lsPrint(270, y, z, 1, 1, 0xffffffff, "0 = no limit");
+    mc = readSetting("maxcasts",mc);
+    allowstart, mc = lsEditBox("MaxCasts", 190, y, z, 50, 30, scale, scale, countColor or 0x000000ff, mc);
+    mc = tonumber(mc);
+    if not mc then
+    	countColor = 0xFF2020ff;
+    	allowstart = false; 
+    	lsPrint(250, y-3, z+10, 1.3, 1.3, countColor, "!");
+    	lsPrint(190, y+30, z+10, 0.65, 0.65, countColor, "MUST BE A NUMBER");
+    	mc = 0;
+    else
+    	countColor = 0x000000ff;
+    	allowstart = true; 
+    end
+    if mc ~= maxcasts then
+    	maxcasts = mc;
+			writeSetting("maxcasts",maxcasts);
+		end
+		y = y + 60;
 
     f = readSetting("autofillet", f)
     f = lsCheckBox(10, y, z, 0xFFFFFFff, "Automatically Fillet Fish", f);
@@ -448,14 +486,16 @@ function doit()
     	writeSetting("debuglog", debuglog);
     end
 		y = y + 30;
-
-		if lsButtonText(100 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
-      "Start") then
-      errmsg = nil;
-      currentlure = nil;
-      doFishing();
-    end
-
+		
+		if allowstart then
+			if lsButtonText(100 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
+	      "Start") then
+	      errmsg = nil;
+	      currentlure = nil;
+	      doFishing();
+	    end
+		end
+		
     if lsButtonText((lsScreenX - 100) * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
       "End script") then
       error "Clicked End Script button";
