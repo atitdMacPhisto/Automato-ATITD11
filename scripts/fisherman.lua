@@ -36,6 +36,8 @@ end
 function findLures()
 	srReadScreen();
 	refreshAllWindows();
+	lsSleep(click_delay);
+	srReadScreen();
 	local l = findText("Fishing Lure");
 	if not l then
 		errmsg = "Out of lures";
@@ -57,6 +59,8 @@ function chooseLure()
 	local l = lures[1];
 	srReadScreen();
 	refreshAllWindows();
+	lsSleep(click_delay);
+	srReadScreen();
 	local p = findText(l);
 	if not p then
 		errmsg = "Find Lure Fail;";
