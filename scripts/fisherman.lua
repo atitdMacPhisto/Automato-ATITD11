@@ -5,32 +5,55 @@ askText = "Fisherman\nPin your lure menu like in fishing.lua. Also like fishing.
 
 rods = { "Simple Fly Rod", "Whisperer's Fly Rod", "Beachcomber's Fly Rod", "Spiderfang Fly Rod", "Whiptail Fly Rod", "Openheart Fly Rod", "Snakespine Fly Rod"};
 commonfish = {"Abdju", "Carp", "Catfish", "Chromis", "Oxyrynchus", "Perch", "Phagrus", "Tilapia"};
-validlines = {"Caught", "you did catch", "You produced", "You didn't catch anything", "line got wrapped around", "almost caught", "found part"}
-failmsgs = {"You didn't catch anything", "line got wrapped around", "almost caught", "found part"};
 
 flyrod = 1;
 autofillet = false;
 logfish = true;
 loglure = false;
 logfillet = false;
-debuglog = false;
 maxcasts = 0;
 castsmade = 0;
+isfishing = false;
 
 currentlure = nil;
 lures = {};
 caughtFish = {};
-lastChat = {};
-lastFish = nil;
-isfishing = false;
-errmsg = nil;
-doreturn = false;
+
+CAUGHTFISH = 1;
+FISHMENU = 2;
+CASTFAIL = 4;
+
+validlines = {"Caught ", "You didn't catch anything", "line got wrapped around", "almost caught", "found part", "you did catch"};
 
 local waitChars = {"-", "\\", "|", "/"};
 local waitFrame = 1;
 
+OR, XOR, AND = 1, 3, 4
+
 function trim(s)
 	return string.match( s, "^()%s*$" ) and "" or string.match( s, "^%s*(.*%S)" )
+end
+
+function checkIfMain(chatText)
+--	lsPrintln("function checkIfMain");
+  for j = 1, #chatText do
+    if string.find(chatText[j][2], "^%*%*", 0) then
+      return true;
+    end
+  end
+  return false;
+end
+
+function getChatLine(validtext)
+--	lsPrintln("function getChatLine");
+	local chatText = getChatText();
+	while not (checkIfMain(chatText)) do
+		sleepWithStatus(1000, "Please selec the main chat tab so we can determine last chat line.");
+		srReadScreen();
+		chatText = getChatText();
+	end
+	local s = chatText[#chatText][2];
+	return s:match("%]%s*([%w%s%p]+)");
 end
 
 function findLures()
@@ -55,6 +78,7 @@ function findLures()
 end
 
 function chooseLure()
+	findLures();
 	castsmade = 0;
 	local l = lures[1];
 	srReadScreen();
@@ -92,73 +116,140 @@ function chooseLure()
 	return true;
 end
 
-function checkIfMain(chatText)
-  for j = 1, #chatText do
-    if string.find(chatText[j][2], "^%*%*", 0) then
-      return true;
-    end
-  end
-  return false;
+function logLure()
+	if loglure then
+		local t = getTime(1);
+		local r = getRegion();
+		if not t then
+			t = "----";
+		end
+		local f = io.open("fisherman_lures.txt","a");
+		f:write(t .. "\t" .. r .. "\t" .. currentlure .. "\n");
+		f:close();
+	end
 end
 
-function getChatLines()
-	srReadScreen();
-	chatText = getChatText();
-	while not (checkIfMain(chatText)) do
-		sleepWithStatus(1000, "Please selec the main chat tab so we can determine last chat line.");
-		srReadScreen();
-		chatText = getChatText();
+function logFish(db, fish)
+	if logfish then
+		local t = getTime(1);
+		local r = getRegion();
+		local loc = findCoords();
+		local f = io.open("fisherman.txt","a");
+		f:write(t .. "\t" .. r .. "\t" .. loc[0] .. "\t" .. loc[1] .. "\t" .. rods[flyrod] .. "\t" .. currentlure .. "\t" .. fish .. "\t" .. db .. "\n");
+		f:close();
 	end
-	lastChat = {}
-	local i;
-	for i = 1, #chatText do
-		local s = chatText[i][2];
-		for j = 1, #validlines do
-			if s:find(validlines[j]) then
-				local s2 = s:match("%]%s([%w%s%p]+)");
-				lastChat[#lastChat+1] = s2;
+end
+
+function logFillet(meat, roe, oil, rmeat)
+	if logfillet then
+		if lastFish then
+			local t = getTime("date");
+			local d = t:match("([%a%s]+)-[%d]");
+			local f = io.open("fisherman_fillet.txt","a");
+			f:write(d .. "\t" .. lastFish .. "\t" .. meat .. "\t" .. roe .. "\t" .. oil .. "\t" .. rmeat .. "\n");
+			f:close();
+		end
+	end
+end
+
+function doTimestamp()
+--	lsPrintln("function doTimestamp");
+	srReadScreen();
+	local chatmin = srFindImage("chat/chat_min.png");
+	if chatmin then
+		srCharEvent("\n");
+		srReadScreen();
+		waitForNoImage("chat/chat_min.png");
+	end
+	srCharEvent("/time\n");
+	lsSleep(click_delay);
+	srReadScreen();
+	if chatmin then
+		srCharEvent("\n");
+		srReadScreen();
+		waitForImage("chat/chat_min.png");
+	end
+end
+
+function filletFish(dofillet)
+--	lsPrintln("function filletFish");
+--	lsPrintln(dofillet);
+	if not autofillet then
+		doTimestamp();
+		return;
+	end
+	
+--	lsPrintln("bitoper: filletFish");
+	if dofillet and dofillet > 0 then
+--		lsPrintln("doing fillet");
+		local p = nil;
+		local s = nil;
+		
+		while not p do
+			checkBreak();
+			srReadScreen();
+			clickAllImages("WindowEmpty.png", 5, 5, nil, nil);
+			lsSleep(click_delay);
+			srReadScreen();
+--			refreshAllWindows();
+			p = findText("Fillet all fish");
+			if not p then
+				p = findText("All Fish");
 			end
 		end
-	end
-end
-
-function chatChanged()
-	local oldChat 
-	oldChat = lastChat;
-	srReadScreen();
-	getChatLines();
-	local mincount = math.min(#oldChat, #lastChat);
-	local i
-	for i = 0, mincount - 1 do
-		if lastChat[#lastChat - i] ~= oldChat[#oldChat - i] then
-			logFishDebug();
-			return true;
+--		lsPrintln("fillet all fish found");
+		clickText(p);
+		
+		while p do
+			checkBreak();
+			local win = getWindowBorders(p[0], p[1]);
+			srClickMouseNoMove(win.x + 5, win.y+5);
+			lsSleep(click_delay);
+			srReadScreen();
+--			refreshAllWindows();
+			p = findText("Fillet all fish");
+			if not p then
+				p = findText("All Fish");
+			end
 		end
+		
+		local filletText = nil;
+		while not filletText do
+			checkBreak();
+			lsSleep(click_delay);
+			srReadScreen();
+			s = getChatLine();
+			if s:find("You produced") then
+				filletText = s;
+			end
+		end
+		
+		local m, r, o, rm = filletText:match("(%d+) Meat, (%d+) Roe, (%d+) Fish Oil and (%d+) Rotten Meat");
+		logFillet(m, r, o, rm);
+	else
+		doTimestamp();
 	end
-	if #lastChat > #oldChat then
-		logFishDebug();
-		return true;
-	end
-	return false;
 end
 
 function checkCommonFish(fishtext)
+--	lsPrintln("function checkCommonFish");
 	local i;
 	for i = 1, #commonfish do
 		if fishtext:find(commonfish[i]) then
 			lastFish = nil;
-			isfishing = false;
-			return true;
+--			isfishing = false;
+			return 1;
 		end
 	end
-	return false;
+	return 0;
 end
 
 function checkCaughtFish(fishtext)
+--	lsPrintln("function checkCaughtFish");
 	local db, f
 	
-	if not fishtext:find("Caught a") and not fishtext:find("catch a") then 
-		return false
+	if not fishtext:find("Caught a") and not fishtext:find("did catch a") then 
+		return 0
 	end
 	db, f = fishtext:match("a (%d+) deben ([%a%s]+).");
 	lastFish = f;
@@ -175,11 +266,12 @@ function checkCaughtFish(fishtext)
 	caughtFish = newCaught;
 	
 	logFish(db, f);
-	isfishing = false;
-	return true;
+--	isfishing = false;
+	return 1;
 end
 
 function checkLostLure(fishtext)
+--	lsPrintln("function checkLostLure");
 --	if fishtext:find("The Fishing Lure") then
 --		if fishtext:find("falls apart, it is unable to do any more work") then
 --			return true
@@ -191,98 +283,103 @@ function checkLostLure(fishtext)
 	return false;
 end
 
-function checkFailCast(fishtext)
-	local i;
-	for i = 1, #failmsgs do
-		if fishtext:find(failmsgs[i]) then
-			isfishing = false;
-			return true;
-		end
-	end
-	return false;
-end
-
-function filletFish()
-	if not autofillet then
-		return;
+function getFishingResult()
+--	lsPrintln("function getFishingResult");
+	local result = 0;
+	srReadScreen();
+	local chatText = getChatText();
+	while not (checkIfMain(chatText)) do
+		checkBreak();
+		sleepWithStatus(1000, "Please selec the main chat tab so we can determine last chat line.");
+		srReadScreen();
+		chatText = getChatText();
 	end
 	
-	srReadScreen();
-	refreshAllWindows();
-	lsSleep(click_delay);
-	srReadScreen();
-	local p;
-	p = findText("Fillet all fish");
-	if p then
-		clickText(p);
-		srReadScreen();
-		while not chatChanged() do
-			checkBreak();
-			lsSleep(click_delay);
+	local i, j;
+	for i = #chatText, 1, -1 do
+		local s = chatText[i][2];
+		local s2 = s:match("%]%s*([%w%s%p]+)");
+--		lsPrintln(s2);
+		if s2:find("You produced") or s2:find("Year") then
+			return nil;
+		end
+		
+		for j = 1, #validlines do
+			if s2:find(validlines[j]) then
+				return s2;
+			end
+		end
+		
+		return nil;
+	end
+	
+	return nil;
+end
+
+function fishingTick()
+--	lsPrintln("fishingTick");
+	local dofillet = 0;
+	
+	if not isfishing then
+		if currentlure then
+			if maxcasts > 0 then
+				if castsmade >= maxcasts then
+					isfishing = false
+					return;
+				end
+			end
 			srReadScreen();
+			local fishIcon = findImage("Fishing/fishicon.png");
+			while not fishIcon do
+				sleepWithStatus(2000, "You are not in range of water...");
+				srReadScreen();
+				fishIcon = findImage("Fishing/fishicon.png");
+			end
+			logLure();
+			srClickMouseNoMove(fishIcon[0], fishIcon[1]);
+			castsmade = castsmade + 1;
+			isfishing = true
+			return;
 		end
-		if lastFish then
-			local s = lastChat[#lastChat];
-			local m, r, o, rm = s:match("(%d+) Meat, (%d+) Roe, (%d+) Fish Oil and (%d+) Rotten Meat");
-			logFillet(m, r, o, rm);
+	else
+		local fishingResult = getFishingResult();
+		if not fishingResult then
+			return
 		end
-		refreshAllWindows();
-		getChatLines();
---		logFishDebug();
-	end
-end
 
-function logFish(db, fish)
-	if logfish then
-		local t = getTime(1);
-		local r = getRegion();
-		local loc = findCoords();
-		local f = io.open("fisherman.txt","a");
-		f:write(t .. "\t" .. r .. "\t" .. loc[0] .. "\t" .. loc[1] .. "\t" .. rods[flyrod] .. "\t" .. currentlure .. "\t" .. fish .. "\t" .. db .. "\n");
-		f:close();
-	end
-end
-
-function logFishDebug()
-	if debuglog then
-		local f = io.open("fisherman_debug.txt","a");
-		f:write(lastChat[#lastChat] .. "\n");
-		f:close();
-	end
-end
-
-function logLure()
-	if loglure then
-		local t = getTime(1);
-		local r = getRegion();
-		if not t then
-			t = "----";
+	--	lsPrintln(fishingResult);
+		
+		dofillet = dofillet + checkCommonFish(fishingResult);
+		dofillet = dofillet + checkCaughtFish(fishingResult);
+		if checkLostLure(fishingResult) then
+			chooseLure();
 		end
-		local f = io.open("fisherman_lures.txt","a");
-		f:write(t .. "\t" .. r .. "\t" .. currentlure .. "\n");
-		f:close();
+		
+		filletFish(dofillet);
+		
+		isfishing = false;
 	end
 end
 
-function logFillet(meat, roe, oil, rmeat)
-	if logfillet then
-		if lastFish then
-			local f = io.open("fisherman_fillet.txt","a");
-			f:write(lastFish .. "\t" .. meat .. "\t" .. roe .. "\t" .. oil .. "\t" .. rmeat .. "\n");
-			f:close();
-		end
+function fishingLoop()
+	isfishing = false;
+	errmsg = nil;
+	
+--	lsPrintln("function doFishing");
+	if not findLures() then
+		return;
 	end
-end
 
-function waitForFishStatus()
+	chooseLure();
+	
 	local scale = 1.4;
   local z = 0;
-
-	while not chatChanged() do
+	local domenu = false;
+	
+	while (1) do	
 		checkBreak();
 
 		local luremsg;
-		
 		if maxcasts > 0 then
 			luremsg = "Current lure: " .. currentlure .. " [" .. castsmade .. "/" .. maxcasts .. " casts]";	
 		else
@@ -305,100 +402,33 @@ function waitForFishStatus()
 			y = y + 20;
 		end
 		
-		if not doreturn then
-			if lsButtonText(10 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
-		    "Menu") then
-		    return "menu";
+		if not domenu then
+			if lsButtonText(10 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff, "Menu") then
+		    domenu = true;
 		  end
 		end
-		
+
     if lsButtonText((lsScreenX - 100) * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
       "End script") then
       error "Clicked End Script button";
     end
-
+		
+		if not isfishing and (errmsg or domenu or (maxcasts > 0 and castsmade >= maxcasts)) then
+			return;
+		end
+		
     lsDoFrame();
     lsSleep(100);
     waitFrame = waitFrame + 1;
-	end
-	
-	return lastChat[#lastChat];
-end
-
-function doFishing()
-	doreturn = false;
-	
-	getChatLines();
-
-	if not findLures() then
-		return;
-	end
-	
-	while (1) do
-		checkBreak();
-
-		if not currentlure then
-			if not chooseLure() then
-				isfishing = false
-				return;
-			end
-		end
-		
-		srReadScreen();
-		local fishIcon = findImage("Fishing/fishicon.png");
-		while not fishIcon do
-			sleepWithStatus(2000, "You are not in range of water...");
-			srReadScreen();
-			fishIcon = findImage("Fishing/fishicon.png");
-		end
-		
-		if not isfishing then
-			if doreturn then
-				isfishing = false
-				return
-			end
-			if maxcasts > 0 then
-				if castsmade >= maxcasts then
-					isfishing = false
-					return;
-				end
-			end
-			logLure();
-			srClickMouseNoMove(fishIcon[0], fishIcon[1]);
-			castsmade = castsmade + 1;
-			isfishing = true
-		end
-		
-		local fishingStatus = waitForFishStatus();
-		
-		if fishingStatus == "menu" then
-			doreturn = true;
-		end
-		
-		if isfishing then
-			if not checkFailCast(fishingStatus) then
-				if checkCommonFish(fishingStatus) or checkCaughtFish(fishingStatus) then
-					filletFish();
-					if checkLostLure(fishingStatus) then
-						if not findLures() then
-							doreturn = true;
-						else
-							if not chooseLure() then
-								doreturn = true;
-							end
-						end
-					end
-				end
-			end
-		end
-
-    lsDoFrame();
+    fishingTick();
 	end
 end
 
 function doit()
 	askForWindow(askText)
 	srReadScreen();
+	
+	doTimestamp();
 	
 	local scale = 1.4;
   local z = 0;
@@ -408,7 +438,6 @@ function doit()
 	local lf = logfish;
 	local ll = loglure;
 	local lfi = logfillet;
-	local dl = debuglog;
 	local mc = maxcasts;
 	local allowstart = true;
 	
@@ -487,20 +516,12 @@ function doit()
     end
 		y = y + 30;
 
-		dl = readSetting("debuglog", dl)
-    dl = lsCheckBox(10, y, z, 0xFFFFFFff, "Debug Log", dl);
-    if dl ~= debuglog then
-    	debuglog = dl;
-    	writeSetting("debuglog", debuglog);
-    end
-		y = y + 30;
-		
 		if allowstart then
 			if lsButtonText(100 * scale, (lsScreenY - 30) * scale, z, 100, 0xFFFFFFff,
 	      "Start") then
 	      errmsg = nil;
 	      currentlure = nil;
-	      doFishing();
+	      fishingLoop();
 	    end
 		end
 		
@@ -513,4 +534,3 @@ function doit()
     lsSleep(100);
 	end
 end
-                                                           
